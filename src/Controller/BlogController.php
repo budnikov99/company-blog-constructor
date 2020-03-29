@@ -3,12 +3,17 @@ namespace App\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
 
-class BlogController
+class BlogController 
 {
     public function index()
     {
         return new Response(
-            '<html><body>Hello world!</body></html>'
+            '<html><head>
+            <link rel=\'stylesheet\' href=\'theme/style/dummy.css\'>
+            <script src=\'theme/script/dummy.js\'></script>
+            </head><body>
+            Hello world! '.SERVER_ROOT.'
+            </body></html>'
         );
     }
 }

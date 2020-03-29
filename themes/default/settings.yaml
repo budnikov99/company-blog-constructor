@@ -1,0 +1,8 @@
+blocks:
+  top-menu:
+    active: true
+    allowed-modules:
+      - menu
+    module: 
+      type: menu
+      menu: 'nav-menu'
