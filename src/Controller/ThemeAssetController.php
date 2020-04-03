@@ -4,12 +4,9 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Yaml\Yaml;
+use App\services\ThemeManager;
 
-class Theme extends AbstractController {
-
-    var $active_theme = 'default';
-    var $theme_dir = SERVER_ROOT.'\\themes\\default\\';
-
+class ThemeAssetController extends AbstractController {
     public function __construct()
     {
         $theme_settings = Yaml::parseFile(SERVER_ROOT.'\\themes\\theme.yaml');
@@ -17,31 +14,32 @@ class Theme extends AbstractController {
         $this->theme_dir = SERVER_ROOT.'\\themes\\'.$this->active_theme.'\\';
     }
 
-    public function loadFile($path){
-        if(file_exists($path)){
-            return file_get_contents($path);
+    public function loadAssetFile(ThemeManager $theme, $path){
+        $asset = $theme->getAssetFile($path);
+        if(!is_null($asset)){
+            return $asset;
         }else{
             throw $this->createNotFoundException('Requested file does not exist.');
         }
     }
 
-    public function getScript($filename){
+    public function getScript(ThemeManager $theme, $filename){
         $response = new Response();
         $response->headers->set('Content-Type', 'application/javascript');
 
-        $response_file = $this->theme_dir.'script\\'.$filename;
+        $response_file = 'script\\'.$filename;
 
-        $response->setContent($this->loadFile($response_file));
+        $response->setContent($this->loadAssetFile($theme, $response_file));
         return $response;
     }
 
-    public function getStylesheet($filename){
+    public function getStylesheet(ThemeManager $theme, $filename){
         $response = new Response();
         $response->headers->set('Content-Type', 'text/css');
 
-        $response_file = $this->theme_dir.'style\\'.$filename;
+        $response_file = 'style\\'.$filename;
 
-        $response->setContent($this->loadFile($response_file));
+        $response->setContent($this->loadAssetFile($theme, $response_file));
         return $response;
     }
 

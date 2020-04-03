@@ -1,8 +1,32 @@
 blocks:
   top-menu:
     active: true
-    allowed-modules:
+    accepted-formats:
       - menu
     module: 
       type: menu
       menu: 'nav-menu'
+  left-sidebar1:
+    active: true
+    accepted-formats:
+      - list
+      - menu
+      - form
+    module:
+      type: none
+  left-sidebar2:
+    active: false
+    accepted-formats:
+      - list
+      - menu
+      - form
+    module:
+      type: none
+  left-sidebar3:
+    active: false
+    accepted-formats:
+      - list
+      - menu
+      - form
+    module:
+      type: none

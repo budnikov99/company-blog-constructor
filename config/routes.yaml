@@ -4,8 +4,8 @@ index:
 
 theme_script:
     path: theme/script/{filename}
-    controller: App\Controller\Theme::getScript
+    controller: App\Controller\ThemeAssetController::getScript
 
 theme_style:
     path: theme/style/{filename}
-    controller: App\Controller\Theme::getStylesheet
+    controller: App\Controller\ThemeAssetController::getStylesheet
