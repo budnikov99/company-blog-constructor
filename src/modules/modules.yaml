@@ -24,32 +24,7 @@
 #Остальные поля произвольны и передаются в php-метод из файла настроек активной темы.
 #Php метод должен иметь один аргумент, в который будет передаваться массив параметров
 
-none:
-  format: text
-  data: App\modules\None
 
-menu: 
-  format: menu
-  data: 
-  menu: 'menu-name'
 
-form:
-  format: form
-  data: 
-  form: 'form-name'
-
-search:
-  format: form
-  data: 
-
-image:
-  format: image
-  data: 
-  src: 'img-src'
-  
-widget:
-  format: object
-  data: 
-  widget: 'widget-name'
 
 

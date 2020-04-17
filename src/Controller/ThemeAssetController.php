@@ -27,7 +27,7 @@ class ThemeAssetController extends AbstractController {
         $response = new Response();
         $response->headers->set('Content-Type', 'application/javascript');
 
-        $response_file = 'script\\'.$filename;
+        $response_file = 'js\\'.$filename;
 
         $response->setContent($this->loadAssetFile($theme, $response_file));
         return $response;
@@ -37,10 +37,12 @@ class ThemeAssetController extends AbstractController {
         $response = new Response();
         $response->headers->set('Content-Type', 'text/css');
 
-        $response_file = 'style\\'.$filename;
+        $asset = $theme->getStyle($filename);
+        if(is_null($asset)){
+            throw $this->createNotFoundException('Requested file does not exist.');
+        }
 
-        $response->setContent($this->loadAssetFile($theme, $response_file));
+        $response->setContent($asset);
         return $response;
     }
-
 }

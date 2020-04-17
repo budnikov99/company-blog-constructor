@@ -2,31 +2,33 @@ blocks:
   top-menu:
     active: true
     accepted-formats:
-      - menu
+      - MenuFormat
     module: 
-      type: menu
+      module: menu
       menu: 'nav-menu'
+    settings:
+      color:
   left-sidebar1:
     active: true
     accepted-formats:
-      - list
-      - menu
-      - form
+      - ListFormat
+      - MenuFormat
+      - FormFormat
     module:
-      type: none
+      module: null
   left-sidebar2:
     active: false
     accepted-formats:
-      - list
-      - menu
-      - form
+      - ListFormat
+      - MenuFormat
+      - FormFormat
     module:
-      type: none
+      module: null
   left-sidebar3:
     active: false
     accepted-formats:
-      - list
-      - menu
-      - form
+      - ListFormat
+      - MenuFormat
+      - FormFormat
     module:
-      type: none
+      module: null

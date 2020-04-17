@@ -1,18 +1,46 @@
 <?php
 namespace App\modules;
 
+use App\formats\FormatException;
+use App\formats\Format;
+
 abstract class Module {
-    private $format = null;
+    
+    private $format = '';
+    private $arglist = array();
 
-    public function __construct()
+    public function __construct($format, $arglist)
     {
-        
+        $this->format = $format;
+        foreach($arglist as $name => $data){
+            $this->arglist[$name] = new ModuleArgument($this, $name, $data['type'], $data['required']);    
+        }
     }
 
-    public function getData(){
-        
+    public function getFormat(){
+        return $this->format;
     }
 
-    abstract public function generateData();
+    public function getData($args){
+        $data = $this->generateData($args);
+        if(!is_subclass_of($data, Format::class)){
+            throw new FormatException('Модуль вернул неожиданное значение '.gettype($data));
+        }
+
+        if($data->getFormatName() != $this->format){
+            throw new FormatException('Ожидаются данные в формате '.$this->format.', получен '.$data->getFormatName());
+        }
+
+        return $data->getData();
+    }
+
+    public function getArgument($name){
+        if(array_key_exists($name, $this->arglist)){
+            return $this->arglist[$name];
+        }
+        return null;
+    }
+
+    abstract protected function generateData($args);
 
 }

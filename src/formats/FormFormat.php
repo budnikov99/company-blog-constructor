@@ -4,9 +4,9 @@ namespace App\formats;
 use App\formats\Format;
 
 class FormFormat extends Format {
-    private $inputs = array();
-    private $action = '';
-    private $title = '';
+    public $inputs = array();
+    public $action = '';
+    public $title = '';
 
     /**
      * Добавляет новый инпут в форму.
@@ -29,8 +29,4 @@ class FormFormat extends Format {
         $this->action = $action;
     }
 
-    protected function toData()
-    {
-        return array('action' => $this->action, 'title' => $this->title, 'inputs' => $this->inputs);
-    }
 }

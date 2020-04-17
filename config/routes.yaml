@@ -3,9 +3,10 @@ index:
     controller: App\Controller\BlogController::index
 
 theme_script:
-    path: theme/script/{filename}
+    path: theme/js/{filename}
     controller: App\Controller\ThemeAssetController::getScript
 
 theme_style:
-    path: theme/style/{filename}
+    path: theme/css/{filename}
     controller: App\Controller\ThemeAssetController::getStylesheet
+

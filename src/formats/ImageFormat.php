@@ -4,8 +4,8 @@ namespace App\formats;
 use App\formats\Format;
 
 class ImageFormat extends Format {
-    private $url = '';
-    private $title = '';
+    public $url = '';
+    public $title = '';
 
     public function setUrl($url){
         $this->url = $url;
@@ -15,8 +15,4 @@ class ImageFormat extends Format {
         $this->title = $title;
     }
 
-    protected function toData()
-    {
-        return array('url' => $this->url, 'title' => $this->title);
-    }
 }

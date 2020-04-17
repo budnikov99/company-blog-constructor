@@ -65,6 +65,12 @@
     "psr/log": {
         "version": "1.1.2"
     },
+    "scssphp/scssphp": {
+        "version": "1.0.9"
+    },
+    "scssphp/server": {
+        "version": "1.0.9"
+    },
     "sensio/framework-extra-bundle": {
         "version": "5.2",
         "recipe": {

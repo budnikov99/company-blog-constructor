@@ -4,7 +4,7 @@ namespace App\formats;
 use App\formats\Format;
 
 class MenuFormat extends Format {
-    private $items = array();
+    public $items = array();
 
     public function addItem($text, $url){
         $this->items[] = array('text' => $text, 'url' => $url);
@@ -24,8 +24,4 @@ class MenuFormat extends Format {
         return true;
     }
 
-    protected function toData()
-    {
-        return $this->items;
-    }
 }
