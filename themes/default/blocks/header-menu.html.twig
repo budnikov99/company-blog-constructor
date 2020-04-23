@@ -1,0 +1,26 @@
+<div class="header-menu">
+    {% for item in data.items %}
+        <div class="header-menu__item">
+            {% if item.url == null %}
+                <p class="menu-item-text">{{item.text|e}}</p>
+            {% else %}
+                <a class="menu-item-text" href="{{item.url}}">{{item.text|e}}</a>
+            {% endif %}
+            {% if item.children %}
+                <div class="header-menu__submenu">
+                    <div class="header-menu">
+                        {% for child in item.children %}
+                            <div class="header-menu__item">
+                                {% if child.url == null %}
+                                    <p class="menu-item-text">{{child.text|e}}</p>
+                                {% else %}
+                                    <a class="menu-item-text" href="{{child.url}}">{{child.text|e}}</a>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    {% endfor %}
+</div>

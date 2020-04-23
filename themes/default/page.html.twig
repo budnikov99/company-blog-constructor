@@ -1,11 +1,50 @@
 <html>
     <head>
         <link rel="stylesheet" href="/theme/css/reset.css">
-        <link rel="stylesheet" href="/theme/css/bundle.scss">
+        <link rel="stylesheet" href="/theme/css/base.scss">
+
+
     </head>
     <body>
-        <div class="test">
-            Hello, world!
+        {% if blocks.header_image is defined and blocks.header_image.active %}
+            {{ include('blocks/header-image.html.twig', {'data': blocks.header_image.data}, with_context = false) }}
+        {% endif %}
+        <div class="sticky">
+            {% if blocks.header_menu is defined and blocks.header_menu.active %}
+                {{ include('blocks/header-menu.html.twig', {'data': blocks.header_menu.data}, with_context = false) }}
+            {% endif %}   
         </div>
+        <script src="/theme/js/stickyfill.min.js"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                let elements = document.getElementsByClassName('sticky');
+                Stickyfill.add(elements);
+            });
+        </script>
+        <div class="content-container">
+            <div class="left-sidebar">
+                {% if blocks.left_sidebar1 is defined and blocks.left_sidebar1.active %}
+                    {{ include('blocks/left-sidebar.html.twig', {'data': blocks.left_sidebar1.data}, with_context = false) }}
+                {% endif %}  
+                {% if blocks.left_sidebar1 is defined and blocks.left_sidebar1.active %}
+                    {{ include('blocks/left-sidebar.html.twig', {'data': blocks.left_sidebar1.data}, with_context = false) }}
+                {% endif %}
+                {% if blocks.left_sidebar1 is defined and blocks.left_sidebar1.active %}
+                    {{ include('blocks/left-sidebar.html.twig', {'data': blocks.left_sidebar1.data}, with_context = false) }}
+                {% endif %}
+                {% if blocks.left_sidebar1 is defined and blocks.left_sidebar1.active %}
+                    {{ include('blocks/left-sidebar.html.twig', {'data': blocks.left_sidebar1.data}, with_context = false) }}
+                {% endif %}
+                {% if blocks.left_sidebar1 is defined and blocks.left_sidebar1.active %}
+                    {{ include('blocks/left-sidebar.html.twig', {'data': blocks.left_sidebar1.data}, with_context = false) }}
+                {% endif %}
+            </div>
+            <div class="content">
+                ergegeg <br> fdsgergeg
+            </div>
+        </div>
+        <footer>
+            FOOTER
+        </footer>
     </body>
 </html>

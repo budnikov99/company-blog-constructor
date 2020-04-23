@@ -6,18 +6,14 @@ use App\formats\Format;
 class MenuFormat extends Format {
     public $items = array();
 
-    public function addItem($text, $url){
+    public function addItem($url, $text){
         $this->items[] = array('text' => $text, 'url' => $url);
         return count($this->items)-1;
     }
 
-    public function addChild($index, $text, $url){
+    public function addChild($index, $url, $text){
         if($index < 0 || $index >= count($this->items)){
             return false;
-        }
-
-        if(!isset($this->items[$index]['children'])){
-            $this->items[$index]['children'] = array();
         }
 
         $this->items[$index]['children'][] = array('text' => $text, 'url' => $url);

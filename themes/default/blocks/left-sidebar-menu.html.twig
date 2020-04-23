@@ -1,0 +1,26 @@
+<div class="left-sidebar__menu left-sidebar__block">
+    {% for item in data.items %}
+        <div class="left-sidebar__menu__item">
+            {% if item.children %}
+                <div class="left-sidebar__submenu">
+                    <div class="left-sidebar__menu left-sidebar__block">
+                        {% for child in item.children %}
+                            <div class="left-sidebar__menu__item">
+                                {% if child.url == null %}
+                                    <p class="menu-item-text">{{child.text|e}}</p>
+                                {% else %}
+                                    <a class="menu-item-text" href="{{child.url}}">{{child.text|e}}</a>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+            {% if item.url == null %}
+                <p class="menu-item-text">{{item.text|e}}</p>
+            {% else %}
+                <a class="menu-item-text" href="{{item.url}}">{{item.text|e}}</a>
+            {% endif %}
+        </div>
+    {% endfor %}
+</div>

@@ -1,34 +1,18 @@
+main_template: 'page.html.twig'
 blocks:
-  top-menu:
+  header_menu:
     active: true
-    accepted-formats:
+    accepted_formats:
       - MenuFormat
     module: 
       module: menu
       menu: 'nav-menu'
-    settings:
-      color:
-  left-sidebar1:
+  left_sidebar1:
     active: true
-    accepted-formats:
-      - ListFormat
+    accepted_formats:
+      - TextFormat
       - MenuFormat
       - FormFormat
     module:
-      module: null
-  left-sidebar2:
-    active: false
-    accepted-formats:
-      - ListFormat
-      - MenuFormat
-      - FormFormat
-    module:
-      module: null
-  left-sidebar3:
-    active: false
-    accepted-formats:
-      - ListFormat
-      - MenuFormat
-      - FormFormat
-    module:
-      module: null
+      module: menu
+      menu: 'nav-menu'

@@ -10,3 +10,6 @@ theme_style:
     path: theme/css/{filename}
     controller: App\Controller\ThemeAssetController::getStylesheet
 
+img:
+    path: img/{filename}
+    controller: App\Controller\UploadedImageController::getImage

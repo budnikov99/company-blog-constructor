@@ -5,14 +5,14 @@ use App\formats\Format;
 
 class ImageFormat extends Format {
     public $url = '';
-    public $title = '';
+    public $alt = '';
 
     public function setUrl($url){
         $this->url = $url;
     }
 
-    public function setTitle($title){
-        $this->title = $title;
+    public function setAlt($alt){
+        $this->title = $alt;
     }
 
 }

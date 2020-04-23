@@ -10,12 +10,13 @@ class ModuleArgument {
     public $module = null;
 
     public $name = '';
+    public $title = '';
     public $type = '';
     public $validator = null;
     public $valuelist = null;
     public $required = false;
 
-    public function __construct(Module $module, $name, $type, $required){
+    public function __construct(Module $module, $name, $type, $title, $required){
         if(!in_array($type, array(ModuleArgument::$TYPE_LIST, 
                             ModuleArgument::$TYPE_STRING, 
                             ModuleArgument::$TYPE_NUMBER, 
@@ -26,6 +27,7 @@ class ModuleArgument {
 
         $this->module = $module;
         $this->name = $name;
+        $this->title = $title ?: $module;
         $this->type = $type;
         $this->required = $required;
 

@@ -39,6 +39,10 @@ class ThemeManager {
     public function getStyle($filename){
         $dir = $this->theme_dir.'assets\\css\\';
         
+        if(substr($filename, -6) == '.cache'){
+            $filename = substr($filename, 0, -6);
+        }
+
         if(!file_exists($dir.$filename)){
             return null;
         }
@@ -67,6 +71,10 @@ class ThemeManager {
     }
 
     public function getMainTemplate(){
-        return $this->active_theme.'\\page.html.twig';
+        return $this->page_settings['main_template'];
+    }
+
+    public function getThemeDir(){
+        return $this->theme_dir;
     }
 }

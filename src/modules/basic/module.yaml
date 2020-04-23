@@ -1,6 +1,7 @@
 menu: 
   format: MenuFormat
   class: MenuModule
+  title: 'Меню'
   args:
     menu:                     #может существовать метод menuValidate($value), проверяющий корректность, иначе, любое значение корректно
       type: list              #string(поле), list(список), number(число) или boolean(галочка)
@@ -9,4 +10,5 @@ menu:
                               #если menuValidate($val) не определён, всегда будет возвращаться true, но в случае с типом list,
                               #true будет возвращаться только если полученное значение содержится в списке
       required: true          #является ли аргумент обязательным
+      title: 'Отображаемое меню'
 
