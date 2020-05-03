@@ -1,0 +1,27 @@
+main_template: 'page.html.twig'
+blocks:
+  header_image:
+    multiple: false
+    accepted_formats:
+      - ImageFormat
+  header_menu:
+    multiple: false
+    accepted_formats:
+      - MenuFormat
+  left_sidebar:
+    multiple: true
+    accepted_formats:
+      - TextFormat
+      - TextListFormat
+      - ButtonListFormat
+      - MenuFormat
+      - FormFormat
+  footer_copyright:
+    multiple: false
+    accepted_formats:
+      - TextFormat
+
+supported_content_types:
+  - basic\static
+  - basic\post
+  - basic\posts

@@ -8,7 +8,7 @@ use Symfony\Component\Yaml\Yaml;
 class ThemeManager {
     private $active_theme = null;
     private $theme_dir = null;
-    private $page_settings = null;
+    private $theme_data = null;
 
     public function __construct()
     {
@@ -19,7 +19,7 @@ class ThemeManager {
         $this->active_theme = $theme_settings['active-theme'];
         $this->theme_dir = SERVER_ROOT.'\\themes\\'.$this->active_theme.'\\';
 
-        $this->page_settings = Yaml::parseFile($this->theme_dir.'settings.yaml');
+        $this->theme_data = Yaml::parseFile($this->theme_dir.'theme.yaml');
 
         return true;
     }
@@ -34,6 +34,10 @@ class ThemeManager {
 
     public function getAssetFile($filename){
         return $this->loadFile($this->theme_dir.'assets\\'.$filename);
+    }
+
+    public function getAssetMimeType($filename){
+        return mime_content_type($this->theme_dir.'assets\\'.$filename);
     }
 
     public function getStyle($filename){
@@ -66,12 +70,12 @@ class ThemeManager {
         }
     }
 
-    public function getSettings(){
-        return $this->page_settings;
+    public function getThemeData(){
+        return $this->theme_data;
     }
 
     public function getMainTemplate(){
-        return $this->page_settings['main_template'];
+        return $this->theme_data['main_template'];
     }
 
     public function getThemeDir(){

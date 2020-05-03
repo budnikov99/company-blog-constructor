@@ -1,5 +1,9 @@
-{% if data.format == 'MenuFormat' %}
-    {{ include('blocks/left-sidebar-menu.html.twig') }}
-{% else %}
+<div class="left-sidebar">
+    {% for module in data %}
+        {% if module.data.format == 'MenuFormat' %}
+            {{ include('blocks/left-sidebar-menu.html.twig', {'data': module.data}, with_context = false) }}
+        {% else %}
 
-{% endif %}
+        {% endif %}
+    {% endfor %}
+</div>

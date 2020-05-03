@@ -5,6 +5,7 @@ menu:
   args:
     menu:                     #может существовать метод menuValidate($value), проверяющий корректность, иначе, любое значение корректно
       type: list              #string(поле), list(список), number(число) или boolean(галочка)
+                              #file(файл в папке uploads сервера)
                               #может быть list, тогда будет вызван метод menuValues() модуля, который возвращает массив строк
                               #и поле будет отбражаться как выпадающий список
                               #если menuValidate($val) не определён, всегда будет возвращаться true, но в случае с типом list,
@@ -12,3 +13,26 @@ menu:
       required: true          #является ли аргумент обязательным
       title: 'Отображаемое меню'
 
+fixed_text:
+  format: TextFormat
+  class: FixedTextModule
+  title: 'Фиксированный текст'
+  args:
+    text:
+      type: string
+      required: true
+      title: 'Текст'
+
+image_url:
+  format: ImageFormat
+  class: ImageURLModule
+  title: 'Картинка по URL'
+  args:
+    url:
+      type: string
+      required: true
+      title: 'URL картинки'
+    alt:
+      type: string
+      required: false
+      title: 'Подпись картинки'

@@ -1,0 +1,37 @@
+header_image:
+  active: true
+  modules:
+    -
+      module: image_url
+      url: /img/header-image.jpg
+header_menu:
+  active: true
+  modules:
+    -
+      module: menu
+      menu: 'menu1'
+left_sidebar:
+  active: true
+  modules:
+    -
+      module: menu
+      menu: 'menu2'
+    -
+      module: menu
+      menu: 'menu1'
+    -
+      module: menu
+      menu: 'menu1'
+    -
+      module: menu
+      menu: 'menu2'
+    -
+      module: menu
+      menu: 'menu1'
+    
+footer_copyright:
+  active: true
+  modules:
+    -
+      module: fixed_text
+      text: '2020 Govno-Mocha inc.'

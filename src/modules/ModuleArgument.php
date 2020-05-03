@@ -7,14 +7,14 @@ class ModuleArgument {
     public static $TYPE_NUMBER = 'number';
     public static $TYPE_BOOLEAN = 'boolean';
 
-    public $module = null;
+    private $module = null;
 
-    public $name = '';
-    public $title = '';
-    public $type = '';
-    public $validator = null;
-    public $valuelist = null;
-    public $required = false;
+    private $name = '';
+    private $title = '';
+    private $type = '';
+    private $validator = null;
+    private $valuelist = null;
+    private $required = false;
 
     public function __construct(Module $module, $name, $type, $title, $required){
         if(!in_array($type, array(ModuleArgument::$TYPE_LIST, 
@@ -43,23 +43,43 @@ class ModuleArgument {
         }
     }
 
+    public function hasValidator(){
+        return !is_null($this->validator);
+    }
+
     public function validate($value){
-        if($this->validator != null){
+        if($this->validator !== null){
             return $this->module->$this->validator($value);
         }else{
-            if($this->type == ModuleArgument::$TYPE_LIST){
-                return in_array($value, $this->module->$this->valuelist());
-            }else{
-                return true;
-            }
+            return true;
         }
     }
 
+    public function hasValuelist(){
+        return !is_null($this->valuelist);
+    }
+
     public function values(){
-        if($this->valuelist != null){
-            return $this->module->$this->valuelist();
+        if($this->valuelist !== null){
+            return $this->module->{$this->valuelist}();
         }
         return null;
+    }
+
+    public function getName(){
+        return $this->name;
+    }
+
+    public function getType(){
+        return $this->type;
+    }
+
+    public function getTitle(){
+        return $this->title;
+    }
+
+    public function isRequired(){
+        return $this->required;
     }
 
 }

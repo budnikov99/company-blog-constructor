@@ -1,6 +1,11 @@
+#HWI OAUTH
+
+
+################
+
 index:
     path: /
-    controller: App\Controller\BlogController::index
+    controller: App\Controller\MainController::index
 
 theme_script:
     path: theme/js/{filename}
@@ -10,6 +15,27 @@ theme_style:
     path: theme/css/{filename}
     controller: App\Controller\ThemeAssetController::getStylesheet
 
+theme_asset:
+    path: theme/asset/{filename}
+    controller: App\Controller\ThemeAssetController::getAsset
+
 img:
     path: img/{filename}
     controller: App\Controller\UploadedImageController::getImage
+
+
+#CONSTRUCTOR
+
+validate_argument:
+    path: constructor_data/{module_name}/{arg_name}/validate
+    controller: App\Controller\ConstructorController::validateModuleArgument
+
+argument_list:
+    path: constructor_data/{module_name}/{arg_name}/list
+    controller: App\Controller\ConstructorController::getModuleArgumentList
+
+admin_panel:
+    path: panel
+    controller: App\Controller\ConstructorController::adminPanel
+
+

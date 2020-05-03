@@ -1,0 +1,13 @@
+title: 'Главная'
+
+page_content: 
+  type: static
+  file: index.html
+# type: posts
+# category: 
+#   - 'Категория1'
+#   - 'Категория2'
+
+
+block_override: null
+

@@ -47,6 +47,10 @@ abstract class Module {
         return $this->title;
     }
 
+    public function getArgumentList(){
+        return $this->arglist;
+    }
+
     abstract protected function generateData($args);
 
 }

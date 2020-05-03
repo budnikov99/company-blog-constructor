@@ -1,0 +1,3 @@
+{% if block_obj and block_obj.active %}
+    {{ include('blocks/' ~ block_file ~ '.html.twig', {'data': block_obj.getModules()}, with_context = false) }}
+{% endif %}

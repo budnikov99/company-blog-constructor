@@ -6,7 +6,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class UploadedImageController extends AbstractController {
     public function getImage($filename){
-        $filename = SERVER_ROOT.'\\uploads\\img\\'.$filename;
+        $filename = SERVER_ROOT.'\\data\\uploads\\img\\'.$filename;
 
         $response = new Response();
         $response->headers->set('Content-Type', 'image');

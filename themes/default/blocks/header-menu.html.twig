@@ -1,5 +1,5 @@
 <div class="header-menu">
-    {% for item in data.items %}
+    {% for item in data[0].data.items %}
         <div class="header-menu__item">
             {% if item.url == null %}
                 <p class="menu-item-text">{{item.text|e}}</p>

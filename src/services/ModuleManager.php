@@ -48,4 +48,8 @@ class ModuleManager {
         }
         return null;
     }
+
+    public function getModuleList(){
+        return $this->module_list;
+    }
 }
