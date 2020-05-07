@@ -8,18 +8,18 @@ abstract class Content {
         $this->loadData($args);
     }
 
-    protected abstract function loadData();
+    protected abstract function loadData(array $args);
 
     public function getType(){
         $name = explode('\\',get_class($this));
         $name = $name[count($name)-1];
-        $name = substr($name, 0, -count('Content'));
+        $name = substr($name, 0, -strlen('Content'));
 
-        return $name;
+        return strtolower($name);
     }
 
     public static function create(string $type, array $args){
-        $type = 'App\\content\\'.$type.'Content';
+        $type = 'App\\content\\'.ucfirst($type).'Content';
         if(class_exists($type)){
             return new $type($args);
         }

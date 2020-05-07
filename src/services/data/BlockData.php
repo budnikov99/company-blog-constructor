@@ -1,14 +1,12 @@
 <?php
 namespace App\services\data;
 
-class BlockData {
-    private $name = '';
+class BlockData extends Data {
     private $active = false;
     private $modules = [];
 
-    public function __construct(string $name, bool $active = true)
+    public function __construct(bool $active = true)
     {
-        $this->name = $name;
         $this->active = $active;
     }
 
@@ -20,12 +18,37 @@ class BlockData {
         return $this->modules;
     }
 
-    public function getName(){
-        return $this->name;
-    }
 
     public function isActive(){
         return $this->active;
+    }
+
+    protected static function deserialize_raw(array $data){
+        $block = new BlockData($data['active']);
+        if(is_array($data['modules'])){
+            foreach($data['modules'] as $module_data){
+                $module = BlockModuleData::deserialize($module_data);
+                if(is_null($module)){
+                    return null;
+                }else{
+                    $block->addModule($module);
+                }
+            }
+        }
+
+        return $block;
+    }
+
+    public function serialize(){
+        $data = [
+            'active' => $this->active,
+            'modules' => []
+        ];
+        foreach($this->modules as $module){
+            $data['modules'] []= $module->serialize();
+        }
+
+        return $data;
     }
 
 }

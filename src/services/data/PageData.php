@@ -3,16 +3,21 @@ namespace App\services\data;
 
 use App\content\Content;
 
-class PageData {
+class PageData extends Data {
+
     private $title = '';
     private $favicon = null;
     private $blocks = [];
 
+    private $page_content_type = 'void';
+    private $page_content = [];
+
     private $content = null;
 
-    public function __construct(string $title)
+    public function __construct(string $title, string $content_type)
     {
         $this->title = $title;
+        $this->page_content = $content_type;
     }
 
     public function setFavicon($favicon){
@@ -39,8 +44,8 @@ class PageData {
         }
     }
 
-    public function addBlock(BlockData $block){
-        $this->blocks[$block->getName()] = $block;
+    public function addBlock(string $id, BlockData $block){
+        $this->blocks[$id] = $block;
     }
 
     public function setBlockList(array $blocks){
@@ -55,5 +60,57 @@ class PageData {
     public function getContent(){
         return $this->content;
     }    
+
+    public function getContentType(){
+        return $this->page_content_type;
+    }
+
+    public function getContentArgs(){
+        return $this->page_content;
+    } 
+
+    public function setContentArgs(array $args){
+        $this->page_content = $args;
+    }
+
+
+
+    protected static function deserialize_raw(array $data){
+        $page = new PageData($data['title'], $data['page_content']['type']);
+        $page->setFavicon($data['favicon'] ?? null);
+        $page->setContentArgs($data['page_content']);
+
+        if(is_array($data['blocks'])){
+            foreach($data['blocks'] as $block_name => $block_data){
+                $block = BlockData::deserialize($block_data);
+                if(is_null($block)){
+                    return null;
+                }else{
+                    $page->addBlock($block_name, $block);
+                }
+            }
+        }
+        return $page;
+    }
+
+    public function serialize(){
+        $page_content = $this->page_content;
+        $page_content['type'] = $this->page_content_type;
+
+        $data = [
+            'title' => $this->title,
+            'page_content' => $page_content,
+            'blocks' => []
+        ];
+
+        if(!is_null($this->favicon)){
+            $data['favicon'] = $this->favicon;
+        }
+
+        foreach($this->blocks as $block_name => $block){
+            $data['blocks'][$block_name] = $block->serialize();
+        }
+        return $data;
+    }
 
 }

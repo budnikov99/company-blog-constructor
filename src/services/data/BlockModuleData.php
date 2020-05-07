@@ -3,7 +3,7 @@ namespace App\services\data;
 
 use App\formats\Format;
 
-class BlockModuleData {
+class BlockModuleData extends Data {
     private $name = null;
     private $args = [];
     private $data = null;
@@ -28,6 +28,16 @@ class BlockModuleData {
 
     public function getData(){
         return $this->data;
+    }
+
+    protected static function deserialize_raw(array $data){
+        return new BlockModuleData($data['module']??null, $data);
+    }
+
+    public function serialize(){
+        $data = $this->args;
+        $data['module'] = $this->name;
+        return $data;
     }
     
 }

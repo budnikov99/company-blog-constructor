@@ -1,77 +1,65 @@
 <?php
 namespace App\services;
 
+use App\content\Content;
 use App\services\data\BlockData;
 use App\services\data\BlockModuleData;
 use App\services\data\PageData;
+use Exception;
 use Symfony\Component\Yaml\Yaml;
 
 class PageManager {
-    private $blocks_global = null;
-    private $settings = null;
+    private $themem = null;
+    private $global_settings = null;
 
-    public function __construct(){
-        $this->blocks_global = Yaml::parseFile(SERVER_ROOT.'\\data\\blocks_global.yaml');
-        $this->settings = Yaml::parseFile(SERVER_ROOT.'\\data\\settings.yaml');
-    }
-
-    /**
-     * Создаёт пустую главную страницу
-     *
-     * @return void
-     */
-    public static function generateIndexPage(){
-        file_put_contents(SERVER_ROOT.'\\data\\pages\\index.yaml', Yaml::dump([
-            'title' => 'Главная',
-            'page_content' => [
-                'type' => 'static',
-                'file' => 'index.html'
-            ],
-            'blocks_override' => null
-        ]));
-        file_put_contents(SERVER_ROOT.'\\data\\pages\\index.html', '<h1>Это шаблон главной страницы. Используйте конструктор, чтобы изменить её.</h1>');
-        file_put_contents(SERVER_ROOT.'\\data\\pages\\_post.yaml', Yaml::dump(['blocks_override' => null]));
+    public function __construct(ThemeManager $themem){
+        $this->themem = $themem;
+        $this->global_settings = PageData::deserialize(Yaml::parseFile(SERVER_ROOT.'\\data\\pages\\_global.yaml'));
+        if(is_null($this->global_settings)){
+            throw new Exception('Ошибка в файле глобальной конфигурации _global.yaml');
+        }
     }
 
     public function pageExists($pageid){
-        return file_exists(SERVER_ROOT.'\\data\\pages\\'.$pageid.'.yaml');
+        return file_exists($this->getPageDir().$pageid.'.yaml');
     }
 
     public static function getPageDir(){
         return SERVER_ROOT.'\\data\\pages\\';
     }
 
-    public function getPageData($pageid){
+    public function getPageData($pageid):PageData{
         $page_dir = $this->getPageDir();
-        $block_data = array();
-        
-        $page = Yaml::parseFile($page_dir.$pageid.'.yaml');
+        $global = $this->global_settings;
 
-        foreach($this->blocks_global as $block_name => $block_global){
-            $block = $block_global;
-            if(array_key_exists('block_override', $page) && is_array($page['block_override']) 
-               && array_key_exists($block_name, $page['block_override']))
-            {
-                $block = $page['block_override'][$block_name];
-            }
-
-            $bdata = new BlockData($block_name, $block['active']);
-            foreach($block['modules'] as $module){
-                $bdata->addModule(new BlockModuleData($module['module'], $module));
-            }
-
-            $block_data[$block_name] = $bdata;
+        if(!$this->pageExists($pageid)){
+            return null;
         }
 
-        $pdata = new PageData($page['title']);
-        $pdata->setFavicon($page['favicon'] ?? $this->settings['favicon']);
-        $pdata->setBlockList($block_data);
-        $page_content = $page['page_content'];
-        $pdata->setContent($page_content['type'], $page_content);
+        $page = PageData::deserialize(Yaml::parseFile($page_dir.$pageid.'.yaml'));
+        if(is_null($page)){
+            return null;
+        }
 
-        return $pdata;
+        if(is_null($page->getFavicon())){
+            $page->setFavicon($global->getFavicon());
+        }  
+
+        foreach($global->getBlocks() as $block_name => $block){
+            if(is_null($page->getBlock($block_name))){
+                $page->addBlock($block_name, $block);
+            }
+        }
+
+        return $page;
     }
 
+    public function setBlock(string $page_id, string $block_id, BlockData $block){
+        if(!$this->pageExists($page_id)){
+            return false;
+        }
 
+
+    }    
 
 }

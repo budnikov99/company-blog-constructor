@@ -21,7 +21,3 @@ blocks:
     accepted_formats:
       - TextFormat
 
-supported_content_types:
-  - basic\static
-  - basic\post
-  - basic\posts

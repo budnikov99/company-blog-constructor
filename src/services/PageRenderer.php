@@ -19,7 +19,7 @@ class PageRenderer {
         $this->pagem = $pagem;
 
         $loader = new FilesystemLoader($themem->getThemeDir());
-        $loader->addPath(SERVER_ROOT.'\\constructor');
+        $loader->addPath(SERVER_ROOT.'\\util');
         $this->twig = new Environment($loader, ['debug' => $_SERVER['APP_DEBUG']]);
         if($_SERVER['APP_DEBUG']){
             $this->twig->addExtension(new \Twig\Extension\DebugExtension());
@@ -41,6 +41,7 @@ class PageRenderer {
 
                     if(is_null($this->modules->getModule($module->getName()))){
                         $this->logger->error('Несущетсвующий модуль '.$module.' запрошен в блоке '.$name);
+                        continue;
                     }
 
                     if(in_array($this->modules->getModule($module->getName())->getFormat(), $formats)){
@@ -56,6 +57,9 @@ class PageRenderer {
 
 
     public function getPage($pageid){
+        if(!$this->pagem->pageExists($pageid)){
+            return null;
+        }
         $page_data = $this->pagem->getPageData($pageid);
         $this->renderBlockData($page_data->getBlocks());
 

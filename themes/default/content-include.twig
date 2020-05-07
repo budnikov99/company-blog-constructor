@@ -1,0 +1,7 @@
+{% if data.type == 'static'%}
+    {{include('content/static.html.twig')}}
+{% elseif data.type == 'post' %}
+    TODO
+{% else %}
+    Unsupported content type "{{data.type}}"
+{% endif %}
