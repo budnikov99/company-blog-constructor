@@ -27,12 +27,10 @@ class PageRenderer {
         $this->logger = $logger;
     }
 
-    private function renderBlockData($block_data){
+    private function renderBlockData($page_data){
         $theme_data = $this->themem->getThemeData();
-
-        $blocks_data = array();
-
-        foreach($block_data as $name => $block){
+        
+        foreach($page_data->getBlocks() as $name => $block){
             $block_theme = $theme_data['blocks'][$name];
             $formats = $block_theme['accepted_formats'];
 
@@ -55,13 +53,12 @@ class PageRenderer {
         }
     }
 
-
     public function getPage($pageid){
         if(!$this->pagem->pageExists($pageid)){
             return null;
         }
         $page_data = $this->pagem->getPageData($pageid);
-        $this->renderBlockData($page_data->getBlocks());
+        $this->renderBlockData($page_data);
 
         $template_name = $this->themem->getMainTemplate();
 

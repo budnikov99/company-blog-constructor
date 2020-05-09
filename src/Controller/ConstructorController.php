@@ -1,11 +1,17 @@
 <?php
 namespace App\Controller;
 
+use App\services\data\BlockData;
 use App\services\ModuleManager;
+use App\services\PageManager;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\CssSelector\Exception\InternalErrorException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\Yaml\Yaml;
 
-class ConstructorController {
+class ConstructorController extends AbstractController {
 
 
     private function getArgument(ModuleManager $mm, $module_name, $argument_name){
@@ -26,9 +32,7 @@ class ConstructorController {
         if($arg){
             $response->setContent(json_encode(['valid' => $arg->validate($value)]));
         }else{
-            $response->setStatusCode(404);
-            $response->setContent(json_encode(['valid' => 'error', 'message' => 'wrong module or argument']));
-            return $response;
+            throw $this->createNotFoundException('Модуль или аргумент не существует.');
         }
         
         return $response;
@@ -42,53 +46,38 @@ class ConstructorController {
         if($arg){
             $response->setContent(json_encode(['list' => $arg->values()]));
         }else{
-            $response->setStatusCode(404);
-            $response->setContent(json_encode(['list' => 'error', 'message' => 'wrong module or argument']));
-            return $response;
+            throw $this->createNotFoundException('Модуль или аргумент не существует.');
         }
         
         return $response;
     }
 
-    public function getModuleData(ModuleManager $mm){
-        $data = array();
-
-        foreach($mm->getModuleList() as $module_name => $module){
-            $module_data = [
-                'name' => $module_name,
-                'format' => $module->getFormat(),
-                'title' => $module->getTitle(),
-                'args' => array(),
-            ];
-            foreach($module->getArgumentList() as $arg_name => $arg){
-                $arg_data = [
-                    'name' => $arg_name,
-                    'type' => $arg->getType(),
-                    'title' => $arg->getTitle(),
-                    'required' => $arg->isRequired(),
-                    'list' => null,
-                ];
-
-                if($arg->hasValueList()){
-                    $arg_data['list'] = $arg->values();
-                }
-
-                $module_data['args'][$arg_name] = $arg_data;
-            }
-
-            $data[$module_name] = $module_data;
+    public function setBlock(PageManager $pm, Request $request, $page_id, $block_name){
+        $block = BlockData::deserialize(json_decode($request->getContent(), true));
+        if(is_null($block)){
+            throw new BadRequestHttpException('Некорректные данные.');
+        }
+        if(!$pm->pageExists($page_id)){
+            throw $this->createNotFoundException('Страница не существует.');
+        }
+   
+        if(!$pm->saveBlockToConfig($page_id, $block_name, $block)){
+            throw new InternalErrorException('Произошла ошибка');
         }
 
-        $response = new Response();
-
-        $response->headers->set('Content-Type', 'text/json');
-        $response->setContent(json_encode($data));
-
-        return $response;
+        return new Response();
     }
 
-    public function getBlockData(){
-        
+    public function removeBlock(PageManager $pm, Request $request, $page_id, $block_name){
+        if(!$pm->pageExists($page_id)){
+            throw $this->createNotFoundException('Страница не существует.');
+        }
+   
+        if(!$pm->saveBlockToConfig($page_id, $block_name, null)){
+            throw new InternalErrorException('Произошла ошибка');
+        }
+
+        return new Response();
     }
 
 }

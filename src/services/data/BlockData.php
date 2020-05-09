@@ -24,6 +24,8 @@ class BlockData extends Data {
     }
 
     protected static function deserialize_raw(array $data){
+        Data::assertValueType($data['active'], 'boolean');
+
         $block = new BlockData($data['active']);
         if(is_array($data['modules'])){
             foreach($data['modules'] as $module_data){

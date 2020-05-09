@@ -38,17 +38,14 @@ argument_list:
     path: constructor/data/{module_name}/{arg_name}/list
     controller: App\Controller\ConstructorController::getModuleArgumentList
 
-block_get:
+block_set:
     path: constructor/block/{page_id}/{block_name}/set
     controller: App\Controller\ConstructorController::setBlock
 
-block_set:
-    path: constructor/block/{page_id}/{block_name}/get
-    controller: App\Controller\ConstructorController::getBlock
+block_remove:
+    path: constructor/block/{page_id}/{block_name}/remove
+    controller: App\Controller\ConstructorController::removeBlock
 
-constructor_data:
-    path: constructor/blocks
-    controller: App\Controller\ConstructorController::getConstructorData
 
 #ADMIN
 

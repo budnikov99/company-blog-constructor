@@ -31,6 +31,7 @@ class BlockModuleData extends Data {
     }
 
     protected static function deserialize_raw(array $data){
+        Data::assertValueType($data['module'], 'string');
         return new BlockModuleData($data['module']??null, $data);
     }
 

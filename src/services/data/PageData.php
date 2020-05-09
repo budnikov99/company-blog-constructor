@@ -44,8 +44,14 @@ class PageData extends Data {
         }
     }
 
-    public function addBlock(string $id, BlockData $block){
+    public function setBlock(string $id, BlockData $block){
         $this->blocks[$id] = $block;
+    }
+
+    public function removeBlock(string $id){
+        if(array_key_exists($id, $this->blocks)){
+            unset($this->blocks[$id]);
+        }
     }
 
     public function setBlockList(array $blocks){
@@ -76,6 +82,13 @@ class PageData extends Data {
 
 
     protected static function deserialize_raw(array $data){
+        Data::assertValueType($data['title'], 'string');
+        if(array_key_exists('favicon', $data)){
+            Data::assertValueType($data['favicon'], 'string');
+        }
+        Data::assertValueType($data['page_content'], 'array');
+        Data::assertValueType($data['page_content']['type'], 'string');
+
         $page = new PageData($data['title'], $data['page_content']['type']);
         $page->setFavicon($data['favicon'] ?? null);
         $page->setContentArgs($data['page_content']);
@@ -86,7 +99,7 @@ class PageData extends Data {
                 if(is_null($block)){
                     return null;
                 }else{
-                    $page->addBlock($block_name, $block);
+                    $page->setBlock($block_name, $block);
                 }
             }
         }

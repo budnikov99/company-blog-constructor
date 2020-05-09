@@ -1,6 +1,7 @@
 <?php
 namespace App\services\data;
 
+use AssertionError;
 use Monolog\Logger;
 use PhpParser\Node\Stmt\TryCatch;
 
@@ -9,7 +10,7 @@ abstract class Data {
      * Создаёт объект данных на основе переданного словаря. Если данные не содержат необходимых полей, бросает исключение.
      *
      * @param array $data - словарь
-     * @return void - объект
+     * @return null|PageData|BlockData|BlockModuleData - объект
      */
     protected abstract static function deserialize_raw(array $data);
 
@@ -17,7 +18,7 @@ abstract class Data {
      * Создаёт объект данных, на основе словаря.
      *
      * @param array $data - словарь.
-     * @return void - Объект данных, либо null, если словарь не содержит необходимых полей.
+     * @return null|PageData|BlockData|BlockModuleData - Объект данных, либо null, если словарь не содержит необходимых полей.
      */
     public static function deserialize(array $data){
         //try {
@@ -34,4 +35,10 @@ abstract class Data {
      * @return array
      */
     public abstract function serialize();
+
+    protected static function assertValueType($value, string $type){
+        if(gettype($value) != $type){
+            throw new AssertionError('Значение '.$value.' должно иметь тип '.$type);
+        }
+    }
 }
