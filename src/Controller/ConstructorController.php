@@ -2,6 +2,7 @@
 namespace App\Controller;
 
 use App\services\data\BlockData;
+use App\services\data\PageData;
 use App\services\ModuleManager;
 use App\services\PageManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -52,28 +53,40 @@ class ConstructorController extends AbstractController {
         return $response;
     }
 
-    public function setBlock(PageManager $pm, Request $request, $page_id, $block_name){
-        $block = BlockData::deserialize(json_decode($request->getContent(), true));
-        if(is_null($block)){
+    public function updatePage(PageManager $pm, Request $request, $page_id){
+        $page = PageData::deserialize(json_decode($request->getContent(), true));
+        if(is_null($page)){
             throw new BadRequestHttpException('Некорректные данные.');
         }
         if(!$pm->pageExists($page_id)){
             throw $this->createNotFoundException('Страница не существует.');
         }
    
-        if(!$pm->saveBlockToConfig($page_id, $block_name, $block)){
+        if(!$pm->savePage($page_id, $page)){
             throw new InternalErrorException('Произошла ошибка');
         }
 
         return new Response();
     }
 
-    public function removeBlock(PageManager $pm, Request $request, $page_id, $block_name){
+    public function removePage(PageManager $pm, $page_id){
         if(!$pm->pageExists($page_id)){
             throw $this->createNotFoundException('Страница не существует.');
         }
    
-        if(!$pm->saveBlockToConfig($page_id, $block_name, null)){
+        if(!$pm->removePage($page_id)){
+            throw new InternalErrorException('Произошла ошибка');
+        }
+
+        return new Response();
+    }
+
+    public function createPage(PageManager $pm, $page_id){
+        if($pm->pageExists($page_id)){
+            throw $this->createNotFoundException('Страница уже существует.');
+        }
+   
+        if(!$pm->createPage($page_id)){
             throw new InternalErrorException('Произошла ошибка');
         }
 

@@ -6,6 +6,7 @@ class ModuleArgument {
     public static $TYPE_LIST = 'list';
     public static $TYPE_NUMBER = 'number';
     public static $TYPE_BOOLEAN = 'boolean';
+    public static $TYPE_FILE = 'file';
 
     private $module = null;
 
@@ -16,18 +17,23 @@ class ModuleArgument {
     private $valuelist = null;
     private $required = false;
 
+    public static function isTypeValid(string $type){
+        return in_array($type, array(ModuleArgument::$TYPE_LIST, 
+            ModuleArgument::$TYPE_STRING, 
+            ModuleArgument::$TYPE_NUMBER, 
+            ModuleArgument::$TYPE_BOOLEAN,
+            ModuleArgument::$TYPE_FILE));
+    }
+
     public function __construct(Module $module, $name, $type, $title, $required){
-        if(!in_array($type, array(ModuleArgument::$TYPE_LIST, 
-                            ModuleArgument::$TYPE_STRING, 
-                            ModuleArgument::$TYPE_NUMBER, 
-                            ModuleArgument::$TYPE_BOOLEAN))){
+        if(!ModuleArgument::isTypeValid($type)){
             throw new ModuleException('Аргумент '.$name.' модуля '.get_class($module).
             ' имеет неизвестный тип '.$type);                   
         }
 
         $this->module = $module;
         $this->name = $name;
-        $this->title = $title ?: $module;
+        $this->title = $title;
         $this->type = $type;
         $this->required = $required;
 

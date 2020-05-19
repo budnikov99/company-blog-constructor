@@ -17,7 +17,7 @@ class PageData extends Data {
     public function __construct(string $title, string $content_type)
     {
         $this->title = $title;
-        $this->page_content = $content_type;
+        $this->page_content_type = $content_type;
     }
 
     public function setFavicon($favicon){
@@ -63,6 +63,10 @@ class PageData extends Data {
         $this->content = $content;
     }
 
+    public function createContentFromArgs(){
+        $this->setContent(Content::create($this->getContentType(), $this->getContentArgs()));
+    }
+
     public function getContent(){
         return $this->content;
     }    
@@ -78,8 +82,6 @@ class PageData extends Data {
     public function setContentArgs(array $args){
         $this->page_content = $args;
     }
-
-
 
     protected static function deserialize_raw(array $data){
         Data::assertValueType($data['title'], 'string');
@@ -111,7 +113,7 @@ class PageData extends Data {
         $page_content['type'] = $this->page_content_type;
 
         $data = [
-            'title' => $this->title,
+            'title' => $this->title ?? '',
             'page_content' => $page_content,
             'blocks' => []
         ];

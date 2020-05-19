@@ -18,6 +18,9 @@ class BlockData extends Data {
         return $this->modules;
     }
 
+    public function setActive(bool $active){
+        $this->active = $active;
+    }
 
     public function isActive(){
         return $this->active;

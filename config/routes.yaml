@@ -38,19 +38,32 @@ argument_list:
     path: constructor/data/{module_name}/{arg_name}/list
     controller: App\Controller\ConstructorController::getModuleArgumentList
 
-block_set:
-    path: constructor/block/{page_id}/{block_name}/set
-    controller: App\Controller\ConstructorController::setBlock
+page_update:
+    path: constructor/page/{page_id}/update
+    controller: App\Controller\ConstructorController::updatePage
 
-block_remove:
-    path: constructor/block/{page_id}/{block_name}/remove
-    controller: App\Controller\ConstructorController::removeBlock
+page_remove:
+    path: constructor/page/{page_id}/remove
+    controller: App\Controller\ConstructorController::removePage
+
+page_create:
+    path: constructor/page/{page_id}/create
+    controller: App\Controller\ConstructorController::createPage
 
 
 #ADMIN
 
-admin_panel:
+admin_logout:
+    path: admin/logout
+    controller: App\Controller\ConstructorController::null
+
+admin_login:
     path: admin
-    controller: App\Controller\ConstructorController::adminPanel
+    controller: App\Controller\ConstructorController::null
+
+############
+page:
+    path: /{pageid}
+    controller: App\Controller\MainController::getPage
 
 

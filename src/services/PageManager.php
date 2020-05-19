@@ -11,12 +11,18 @@ use Symfony\Component\Yaml\Yaml;
 class PageManager {
     private $themem = null;
     private $global_settings = null;
+    private $page_list = [];
 
     public function __construct(ThemeManager $themem){
         $this->themem = $themem;
         $this->global_settings = $this->loadGlobalPage();
         if(is_null($this->global_settings)){
             throw new Exception('Ошибка в файле глобальной конфигурации _global.yaml');
+        }
+        foreach(scandir($this->getPageDir()) as $file){
+            if(substr($file, -5) == '.yaml'){
+                $this->page_list []= substr($file, 0, -5);
+            }
         }
     }
 
@@ -31,10 +37,10 @@ class PageManager {
     private function loadGlobalPage(){
         $data = PageData::deserialize(Yaml::parseFile(SERVER_ROOT.'\\data\\pages\\_global.yaml'));
 
-        $theme_blocks = $this->themem->getThemeData()['blocks'];
+        $theme_blocks = $this->themem->getBlocks();
 
         //Удаление блоков, не поддерживаемых темой
-        foreach($data->getBlocks() as $block_name => $_){
+        foreach($data->getBlocks() as $block_name => $block){
             if(!array_key_exists($block_name, $theme_blocks)){
                 $data->removeBlock($block_name);
             }
@@ -59,7 +65,7 @@ class PageManager {
     }
 
     public function savePage(string $pageid, PageData $page){
-        if(!$this->pageExists($pageid) || is_null($page)){
+        if(is_null($page)){
             return false;
         }
 
@@ -68,45 +74,35 @@ class PageManager {
         return true;
     }
 
-    /**
-     * Записывает или удаляет блок в конфиг страницы. 
-     *
-     * @param string $pageid - id страницы
-     * @param string $block_name - название блока
-     * @param BlockData|null $block - данные блока. Если передано null, блок удаляется
-     * @return boolean - true, если блок был записан, false в остальных случаях.
-     */
-    public function saveBlockToConfig(string $pageid, string $block_name, BlockData $block = null){
-        $page = $this->loadPage($pageid);
-
-        if(is_null($page)){
+    public function createPage(string $pageid){
+        if($this->pageExists($pageid)){
             return false;
         }
 
-        //Удаление блока
-        if(is_null($block)){
-            if(!is_null($page->getBlock($block_name))){
-                $page->removeBlock($block_name);
-            }else{
-                //Блока уже не существует
-                return false;
-            }
-        //Добавление блока
-        }else{
-            if(array_key_exists($block_name, $this->global_settings->getBlocks())){
-                $page->setBlock($block_name, $block);
-            }else{
-                //Блок не существует в теме, добавление не имеет смысла
-                return false;
-            }
+        file_put_contents($this->getPageDir().$pageid.'.yaml', Yaml::dump([
+            'title' => $pageid,
+            'page_content' => [
+                'type' => 'static',
+                'content' => '<h1>Это шаблон страницы. Используйте <a href="/admin/login">конструктор</a>, чтобы изменить её.</h1>'
+            ],
+            'blocks' => null
+        ]));
+        return true;
+    }
+
+    public function removePage($pageid){
+        //Нельзя удалять технические страницы
+        if(!$this->pageExists($pageid) || $pageid[0]=='_'){
+            return false;
         }
 
-        return $this->savePage($pageid, $page);
-
+        unlink($this->getPageDir().$pageid.'.yaml');
+        return true;
     }
 
     public function getPageData($pageid){
         $global = $this->global_settings;
+        
 
         if(!$this->pageExists($pageid)){
             return null;
@@ -128,6 +124,14 @@ class PageManager {
         }
 
         return $page;
+    }
+
+    public function getGlobalPage(){
+        return $this->global_settings;
+    }
+
+    public function getPageList(){
+        return $this->page_list;
     }
 
 }

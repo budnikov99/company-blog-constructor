@@ -5,13 +5,14 @@ use App\formats\FormatException;
 use App\formats\Format;
 
 abstract class Module {
-    
+    private $name = '';
     private $format = '';
     private $title = '';
     private $arglist = array();
 
-    public function __construct($title, $format, $arglist)
+    public function __construct(string $name, string $title, string $format, array $arglist)
     {
+        $this->name = $name;
         $this->format = $format;
         $this->title = $title;
         foreach($arglist as $name => $data){
@@ -41,6 +42,10 @@ abstract class Module {
             return $this->arglist[$name];
         }
         return null;
+    }
+
+    public function getName(){
+        return $this->name;
     }
 
     public function getTitle(){

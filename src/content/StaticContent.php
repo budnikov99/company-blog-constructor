@@ -7,13 +7,12 @@ class StaticContent extends Content {
     private $html = null;
 
     protected function loadData(array $args){
-        if($args['file']){
-            $file = PageManager::getPageDir().$args['file'];
-
-            if(file_exists($file)){
-                $this->html = file_get_contents($file);
-            }
+        if($args['content']){
+            $this->html = $args['content'];
+            return true;
         }
+
+        return false;
     }
 
     public function getHtml(){

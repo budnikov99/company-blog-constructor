@@ -1,6 +1,7 @@
 <?php
 namespace App\services;
 
+use App\services\data\ThemeBlockData;
 use ScssPhp\ScssPhp\Compiler;
 use ScssPhp\Server\Server;
 use Symfony\Component\Yaml\Yaml;
@@ -9,6 +10,7 @@ class ThemeManager {
     private $active_theme = null;
     private $theme_dir = null;
     private $theme_data = null;
+    private $blocks = [];
 
     public function __construct()
     {
@@ -20,6 +22,10 @@ class ThemeManager {
         $this->theme_dir = SERVER_ROOT.'\\themes\\'.$this->active_theme.'\\';
 
         $this->theme_data = Yaml::parseFile($this->theme_dir.'theme.yaml');
+
+        foreach($this->theme_data['blocks'] as $block_name => $block_data){
+            $this->blocks[$block_name] = ThemeBlockData::deserialize($block_data);
+        }
 
         return true;
     }
@@ -72,6 +78,10 @@ class ThemeManager {
 
     public function getThemeData(){
         return $this->theme_data;
+    }
+
+    public function getBlocks(){
+        return $this->blocks;
     }
 
     public function getMainTemplate(){

@@ -4,6 +4,7 @@ namespace App\Controller;
 use App\services\PageRenderer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class MainController extends AbstractController
 {
@@ -16,6 +17,11 @@ class MainController extends AbstractController
 
     public function getPage($pageid)
     {
+        if($pageid[0] == '_' && !true){
+            //Страницы, id которых начинается с "_" должны обрабатываться отдельно.
+            throw new NotFoundHttpException();
+        }
+
         $page = $this->page_generator->getPage($pageid);
         if(is_null($page)){
             throw $this->createNotFoundException('Страницы не существует.');
@@ -24,6 +30,10 @@ class MainController extends AbstractController
     }
 
     public function index(){
-        return $this->getPage('index');
+        $page = $this->page_generator->getIndexPage();
+        if(is_null($page)){
+            throw $this->createNotFoundException('Страницы не существует.');
+        }
+        return new Response($page);
     }
 }

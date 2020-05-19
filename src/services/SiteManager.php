@@ -14,15 +14,14 @@ class SiteManager {
             mkdir(SERVER_ROOT.'\\data\\pages');
         }
 
-        file_put_contents(SERVER_ROOT.'\\data\\pages\\index.yaml', Yaml::dump([
+        file_put_contents(SERVER_ROOT.'\\data\\pages\\_index.yaml', Yaml::dump([
             'title' => 'Главная',
             'page_content' => [
                 'type' => 'static',
-                'file' => 'index.html'
+                'content' => '<h1>Это шаблон страницы. Используйте <a href="/admin">конструктор</a>, чтобы изменить её.</h1>'
             ],
             'blocks' => null
         ]));
-        file_put_contents(SERVER_ROOT.'\\data\\pages\\index.html', '<h1>Это шаблон главной страницы. Используйте конструктор, чтобы изменить её.</h1>');
         file_put_contents(SERVER_ROOT.'\\data\\pages\\_post.yaml', Yaml::dump([
             'title' => 'Страница отображения публикаций',
             'page_content' => [

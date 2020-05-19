@@ -2,10 +2,11 @@
 namespace App\content;
 
 abstract class Content {
+    private $loaded = false;
    
     public function __construct($args)
     {
-        $this->loadData($args);
+        $this->loaded = $this->loadData($args);
     }
 
     protected abstract function loadData(array $args);
@@ -24,5 +25,9 @@ abstract class Content {
             return new $type($args);
         }
         return null;
+    }
+
+    public function isLoaded(){
+        return $this->loaded;
     }
 }

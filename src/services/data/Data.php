@@ -10,7 +10,7 @@ abstract class Data {
      * Создаёт объект данных на основе переданного словаря. Если данные не содержат необходимых полей, бросает исключение.
      *
      * @param array $data - словарь
-     * @return null|PageData|BlockData|BlockModuleData - объект
+     * @return null|PageData|BlockData|BlockModuleData|ThemeBlockData|ModuleData|ModuleArgumentData - объект
      */
     protected abstract static function deserialize_raw(array $data);
 
@@ -18,7 +18,7 @@ abstract class Data {
      * Создаёт объект данных, на основе словаря.
      *
      * @param array $data - словарь.
-     * @return null|PageData|BlockData|BlockModuleData - Объект данных, либо null, если словарь не содержит необходимых полей.
+     * @return null|PageData|BlockData|BlockModuleData|ThemeBlockData|ModuleData|ModuleArgumentData - Объект данных, либо null, если словарь не содержит необходимых полей.
      */
     public static function deserialize(array $data){
         //try {

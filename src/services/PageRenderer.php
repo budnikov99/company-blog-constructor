@@ -1,9 +1,15 @@
 <?php
 namespace App\services;
 
+use App\content\Content;
+use App\services\data\ModuleData;
+use App\services\data\PageData;
 use Twig\Environment;
 use \Twig\Loader\FilesystemLoader;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\CssSelector\Exception\InternalErrorException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Yaml\Yaml;
 
 class PageRenderer {
@@ -28,11 +34,15 @@ class PageRenderer {
     }
 
     private function renderBlockData($page_data){
-        $theme_data = $this->themem->getThemeData();
+        $theme_data = $this->themem->getBlocks();
         
         foreach($page_data->getBlocks() as $name => $block){
-            $block_theme = $theme_data['blocks'][$name];
-            $formats = $block_theme['accepted_formats'];
+            $block_theme = $theme_data[$name];
+            $formats = $block_theme->getAcceptedFormats();
+
+            if(!is_array($block->getModules()) || count($block->getModules()) == 0){
+                $block->setActive(false);
+            }
 
             if($block->isActive()){
                 foreach($block->getModules() as $module){
@@ -53,16 +63,80 @@ class PageRenderer {
         }
     }
 
-    public function getPage($pageid){
+    public function getConstructorData(PageData $page_data){
+        $blocks_serialized = [];
+        foreach($this->themem->getBlocks() as $key => $value){
+            $blocks_serialized[$key] = $value->serialize();
+        }
+
+        $current_page = $page_data;
+        $global_page = $this->pagem->getGlobalPage();
+
+        $modules_serialized = [];
+        foreach($this->modules->getModuleList() as $key => $value){
+            $modules_serialized[$key] = ModuleData::createFromModule($value)->serialize();
+        }
+
+        return [
+            'theme_blocks_json' => json_encode($blocks_serialized),
+            'modules_json' => json_encode($modules_serialized),
+            'page_json' => json_encode($current_page->serialize()),
+            'global_page_json' => json_encode($global_page->serialize()),
+
+            'blocks' => $this->themem->getBlocks(),
+            'modules' => $this->modules->getModuleList(),
+            'global_page' => $global_page,
+            'page_list' => $this->pagem->getPageList(),
+        ];
+    }
+
+    public function getPageData($pageid){
         if(!$this->pagem->pageExists($pageid)){
             return null;
         }
-        $page_data = $this->pagem->getPageData($pageid);
+
+        return $this->pagem->getPageData($pageid);
+    }
+
+    public function generateTemplateData(string $pageid, PageData $page_data){
         $this->renderBlockData($page_data);
 
-        $template_name = $this->themem->getMainTemplate();
+        $data = [
+            'id' => $pageid,
+            'data' => $page_data,            
+        ];
 
-        return $this->twig->render($template_name, ['data' => $page_data]);
+        if(true){
+            $data['constructor'] = $this->getConstructorData($page_data);
+        }
+
+        return $data;
+    }
+
+    public function getPage($pageid){
+        $page = $this->getPageData($pageid);
+
+        //Контент для технических страниц генерируется отдельно
+        if($pageid[0] != '_'){
+            $page->createContentFromArgs();
+            if(is_null($page->getContent()) || !$page->getContent()->isLoaded()){
+                throw new InternalErrorException('Ошибка при загрузке контента');
+            }
+        }
+
+        return $this->renderPage($this->generateTemplateData($pageid, $page));
+    }
+
+    public function getIndexPage(){
+        $page = $this->getPageData('_index');
+        $page->createContentFromArgs();
+
+        return $this->renderPage($this->generateTemplateData('_index', $page));
+    }
+
+    public function renderPage($data){
+        $template_name = $this->themem->getMainTemplate();
+        return $this->twig->render($template_name, $data);
     }
 
 }

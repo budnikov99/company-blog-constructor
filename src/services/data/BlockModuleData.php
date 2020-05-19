@@ -40,5 +40,4 @@ class BlockModuleData extends Data {
         $data['module'] = $this->name;
         return $data;
     }
-    
 }

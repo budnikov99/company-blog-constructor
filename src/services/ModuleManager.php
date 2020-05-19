@@ -29,7 +29,7 @@ class ModuleManager {
                         $arglist = $value['args'];
                         $title = $value['title'] ?: $key;
 
-                        $module = new $classname($title, $format, $arglist);
+                        $module = new $classname($key, $title, $format, $arglist);
 
                         if(!is_subclass_of($module, Module::class)){
                             throw new ModuleException('Модуль '.$classname.' не унаследован от Module.');

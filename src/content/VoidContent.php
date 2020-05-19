@@ -1,11 +1,10 @@
 <?php
 namespace App\content;
 
-class PostContent extends Content {
+use App\services\PageManager;
+
+class VoidContent extends Content {
     protected function loadData(array $args){
-        if($args['id']){
-            
-        }
         return true;
     }
 }

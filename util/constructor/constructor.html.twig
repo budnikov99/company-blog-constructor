@@ -1,1 +1,39 @@
-Constructor panel!
+<link rel="stylesheet" href="/util/constructor.css">
+<script src="/util/constructor.js"></script>
+<script>
+    var constructor = new Constructor({{ id }});
+
+</script>
+<div class="constructor-panel">
+    <div class="item">
+        Страницы
+        <div class="submenu-container">
+            <div class="submenu">
+                {% for value in constructor.page_list %}
+                    <a class="item" href="/{{value}}">
+                        {{value}}
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="item" data-show-popup="constructor-page-edit">
+        Настройки текущей страницы
+    </div>
+    <div class="item" data-show-popup="constructor-global-page-edit">
+        Общие настройки страниц
+    </div>
+
+    <a class="item right" href="admin/logout">
+        Выход
+    </a>
+</div>
+
+<div id="constructor-popup-back" class="constructor-popup">
+    <div id="constructor-page-edit" class="popup">
+        {{include('constructor/page-editor.twig', {'edit': data})}}
+    </div>
+    <div id="constructor-global-page-edit" class="popup">
+        {{include('constructor/page-editor.twig', {'edit': global_page})}}
+    </div>
+</div>

@@ -2,6 +2,9 @@
     {{include('content/static.html.twig')}}
 {% elseif data.type == 'post' %}
     TODO
+{% elseif data.type == 'void' %}
+{% elseif data.type == null %}
+No content.
 {% else %}
     Unsupported content type "{{data.type}}"
 {% endif %}

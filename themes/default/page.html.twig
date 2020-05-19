@@ -8,6 +8,9 @@
         <title>{{data.title}}</title>
     </head>
     <body>
+        {% if constructor is defined %}
+            {{ include('constructor/constructor.html.twig') }}
+        {% endif %}
         {{ 
             include('block-include.twig', {
                 'block_obj': data.blocks.header_image, 
@@ -62,8 +65,5 @@
 
             </div>
         </footer>
-        {% if data.constructor is defined %}
-            {{ include('constructor.html.twig', {'data': data.constructor}, with_context = false) }}
-        {% endif %}
     </body>
 </html>
