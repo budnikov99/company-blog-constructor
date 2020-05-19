@@ -1,10 +1,16 @@
 <link rel="stylesheet" href="/util/constructor.css">
+<link rel="stylesheet" href="/util/constructor-popups.css">
+<link rel="stylesheet" href="/util/constructor-page-edit.css">
 <script src="/util/constructor.js"></script>
-<script>
-    var constructor = new Constructor({{ id }});
-
+<script data-pageid="{{ id }}" data-pagedata="{{ constructor.page_json }}" data-moduledata="{{ constructor.modules_json }}">
+    var constructor = new Constructor(document.currentScript.dataset.pageid);
+    constructor.importPage(JSON.parse(document.currentScript.dataset.pagedata));
+    constructor.importModules(JSON.parse(document.currentScript.dataset.moduledata));
 </script>
 <div class="constructor-panel">
+    <a href="/{{id}}" class="item">
+        {{id}}
+    </a>
     <div class="item">
         Страницы
         <div class="submenu-container">
@@ -17,11 +23,21 @@
             </div>
         </div>
     </div>
-    <div class="item" data-show-popup="constructor-page-edit">
-        Настройки текущей страницы
-    </div>
-    <div class="item" data-show-popup="constructor-global-page-edit">
-        Общие настройки страниц
+    <button class="constructor-button item" data-action="show-popup" data-target="constructor-page-edit">
+        Настройки страницы
+    </button>
+    <div class="item">
+        Файлы
+        <div class="submenu-container">
+            <div class="submenu">
+                <button class="constructor-button item" data-action="show-popup" data-target="constructor-file-manager-assets">
+                    Публичные файлы
+                </button>
+                <button class="constructor-button item" data-action="show-popup" data-target="constructor-file-manager-uploads">
+                    Загруженные файлы
+                </button>
+            </div>
+        </div>
     </div>
 
     <a class="item right" href="admin/logout">
@@ -29,11 +45,46 @@
     </a>
 </div>
 
-<div id="constructor-popup-back" class="constructor-popup">
+<div id="constructor-popup-background" class="constructor-popup constructor-button" data-action="hide-popups">
     <div id="constructor-page-edit" class="popup">
-        {{include('constructor/page-editor.twig', {'edit': data})}}
+        <div class="popup-header">
+            Настройки {{ id }}
+            <button class="constructor-button close-button" data-action="hide-popups"></button>
+        </div>
+        <form id="constructor-page-edit-form" class="constructor-page-edit-form">
+            <div class="entry">
+                <div class="label">Название страницы</div>
+                <input type="text" name="title" value="{{data.title}}">
+            </div>
+
+            <div class="scroll">
+                {% for name, bdata in constructor.current_page.blocks %}
+                    {{include('constructor/block-edit.twig', {'block_name': name, 'block_data': bdata})}}
+                {% endfor %}
+            </div>
+
+            <div class="entry">
+                <input type="submit" value="Применить">
+            </div>
+        </form>
     </div>
-    <div id="constructor-global-page-edit" class="popup">
-        {{include('constructor/page-editor.twig', {'edit': global_page})}}
+
+    <div id="constructor-file-manager-uploads" class="popup" style="width: 90%; height: 80%;">
+        <div class="popup-header">
+            Загруженные файлы
+            <button class="constructor-button close-button" data-action="hide-popups"></button>
+        </div>
+        <iframe src="/manager?conf=uploads" width="100%" height="100%">
+            Ваш браузер не поддерживает iframe.
+        </iframe>
+    </div>
+    <div id="constructor-file-manager-assets" class="popup" style="width: 90%; height: 80%;">
+        <div class="popup-header">
+            Публичные файлы
+            <button class="constructor-button close-button" data-action="hide-popups"></button>
+        </div>
+        <iframe src="/manager?conf=assets" width="100%" height="100%">
+            Ваш браузер не поддерживает iframe.
+        </iframe>
     </div>
 </div>

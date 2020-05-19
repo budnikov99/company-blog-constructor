@@ -7,6 +7,7 @@ use App\services\ModuleManager;
 use App\services\PageManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\CssSelector\Exception\InternalErrorException;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -66,7 +67,7 @@ class ConstructorController extends AbstractController {
             throw new InternalErrorException('Произошла ошибка');
         }
 
-        return new Response();
+        return new Response('true');
     }
 
     public function removePage(PageManager $pm, $page_id){
@@ -78,7 +79,7 @@ class ConstructorController extends AbstractController {
             throw new InternalErrorException('Произошла ошибка');
         }
 
-        return new Response();
+        return new Response('true');
     }
 
     public function createPage(PageManager $pm, $page_id){
@@ -90,7 +91,7 @@ class ConstructorController extends AbstractController {
             throw new InternalErrorException('Произошла ошибка');
         }
 
-        return new Response();
+        return new Response('true');
     }
 
 }

@@ -1,5 +1,8 @@
-#HWI OAUTH
-
+#artgris
+artgris_bundle_file_manager:
+    resource: "@ArtgrisFileManagerBundle/Controller"
+    type:     annotation
+    prefix:   /manager
 
 ################
 
@@ -18,10 +21,6 @@ theme_style:
 theme_asset:
     path: theme/asset/{filename}
     controller: App\Controller\ThemeAssetController::getAsset
-
-img:
-    path: img/{filename}
-    controller: App\Controller\UploadedImageController::getImage
 
 util_asset:
     path: util/{filename}

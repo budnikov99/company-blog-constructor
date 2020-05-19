@@ -1,0 +1,126 @@
+.constructor-page-edit-form {
+    margin: 10px 10px;
+    font-family: sans-serif;
+}
+
+.constructor-page-edit-form .scroll {
+    padding-right: 3px;
+    margin-right: 3px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+/*********SCROLLBAR************/
+.constructor-page-edit-form .scroll::-webkit-scrollbar-track
+{
+	background-color: #a6a6a6;
+}
+.constructor-page-edit-form .scroll::-webkit-scrollbar
+{
+	width: 3px;
+	background-color: #a6a6a6;
+}
+.constructor-page-edit-form .scroll::-webkit-scrollbar-thumb
+{
+    border-radius: 2px;
+    background-color: #111111;
+}
+/********************************/
+
+.constructor-page-edit-form .entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.constructor-page-edit-form .entry, .constructor-page-edit-form .fold {
+    margin-bottom: 10px;
+}
+
+.constructor-page-edit-form .entry .label {
+    font-size: 14px;
+    margin-right: 10px;
+}
+
+.constructor-page-edit-form .entry input,
+.constructor-page-edit-form .entry select {
+    width: 180px;
+    height: 24px;
+}
+
+.constructor-page-edit-form .entry input[type="submit"] {
+    width: 100%;
+    padding: 5px 0;
+    height: auto;
+
+    border: 1px solid #a6a6a6;
+    background: #a6a6a6;
+    color: #eee;
+    font-weight: bold;
+}
+
+.constructor-page-edit-form .entry input[type="submit"]:hover {
+    color: #a6a6a6;
+    background: #eee;
+}
+
+/*////////
+/* FOLD */
+
+.constructor-page-edit-form .fold {
+    border: 1px solid #a6a6a6;
+}
+
+.constructor-page-edit-form .fold .fold-header {
+    display: flex;
+    padding: 5px;
+}
+
+.constructor-page-edit-form .fold .unfold-button {
+    margin-left: auto;
+    cursor: pointer;
+    position: relative;
+    width: 16px;
+}
+
+.constructor-page-edit-form .fold.unfolded .unfold-button:before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 4px;
+    
+    border: 8px solid transparent;
+    border-top: 8px solid #eee;
+    background: transparent;
+}
+
+.constructor-page-edit-form .fold .unfold-button:before {
+    content: '';
+    display: block;
+    position: absolute;
+    
+    border: 8px solid transparent;
+    border-right: 8px solid #a6a6a6;
+    background: transparent;
+}
+
+.constructor-page-edit-form .fold.unfolded .fold-header {
+    color: #fff;
+    background: #a6a6a6;
+}
+
+.constructor-page-edit-form .fold .fold-content {
+    display: none;
+
+    margin: 5px;
+    margin-top: 0;
+    padding-top: 5px;
+}
+
+.constructor-page-edit-form .fold.unfolded .fold-content {
+    display: block;
+}
+
+.block-edit.no-params .params-list {
+    display: none;
+}

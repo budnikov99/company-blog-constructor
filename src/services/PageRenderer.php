@@ -40,11 +40,7 @@ class PageRenderer {
             $block_theme = $theme_data[$name];
             $formats = $block_theme->getAcceptedFormats();
 
-            if(!is_array($block->getModules()) || count($block->getModules()) == 0){
-                $block->setActive(false);
-            }
-
-            if($block->isActive()){
+            if($block->getActive()){
                 foreach($block->getModules() as $module){
 
                     if(is_null($this->modules->getModule($module->getName()))){
@@ -63,13 +59,9 @@ class PageRenderer {
         }
     }
 
-    public function getConstructorData(PageData $page_data){
-        $blocks_serialized = [];
-        foreach($this->themem->getBlocks() as $key => $value){
-            $blocks_serialized[$key] = $value->serialize();
-        }
+    public function getConstructorData(string $pageid, PageData $page_data){
 
-        $current_page = $page_data;
+        $current_page = $this->pagem->correctPage($this->pagem->loadPage($pageid));
         $global_page = $this->pagem->getGlobalPage();
 
         $modules_serialized = [];
@@ -78,10 +70,9 @@ class PageRenderer {
         }
 
         return [
-            'theme_blocks_json' => json_encode($blocks_serialized),
-            'modules_json' => json_encode($modules_serialized),
+            'current_page' => $current_page,
             'page_json' => json_encode($current_page->serialize()),
-            'global_page_json' => json_encode($global_page->serialize()),
+            'modules_json' => json_encode($modules_serialized),
 
             'blocks' => $this->themem->getBlocks(),
             'modules' => $this->modules->getModuleList(),
@@ -107,7 +98,7 @@ class PageRenderer {
         ];
 
         if(true){
-            $data['constructor'] = $this->getConstructorData($page_data);
+            $data['constructor'] = $this->getConstructorData($pageid, $page_data);
         }
 
         return $data;

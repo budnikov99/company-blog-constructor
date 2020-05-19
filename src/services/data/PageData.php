@@ -6,7 +6,6 @@ use App\content\Content;
 class PageData extends Data {
 
     private $title = '';
-    private $favicon = null;
     private $blocks = [];
 
     private $page_content_type = 'void';
@@ -18,14 +17,6 @@ class PageData extends Data {
     {
         $this->title = $title;
         $this->page_content_type = $content_type;
-    }
-
-    public function setFavicon($favicon){
-        $this->favicon = $favicon;
-    }
-
-    public function getFavicon(){
-        return $this->favicon;
     }
 
     public function getTitle(){
@@ -85,14 +76,11 @@ class PageData extends Data {
 
     protected static function deserialize_raw(array $data){
         Data::assertValueType($data['title'], 'string');
-        if(array_key_exists('favicon', $data)){
-            Data::assertValueType($data['favicon'], 'string');
-        }
+
         Data::assertValueType($data['page_content'], 'array');
         Data::assertValueType($data['page_content']['type'], 'string');
 
         $page = new PageData($data['title'], $data['page_content']['type']);
-        $page->setFavicon($data['favicon'] ?? null);
         $page->setContentArgs($data['page_content']);
 
         if(is_array($data['blocks'])){
@@ -118,9 +106,6 @@ class PageData extends Data {
             'blocks' => []
         ];
 
-        if(!is_null($this->favicon)){
-            $data['favicon'] = $this->favicon;
-        }
 
         foreach($this->blocks as $block_name => $block){
             $data['blocks'][$block_name] = $block->serialize();

@@ -3,7 +3,9 @@
         <link rel="stylesheet" href="/theme/css/reset.css">
         <link rel="stylesheet" href="/theme/css/base.scss">
 
-        <link rel="icon" href="{{data.favicon}}">
+        {% if data.blocks.favicon.active %}
+            <link rel="icon" href="{{data.blocks.favicon.modules[0].data.url}}">
+        {% endif %}
 
         <title>{{data.title}}</title>
     </head>

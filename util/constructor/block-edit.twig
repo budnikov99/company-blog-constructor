@@ -1,0 +1,23 @@
+<div class="fold block-edit {{ block_data.active == null ? 'no-params' }}" id="block-edit-{{block_name}}">
+    <div class="fold-header">
+        <div class="fold-title">
+            {{ constructor.blocks[block_name].title }} ({{ block_name }})  
+        </div>
+        <div class="unfold-button" data-target="block-edit-{{block_name}}"></div>
+    </div>
+    <div class="fold-content">
+        <div class="entry">
+            <div class="title">Блок</div>
+            <select name="block-active-{{block_name}}">
+                <option value="true" {{ (block_data.active == true)?'selected':'' }}>Активен</option>
+                <option value="false" {{ (block_data.active == false)?'selected':'' }}>Неактивен</option>
+                {% if id != '_global' %}
+                    <option value="null" {{ (block_data.active == null)?'selected':'' }}>Наслед. из _global</option>
+                {% endif %}
+            </select>
+        </div>
+        <div class="params-list">
+            PARARARAMS
+        </div>
+    </div>
+</div>

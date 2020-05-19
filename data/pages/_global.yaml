@@ -1,16 +1,21 @@
 title: 'Общие настройки страниц'
-favicon: '/img/favicon.png'
 
 page_content: 
   type: void
 
 blocks:
+  favicon:
+    active: true
+    modules:
+      - 
+        module: image_url
+        url: '/assets/img/favicon.png'
   header_image:
     active: true
     modules:
       -
         module: image_url
-        url: /img/header-image.jpg
+        url: /assets/img/header-image.jpg
   header_menu:
     active: true
     modules:

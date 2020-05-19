@@ -2,10 +2,10 @@
 namespace App\services\data;
 
 class BlockData extends Data {
-    private $active = false;
+    private $active = null;
     private $modules = [];
 
-    public function __construct(bool $active = true)
+    public function __construct(bool $active = null)
     {
         $this->active = $active;
     }
@@ -18,16 +18,21 @@ class BlockData extends Data {
         return $this->modules;
     }
 
-    public function setActive(bool $active){
+    /**
+     * Устанавливает статус блока
+     *
+     * @param boolean|null $active - false - блок выключен. true - включен. null - блок наследуется из _global.
+     * @return void
+     */
+    public function setActive(bool $active = null){
         $this->active = $active;
     }
 
-    public function isActive(){
+    public function getActive(){
         return $this->active;
     }
 
     protected static function deserialize_raw(array $data){
-        Data::assertValueType($data['active'], 'boolean');
 
         $block = new BlockData($data['active']);
         if(is_array($data['modules'])){

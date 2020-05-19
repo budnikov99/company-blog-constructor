@@ -1,0 +1,9 @@
+artgris_file_manager:
+    conf:
+        uploads:
+            dir: "../data/uploads"
+        assets:
+            dir: "../public/assets"
+
+framework:
+    translator: { fallbacks: [ "ru" ] }

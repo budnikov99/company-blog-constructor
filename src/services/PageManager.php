@@ -39,10 +39,13 @@ class PageManager {
 
         $theme_blocks = $this->themem->getBlocks();
 
-        //Удаление блоков, не поддерживаемых темой
+        //Удаление блоков, не поддерживаемых темой и корректировка активности
         foreach($data->getBlocks() as $block_name => $block){
             if(!array_key_exists($block_name, $theme_blocks)){
                 $data->removeBlock($block_name);
+            } else if(is_null($block->getActive())) {
+                //Блок на глобальной странице не может быть унаследован из неё же
+                $block->setActive(false);
             }
         }
 
@@ -91,7 +94,7 @@ class PageManager {
     }
 
     public function removePage($pageid){
-        //Нельзя удалять технические страницы
+        //Нельзя удалять технические и не существующие страницы
         if(!$this->pageExists($pageid) || $pageid[0]=='_'){
             return false;
         }
@@ -100,26 +103,36 @@ class PageManager {
         return true;
     }
 
-    public function getPageData($pageid){
-        $global = $this->global_settings;
-        
-
-        if(!$this->pageExists($pageid)){
-            return null;
-        }
-
-        $page = $this->loadPage($pageid);
+    public function correctPage(PageData $page){
         if(is_null($page)){
             return null;
         }
 
-        if(is_null($page->getFavicon())){
-            $page->setFavicon($global->getFavicon());
-        }  
-
-        foreach($global->getBlocks() as $block_name => $block){
+        foreach($this->global_settings->getBlocks() as $block_name => $block){
             if(is_null($page->getBlock($block_name))){
-                $page->setBlock($block_name, $block);
+                $page->setBlock($block_name, new BlockData(null));
+            }else if(count($page->getBlock($block_name)->getModules()) == 0){
+                $page->getBlock($block_name)->setActive(false);
+            }
+        }
+
+        return $page;
+    }
+
+    public function getPageData($pageid){
+        if(!$this->pageExists($pageid)){
+            return null;
+        }
+
+        $page = $this->correctPage($this->loadPage($pageid));
+        if(is_null($page)){
+            return null;
+        }
+
+        //Заменяем унаследованные блоки на блоки из глобальной конфигурации
+        foreach($page->getBlocks() as $block_name => $block){
+            if(is_null($block->getActive())){
+                $page->setBlock($block_name, $this->global_settings->getBlock($block_name));
             }
         }
 
