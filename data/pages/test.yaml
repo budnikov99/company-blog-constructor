@@ -1,5 +1,0 @@
-title: test
-page_content:
-    type: static
-    content: '<h1>Это шаблон страницы. Используйте <a href="/admin/login">конструктор</a>, чтобы изменить её.</h1>'
-blocks: null

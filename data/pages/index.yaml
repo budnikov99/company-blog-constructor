@@ -1,0 +1,11 @@
+title: Главная
+page_content:
+    type: static
+    content: '<p><strong>Главная страница.</strong></p><hr><figure class="image image_resized" style="width:129px;"><img src="/userfiles/images/favicon.png"><figcaption>Symfony 5</figcaption></figure><p>&nbsp;</p>'
+blocks:
+    footer_copyright: { active: true, modules: [{ module: _basic/fixed_text, text: 'ЧТо-нибудь другое' }] }
+    favicon: { active: null, modules: {  } }
+    header_image: { active: null, modules: {  } }
+    header_menu: { active: null, modules: {  } }
+    left_sidebar: { active: null, modules: {  } }
+    header_title: { active: null, modules: {  } }

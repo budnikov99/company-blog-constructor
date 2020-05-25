@@ -2,17 +2,17 @@
     {% for item in data[0].data.items %}
         <div class="header-menu__item">
             {% if item.url == null %}
-                <p class="menu-item-text">{{item.text|e}}</p>
+                <span class="menu-item-text">{{item.text|e}}</span>
             {% else %}
                 <a class="menu-item-text" href="{{item.url}}">{{item.text|e}}</a>
             {% endif %}
-            {% if item.children %}
+            {% if item.children is defined %}
                 <div class="header-menu__submenu">
                     <div class="header-menu">
                         {% for child in item.children %}
                             <div class="header-menu__item">
                                 {% if child.url == null %}
-                                    <p class="menu-item-text">{{child.text|e}}</p>
+                                    <span class="menu-item-text">{{child.text|e}}</span>
                                 {% else %}
                                     <a class="menu-item-text" href="{{child.url}}">{{child.text|e}}</a>
                                 {% endif %}

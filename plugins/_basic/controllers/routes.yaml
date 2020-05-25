@@ -1,0 +1,37 @@
+#route_id: (идентификатор пути. при загрузке преобразуется в "<название плагина>_<исходное значение>")
+#    path: test/{var<\d+>?1} (путь. при загрузке преобразуется в "plugin/<название плагина>/<исходное значение>")
+#    controller: ControllerClass::method (название класса. класс ищется только в неймспейсе \Plugin\<плагин>\controllers)
+#    methods: GET|POST|PUT (методы)
+
+
+validate_argument:
+    path: module/{module_name}/{arg_name}/validate
+    controller: PageEditController::validateModuleArgument
+
+argument_list:
+    path: module/{module_name}/{arg_name}/list
+    controller: PageEditController::getModuleArgumentList
+
+page_get:
+    path: page/{page_id}/get
+    controller: PageEditController::getPage
+
+page_exists:
+    path: page/{page_id}/exists
+    controller: PageEditController::isPageExists
+
+page_name_valid:
+    path: page/{page_id}/valid
+    controller: PageEditController::validatePageName
+
+page_update:
+    path: page/{page_id}/update
+    controller: PageEditController::updatePage
+
+page_remove:
+    path: page/{page_id}/remove
+    controller: PageEditController::removePage
+
+page_create:
+    path: page/{page_id}/create
+    controller: PageEditController::createPage

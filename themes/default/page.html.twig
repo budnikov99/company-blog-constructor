@@ -1,7 +1,7 @@
-<html>
+<html lang="ru">
     <head>
-        <link rel="stylesheet" href="/theme/css/reset.css">
-        <link rel="stylesheet" href="/theme/css/base.scss">
+        <link rel="stylesheet" href="/assets/reset.css">
+        <link rel="stylesheet" href="/assets/theme/css/base.scss">
 
         {% if data.blocks.favicon.active %}
             <link rel="icon" href="{{data.blocks.favicon.modules[0].data.url}}">
@@ -10,9 +10,6 @@
         <title>{{data.title}}</title>
     </head>
     <body>
-        {% if constructor is defined %}
-            {{ include('constructor/constructor.html.twig') }}
-        {% endif %}
         {{ 
             include('block-include.twig', {
                 'block_obj': data.blocks.header_image, 
@@ -38,6 +35,7 @@
         #}
         <main>
             <div class="content-container">
+                <link rel="stylesheet" href="assets/content-styles.css">
                 {{ 
                     include('block-include.twig', {
                         'block_obj': data.blocks.left_sidebar, 

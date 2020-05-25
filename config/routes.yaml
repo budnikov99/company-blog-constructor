@@ -1,8 +1,7 @@
-#artgris
-artgris_bundle_file_manager:
-    resource: "@ArtgrisFileManagerBundle/Controller"
-    type:     annotation
-    prefix:   /manager
+#ckfinder
+ckfinder_connector:
+    resource: "@CKSourceCKFinderBundle/Resources/config/routing.yml"
+    prefix:   /
 
 ################
 
@@ -10,57 +9,48 @@ index:
     path: /
     controller: App\Controller\MainController::index
 
-theme_script:
-    path: theme/js/{filename}
-    controller: App\Controller\ThemeAssetController::getScript
-
-theme_style:
-    path: theme/css/{filename}
-    controller: App\Controller\ThemeAssetController::getStylesheet
-
 theme_asset:
-    path: theme/asset/{filename}
-    controller: App\Controller\ThemeAssetController::getAsset
+    path: assets/theme/{filename}
+    controller: App\Controller\DynamicAssetController::getThemeAsset
+    requirements:
+        filename: .+
 
-util_asset:
-    path: util/{filename}
-    controller: App\Controller\UtilAssetController::getAsset
-
-
-#CONSTRUCTOR
-
-validate_argument:
-    path: constructor/data/{module_name}/{arg_name}/validate
-    controller: App\Controller\ConstructorController::validateModuleArgument
-
-argument_list:
-    path: constructor/data/{module_name}/{arg_name}/list
-    controller: App\Controller\ConstructorController::getModuleArgumentList
-
-page_update:
-    path: constructor/page/{page_id}/update
-    controller: App\Controller\ConstructorController::updatePage
-
-page_remove:
-    path: constructor/page/{page_id}/remove
-    controller: App\Controller\ConstructorController::removePage
-
-page_create:
-    path: constructor/page/{page_id}/create
-    controller: App\Controller\ConstructorController::createPage
+plugin_asset:
+    path: assets/plugin/{plugin}/{filename}
+    controller: App\Controller\DynamicAssetController::getPluginAsset
+    requirements:
+        filename: .+
 
 
-#ADMIN
+#ADMIN PANEL
+
+plugin_routes:
+    resource: app.manager.plugin::loadPluginRoutes
+    type: service
 
 admin_logout:
     path: admin/logout
-    controller: App\Controller\ConstructorController::null
+    controller: App\Controller\MainController::adminLogout
 
 admin_login:
-    path: admin
-    controller: App\Controller\ConstructorController::null
+    path: admin/login
+    controller: App\Controller\MainController::adminLogin
 
-############
+admin_panel:
+    path: admin/
+    controller: App\Controller\MainController::getAdminPanelMain
+
+admin_panel_path:
+    path: admin/{path}
+    controller: App\Controller\MainController::getAdminPanel
+    defaults:
+        path: ''
+    requirements:
+        path: .+
+
+
+
+##################
 page:
     path: /{pageid}
     controller: App\Controller\MainController::getPage

@@ -1,0 +1,11 @@
+title: Контакты
+page_content:
+    type: static
+    content: '<h2><span style="font-family:Arial, Helvetica, sans-serif;font-size:36px;">Контакты</span></h2><p><strong>Телефон: </strong>8 (800) 555-35-35</p><p><strong>E-mail: </strong><a href="mailto:camper2012@yandex.ru">camper2012@yandex.ru</a></p><p>&nbsp;</p>'
+blocks:
+    favicon: { active: null, modules: {  } }
+    header_image: { active: null, modules: {  } }
+    header_menu: { active: null, modules: {  } }
+    left_sidebar: { active: null, modules: {  } }
+    footer_copyright: { active: null, modules: {  } }
+    header_title: { active: null, modules: {  } }

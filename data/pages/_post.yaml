@@ -1,11 +1,11 @@
 title: 'Страница отображения поста'
-
-page_content: 
-  type: post
-# type: posts
-# category: 
-#   - 'Категория1'
-#   - 'Категория2'
-
-blocks: null
-
+page_content:
+    type: static
+    content: ''
+blocks:
+    favicon: { active: null, modules: {  } }
+    header_image: { active: null, modules: {  } }
+    header_menu: { active: null, modules: {  } }
+    left_sidebar: { active: null, modules: {  } }
+    footer_copyright: { active: null, modules: {  } }
+    header_title: { active: null, modules: {  } }

@@ -1,10 +1,11 @@
-{% if data.type == 'static'%}
-    {{include('content/static.html.twig')}}
-{% elseif data.type == 'post' %}
-    TODO
-{% elseif data.type == 'void' %}
-{% elseif data.type == null %}
-No content.
+{% if data %}
+    {% if data.type == 'static'%}
+        {{include('content/static.html.twig')}}
+    {% elseif data.type == 'post' %}
+        TODO: default theme post display
+    {% elseif data.type == 'posts' %}
+        TODO: default theme post list by category display
+    {% endif %}
 {% else %}
-    Unsupported content type "{{data.type}}"
+    No content.
 {% endif %}

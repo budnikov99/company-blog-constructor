@@ -8,7 +8,7 @@ use App\services\data\PageData;
 use Exception;
 use Symfony\Component\Yaml\Yaml;
 
-class PageManager {
+class PageManager extends Manager {
     private $themem = null;
     private $global_settings = null;
     private $page_list = [];
@@ -17,7 +17,8 @@ class PageManager {
         $this->themem = $themem;
         $this->global_settings = $this->loadGlobalPage();
         if(is_null($this->global_settings)){
-            throw new Exception('Ошибка в файле глобальной конфигурации _global.yaml');
+            StaticLogger::critical('Ошибка в файле глобальной конфигурации страниц _global.yaml');
+            throw new Exception('Ошибка в файле глобальной конфигурации страниц _global.yaml');
         }
         foreach(scandir($this->getPageDir()) as $file){
             if(substr($file, -5) == '.yaml'){
@@ -31,11 +32,11 @@ class PageManager {
     }
 
     public static function getPageDir(){
-        return SERVER_ROOT.'\\data\\pages\\';
+        return SERVER_ROOT.'/data/pages/';
     }
 
     private function loadGlobalPage(){
-        $data = PageData::deserialize(Yaml::parseFile(SERVER_ROOT.'\\data\\pages\\_global.yaml'));
+        $data = PageData::deserialize(Yaml::parseFile(SERVER_ROOT.'/data/pages/_global.yaml'));
 
         $theme_blocks = $this->themem->getBlocks();
 
@@ -77,19 +78,45 @@ class PageManager {
         return true;
     }
 
-    public function createPage(string $pageid){
-        if($this->pageExists($pageid)){
+    public function isPageidValid($page_id){
+        if(empty($page_id) ||  gettype($page_id) != 'string' || $page_id[0] == '_'){
             return false;
         }
 
-        file_put_contents($this->getPageDir().$pageid.'.yaml', Yaml::dump([
-            'title' => $pageid,
-            'page_content' => [
-                'type' => 'static',
-                'content' => '<h1>Это шаблон страницы. Используйте <a href="/admin/login">конструктор</a>, чтобы изменить её.</h1>'
-            ],
-            'blocks' => null
-        ]));
+        for($i = 0; $i < strlen($page_id); $i++){
+            $char = $page_id[$i];
+            if(in_array($char, [
+                ' ', '/', '\\', ':', '*', '?', '\"', '\'', '<', '>', '|'
+            ])){
+                return false;
+            }
+        }
+
+        $reserved = [
+            'admin',
+            'assets',
+            'plugin',
+            'plugins',
+        ];
+        if(in_array($page_id, $reserved)){
+            return false;
+        }
+
+        return true;
+    }
+
+    public function getBlankPage(){
+        $data = new PageData('Новая страница', 'static');
+        $data->setContentArgs(['content' => '']);
+        return $this->correctPage($data);
+    }
+
+    public function createPage(string $pageid){
+        if($this->pageExists($pageid) || !$this->isPageidValid($pageid)){
+            return false;
+        }
+
+        file_put_contents($this->getPageDir().$pageid.'.yaml', Yaml::dump($this->getBlankPage()->serialize()));
         return true;
     }
 
@@ -112,11 +139,15 @@ class PageManager {
             if(is_null($page->getBlock($block_name))){
                 $page->setBlock($block_name, new BlockData(null));
             }else if(count($page->getBlock($block_name)->getModules()) == 0){
-                $page->getBlock($block_name)->setActive(false);
+                $page->getBlock($block_name)->setActive(null);
             }
         }
 
         return $page;
+    }
+
+    public function getCorrectedPage($pageid){
+        return $this->correctPage($this->loadPage($pageid));
     }
 
     public function getPageData($pageid){

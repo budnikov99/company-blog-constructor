@@ -1,0 +1,188 @@
+<script>
+    var page_id = '{{ data.page_id }}';
+    var create_mode = new Boolean('{{ data.create_mode }}').valueOf();
+
+    var this_page = JSON.parse('{{ data.page_json|escape("js") }}');
+    var global_page = JSON.parse('{{ data.global_json|escape("js") }}');
+
+    var block_info = JSON.parse('{{ data.blockinfo_json|escape("js") }}');
+    var modules_info = JSON.parse('{{ data.modules_json|escape("js") }}');
+</script>
+<div class="content-container flex-container-column flex-fill-container overflow-x-hidden">
+    <div class="content-container-title big">
+        {% if data.create_mode %}
+            Создать страницу
+        {% else %}
+            Изменить страницу {{data.page_id}}
+        {% endif %}
+    </div>
+    
+    <div class="content-container-block">
+        <div class="content-container-title">
+            Основные данные
+        </div>
+        <form id="create-page-form">
+            <div class="list-line">
+                <input type="text" id="page-title" class="input-field flex-fill-container" placeholder="Название страницы"/>
+            </div> 
+            <div class="list-line">
+                {% if data.create_mode %}
+                    <input type="text" id="page-id" class="input-field flex-fill-container" placeholder="Адрес страницы" value="{{data.page_id}}"/>    
+                    <input type="button" id="create-button" class="input-button blue" value="Создать" />
+                {% else %}
+                    <input type="text" disabled id="page-id" class="input-field flex-fill-container disabled" placeholder="Адрес страницы" value="{{data.page_id}}"/>
+                    <a class="input-button blue" href="/{{data.page_id}}" target="_blank">Перейти</a>
+                    <input type="button" id="save-button" class="input-button blue" value="Сохранить" />
+                    <input type="button" id="remove-button" class="input-button red" value="Удалить" />
+                {% endif %}
+                
+            </div>  
+        </form>
+    </div>
+
+{# Блоки #}
+    <div class="content-container-title">
+        Блоки
+    </div>
+    <div class="content-container-block">
+        <div class="fold">
+            <div class="fold-header">
+                Блоки страницы
+            </div>
+            <div class="fold-content">
+                
+            </div>
+        </div>
+        <div class="fold">
+            <div class="fold-header">
+                Глобальные блоки
+            </div>
+            <div class="fold-content">
+                wefwfwfwf
+            </div>
+        </div>
+    </div>
+
+{# ТИП СТРАНИЦЫ #}
+    <div class="content-container-title">
+        Тип страницы
+    </div>
+    <div class="content-tab-container flex-resize">
+        <div class="content-tabs">
+            <div data-tab-id="content" class="content-tab flex-fill-container">
+                <div class="flex-container-column">
+                    <div id="page-content-editor" class="input-textarea">
+                        <p>Содержимое страницы.</p>
+                    </div>
+                    <script>
+                        if(!create_mode && this_page.page_content.type == 'static'){
+                            document.getElementById('page-content-editor').innerHTML = this_page.page_content.content;
+                        }
+                    </script>
+                </div>
+            </div>
+            <div data-tab-id="blocks" class="content-tab flex-fill-container">
+                TODO
+            </div>
+        </div>
+        <div class="content-tab-buttons">
+            <div id="page-type-static" data-tab-id="content" class="content-tab-button">
+                <div class="content-tab-button-inside">
+                    Статичная страница
+                </div>
+            </div>
+            <div id="page-type-posts" data-tab-id="blocks" class="content-tab-button">
+                <div class="content-tab-button-inside">
+                    Список публикаций
+                </div>
+            </div>
+        </div>
+        <script>
+            if(this_page.page_content.type == 'static'){
+                document.getElementById('page-type-static').classList.add('active');
+            }else if(this_page.page_content.type == 'posts'){
+                document.getElementById('page-type-posts').classList.add('active');
+            }
+        </script>
+    </div>
+</div>
+
+<div id="page-edit-error-popup" class="popup animation">
+    <div class="popup-window">
+        <div class="popup-window-line-center">
+            <div class="popup-window-title error">
+                Ошибка
+            </div>
+        </div>
+        <div class="popup-window-line-center">
+            <div id="page-edit-error-text" class="popup-window-label">
+                Ошибка
+            </div>
+        </div>
+        <div class="popup-window-button-line-bottom">
+            <button class="close-button popup-window-bottom-button red">
+                Закрыть
+            </button>
+        </div>
+    </div>
+</div>
+<script src="/assets/ckeditor.js"></script>
+<script src="/assets/ckeditor-config.js"></script>
+<script type="text/javascript" src="/bundles/cksourceckfinder/ckfinder/ckfinder.js"></script>
+<script>CKFinder.config( { connectorPath: '/ckfinder/connector' } );</script>
+<script>
+    function showErrorPopup(text) {
+        document.getElementById('page-edit-error-text').innerHTML = text;
+        popup.showPopup('page-edit-error-popup');
+    }   
+    (async function(){
+        let field = document.getElementById('page-id');
+
+        let editor = await ClassicEditor.create(document.getElementById('page-content-editor'), ckeditorConfig());
+        
+        document.getElementById('page-type-static').onclick = (evt) => {
+            this_page.page_content = {};
+            this_page.page_content.type = 'static';
+            this_page.page_content.content = editor.getData();
+        };
+        document.getElementById('page-type-posts').onclick = (evt) => {
+            this_page.page_content = {};
+            this_page.page_content.type = 'posts';
+        };
+    }());
+</script>
+{% if data.create_mode %}
+    <script>
+        (function(){
+            let field = document.getElementById('page-id');
+
+            function validate(){
+                if(admin_helpers.validatePageid(field.value)){
+                    field.classList.remove('error');
+                }else{
+                    field.classList.add('error');
+                }
+            };
+
+            validate();
+            field.oninput = () => {validate();};
+
+            document.getElementById('create-button').onclick = (evt) => {
+                let id = field.value;
+                if(!admin_helpers.validatePageid(field.value)){
+                    showErrorPopup('Некорректный адрес страницы.');
+                    return;
+                }
+                admin_helpers.sendRequest('/plugin/_basic/page/'+field.value+'/create').then((response, status) => {
+                    if(response.success){
+                        window.location = '/admin/_basic/page_editor/page/'+id;
+                    }else{
+                        showErrorPopup(response.message);
+                    }
+                }, () => {
+                    showErrorPopup('Неизвестная ошибка.');
+                });
+            }
+        }());
+    </script>
+{% endif %}

@@ -1,0 +1,59 @@
+<html lang="ru">
+    <head>
+        <link rel="stylesheet" href="/assets/reset.css" />
+        <link rel="stylesheet" href="/assets/panel/admin-panel.css" />
+        <link rel="stylesheet" href="/assets/panel/admin-panel-popups.css" />
+        <script src="/assets/panel/admin-panel-helpers.js"></script>
+    </head>
+    <body>
+        <div class="admin-panel flex-container-column">
+            <div class="flex-container-row flex-fill-container">
+                <div class="admin-panel-sidebar flex-container-column"> 
+                    <div class="sidebar-header flex-container-row">
+                        <div class="sidebar-header-item sidebar-header-user">
+                            {{'admin'}}
+                        </div>
+                        <a class="sidebar-header-item sidebar-header-link flex-float-right" href="/admin/logout">
+                            Выход
+                        </a>
+                    </div>
+                    <div class="scroller-vertical sidebar-menu flex-fill-container">
+                        {% for ext, title in data.menu_items %}
+                            {% if data.active_extension == ext %}
+                                <div class="scroller-item sidebar-menu-item active">
+                                    <div class="sidebar-menu-item-title">
+                                        {{title}}
+                                    </div>
+                                    {% if not data.active_submenu_items is empty %}
+                                        <div class="sidebar-submenu flex-container-column">
+                                            {% for item, title in data.active_submenu_items %}
+                                                {% if data.active_submenu_item == item %}
+                                                    <div class="sidebar-submenu-item active">
+                                                        {{title}}
+                                                    </div>
+                                                {% else %}
+                                                    <a class="sidebar-submenu-item" href="/admin/{{ ext ~ '/' ~ item }}">
+                                                        {{title}}
+                                                    </a>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% else %}
+                                <a class="scroller-item sidebar-menu-item" href="/admin/{{ ext }}">
+                                    <div class="sidebar-menu-item-title"> 
+                                        {{title}}
+                                    </div>
+                                </a>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="admin-panel-content flex-fill-container scroller-vertical">
+                    {{ data.content_html|raw }}
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

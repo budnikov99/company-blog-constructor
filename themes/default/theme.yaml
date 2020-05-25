@@ -1,12 +1,13 @@
+
 main_template: 'page.html.twig'
 blocks:
   header_title:
-    title: 'Название страницы'
+    title: 'Заголовок страницы'
     multiple: false
     accepted_formats:
       - TextFormat
   favicon:
-    title: 'Иконка'
+    title: 'Иконка вкладки'
     multiple: false
     accepted_formats:
       - ImageFormat
@@ -32,4 +33,6 @@ blocks:
     multiple: false
     accepted_formats:
       - TextFormat
+      - ImageFormat
+      - MenuFormat
 

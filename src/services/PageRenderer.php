@@ -14,23 +14,23 @@ use Symfony\Component\Yaml\Yaml;
 
 class PageRenderer {
     private $themem = null;
-    private $modules = null;
+    private $plugins = null;
     private $pagem = null;
     private $twig = null;
-    private $logger = null;
 
-    public function __construct(ThemeManager $themem, ModuleManager $modules, LoggerInterface $logger, PageManager $pagem){
+    public function __construct(Environment $twig, ThemeManager $themem, PluginManager $plugins, PageManager $pagem){
         $this->themem = $themem;
-        $this->modules = $modules;
+        $this->modules = $plugins;
         $this->pagem = $pagem;
 
-        $loader = new FilesystemLoader($themem->getThemeDir());
-        $loader->addPath(SERVER_ROOT.'\\util');
-        $this->twig = new Environment($loader, ['debug' => $_SERVER['APP_DEBUG']]);
+        $this->twig = $twig;
+        $loader = $this->twig->getLoader();
+        if($loader instanceof FilesystemLoader){
+            $loader->addPath($themem->getThemeDir());
+        }
         if($_SERVER['APP_DEBUG']){
             $this->twig->addExtension(new \Twig\Extension\DebugExtension());
         }
-        $this->logger = $logger;
     }
 
     private function renderBlockData($page_data){
@@ -44,41 +44,26 @@ class PageRenderer {
                 foreach($block->getModules() as $module){
 
                     if(is_null($this->modules->getModule($module->getName()))){
-                        $this->logger->error('Несущетсвующий модуль '.$module.' запрошен в блоке '.$name);
+                        StaticLogger::error('На странице запрошен несуществующий модуль', [
+                            'module' => $module->getName(),
+                            'block' => $name
+                        ]);
+                        $block->setActive(false);
                         continue;
                     }
 
                     if(in_array($this->modules->getModule($module->getName())->getFormat(), $formats)){
                         $module->setData($this->modules->getModule($module->getName())->getData($module->getArgs()));
                     }else{
-                        $this->logger->error('Блок '.$name.' не поддерживает формат данных модуля '.$module->getName().
-                                ' ('.$this->modules->getModule($module->getName())->getFormat().')');
+                        StaticLogger::error('Блок не поддерживает формат данных модуля ', [
+                            'block' => $name,
+                            'module' => $module->getName(),
+                            'format' => $this->modules->getModule($module->getName())->getFormat()
+                        ]);
                     }
                 }
             }
         }
-    }
-
-    public function getConstructorData(string $pageid, PageData $page_data){
-
-        $current_page = $this->pagem->correctPage($this->pagem->loadPage($pageid));
-        $global_page = $this->pagem->getGlobalPage();
-
-        $modules_serialized = [];
-        foreach($this->modules->getModuleList() as $key => $value){
-            $modules_serialized[$key] = ModuleData::createFromModule($value)->serialize();
-        }
-
-        return [
-            'current_page' => $current_page,
-            'page_json' => json_encode($current_page->serialize()),
-            'modules_json' => json_encode($modules_serialized),
-
-            'blocks' => $this->themem->getBlocks(),
-            'modules' => $this->modules->getModuleList(),
-            'global_page' => $global_page,
-            'page_list' => $this->pagem->getPageList(),
-        ];
     }
 
     public function getPageData($pageid){
@@ -93,19 +78,18 @@ class PageRenderer {
         $this->renderBlockData($page_data);
 
         $data = [
-            'id' => $pageid,
+            'page_id' => $pageid,
             'data' => $page_data,            
         ];
-
-        if(true){
-            $data['constructor'] = $this->getConstructorData($pageid, $page_data);
-        }
 
         return $data;
     }
 
     public function getPage($pageid){
         $page = $this->getPageData($pageid);
+        if(is_null($page)){
+            throw new NotFoundHttpException();
+        }
 
         //Контент для технических страниц генерируется отдельно
         if($pageid[0] != '_'){
@@ -114,15 +98,12 @@ class PageRenderer {
                 throw new InternalErrorException('Ошибка при загрузке контента');
             }
         }
-
+    
         return $this->renderPage($this->generateTemplateData($pageid, $page));
     }
 
     public function getIndexPage(){
-        $page = $this->getPageData('_index');
-        $page->createContentFromArgs();
-
-        return $this->renderPage($this->generateTemplateData('_index', $page));
+        return $this->getPage('index');
     }
 
     public function renderPage($data){

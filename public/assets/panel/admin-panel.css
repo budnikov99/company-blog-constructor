@@ -1,0 +1,436 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+}
+
+/*//////////
+Общие классы
+//////////*/
+
+.flex-container-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.flex-container-row {
+    display: flex;
+    flex-direction: row;
+}
+
+.flex-float-right {
+    margin-left: auto;
+}
+
+.flex-float-bottom {
+    margin-top: auto;
+}
+
+.flex-resize {
+    flex: 1;
+}
+
+/* Заставляет элемент принимать максимальный размер, не выходя за пределы контейнера */
+.flex-fill-container {
+    flex: 1;
+    min-height: 0;
+}
+
+.overflow-x-hidden {
+    overflow-x: hidden;
+}
+
+.scroller-vertical {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.scroller-horizontal {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+}
+
+.scroller-item {
+    flex: 0 0 auto;
+}
+
+/* панели в контенте */
+
+
+/* стили контента */
+
+.content-container {
+    padding: 30px;
+}
+
+.content-container-title {
+    font-family: sans-serif;
+    color: #555;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.content-container-title.big {
+    color: #888;
+    font-size: 36px;
+}
+
+.content-container-block {
+    font-family: sans-serif;
+    margin: 20px 0;
+    padding: 20px 30px;
+    background: white;
+    box-shadow: 2px 2px 5px 1px rgb(0,0,0,0.25);
+}
+
+/* список */
+
+.list {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+}
+
+.list-title {
+    font-family: sans-serif;
+    color: #555;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.list-line {
+    margin: 10px 0px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.list-line > * {
+    margin-right: 10px;
+}
+
+.list-line > *:last-child {
+    margin-right: inherit;
+}
+
+.list-label {
+    font-family: sans-serif;
+    color: black;
+}
+
+/* tabs */
+
+.content-tab-container {
+    margin: 20px 0;
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: flex-end;
+}
+
+.content-tab-buttons {
+    display: flex;
+    flex-direction: row;
+}
+
+.content-tabs {
+    display: flex;
+    flex-direction: column;
+
+    padding-top: 10px;
+    background-color: white;
+
+    box-shadow: 2px 2px 5px 1px rgb(0,0,0,0.25)
+}
+
+.content-tab {
+    display: none;
+    flex-direction: column;
+    flex: 1;
+    padding: 30px;
+}
+
+.content-tab.show {
+    display: flex;
+}
+
+.content-tab-button {
+    flex: 1 1 0;
+    min-width: 0;
+
+    text-align: center;
+    font-family: sans-serif;
+    font-weight: bold;
+    overflow: hidden;
+    cursor: pointer;
+
+    margin: -5px;
+    margin-bottom: 0;
+}
+
+.content-tab-button > .content-tab-button-inside {
+    margin: 5px;
+    margin-bottom: 0;
+    padding: 10px;
+    color: #666;
+    background-color: transparent;
+}
+
+.content-tab-button:not(.active):hover > .content-tab-button-inside {
+    color: #444;
+}
+
+.content-tab-button.active > .content-tab-button-inside {
+    color: #111;
+    background-color: white;
+    box-shadow: 2px 2px 5px 1px rgb(0,0,0,0.25);
+}
+
+/* fold */
+
+.fold {
+    border: 1px solid #ccc;
+    margin: 10px 0;
+}
+
+.fold-header {
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    padding-left: 40px;
+    height: 40px;
+
+    font-weight: bold;
+    color: #777;
+    background-color: white;
+    cursor: pointer;
+
+    transition: none .15s ease;
+    transition-property: background-color, color;
+}
+
+.fold.unfolded > .fold-header {
+    background-color: #eee;
+    color: black;
+}
+
+.fold-header:before {
+    content: '>';
+    font-family: sans-serif;
+    font-size: 30px;
+    font-weight: bold;
+    color: #888;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 40px;
+    width: 40px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    transition: none .15s ease;
+    transition-property: transform, color;
+    transform: rotate(0deg);
+}
+
+.fold.unfolded > .fold-header:before {
+    transform: rotate(90deg);
+    color: black;
+}
+
+.fold-content {
+    padding: 10px;
+}
+
+.fold:not(.unfolded) > .fold-content {
+    display: none;
+}
+
+/* inputs */
+
+.input-button,
+.input-field {
+    outline: 0;
+    padding: 5px 10px;
+    font-family: sans-serif;
+    font-size: 14px;
+}
+
+.input-button {
+    background: white;
+    border: 1px solid #666;
+    color: #666;
+    cursor: pointer;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.input-button:hover {
+    background: #666;
+    color: white;
+}
+
+.input-button.red {
+    border-color: #c20;
+    color: #c20;
+}
+.input-button.red:hover {
+    background: #c20;
+    color: white;
+}
+
+.input-button.green {
+    border-color: #0c0;
+    color: #0c0;
+}
+.input-button.green:hover {
+    background: #0c0;
+    color: white;
+}
+
+.input-button.blue {
+    border-color: #08c;
+    color: #08c;
+}
+.input-button.blue:hover {
+    background: #08c;
+    color: white;
+}
+
+.input-field {
+    border: 1px solid #aaa;
+    background: white;
+}
+
+.input-field.disabled {
+    background: #eee;
+    color: #666;
+    cursor: default;
+}
+
+.input-field.error {
+    border-color: #c20;
+}
+
+.input-textarea {
+    background: white;
+    border: 1px solid #bbb;
+    padding: 5px 10px;
+}
+
+/*////////////////
+Внешний вид панели
+////////////////*/
+
+/* Обёртка всей админ панели, потому что symfony в режиме отладки добавляет дебаг-панель, которая всё ломает */
+.admin-panel {
+    position: absolute;
+    width: 100%;
+    height: 100%;  
+}
+
+/* Боковая панель */
+
+.admin-panel-sidebar {
+    background-color: #444450;
+
+    font-family: sans-serif;
+    color: white;
+}
+
+.sidebar-header {
+    background-color: #111120;
+}
+
+.sidebar-header-item {
+    padding: 10px 20px;
+}
+
+.sidebar-header-user {
+    font-size: 0.75em;
+    align-self: center;;
+    color: #dddddd;
+}
+
+.sidebar-header-link {
+    color: inherit;
+    text-decoration: none;
+}
+
+.sidebar-header-link:hover {
+    background-color: #222230;
+}
+
+/* Меню */
+
+.sidebar-menu::-webkit-scrollbar { display: none; }
+
+.sidebar-menu-item {
+    color: white;
+    text-decoration: none;
+    background-color: #444450;
+}
+
+
+.sidebar-menu-item:not(.active):hover {
+    background-color: #555560;
+}
+
+.sidebar-menu-item-title {
+    padding: 10px 20px;
+}
+
+.sidebar-menu-item.active .sidebar-menu-item-title {
+    position: relative;
+}
+
+.sidebar-menu-item.active .sidebar-menu-item-title:after {
+    content: '';
+    display: inline;
+    position: absolute;
+    right: 0;
+
+    border: 0.5em solid transparent;
+    border-right: 0.5em solid #eeeeee;
+}
+
+.sidebar-menu-item.active .sidebar-menu-item-title {
+    background-color: #0099cc;
+}
+
+.sidebar-submenu {
+    padding: 10px 0px;
+    background-color: #555560;
+}
+
+.sidebar-submenu-item {
+    color: #bbbbbb;
+    text-decoration: none;
+    font-size: 0.875em;
+
+    padding: 5px 20px 5px 30px;
+}
+
+.sidebar-submenu-item:not(.active):hover {
+    background-color: #666670;
+}
+
+.sidebar-submenu-item.active {
+    background-color: #666670;
+    color: white;
+    font-weight: bold;
+}
+
+.admin-panel-content {
+    background-color: #eeeeee;
+}
+
+
+
+
+

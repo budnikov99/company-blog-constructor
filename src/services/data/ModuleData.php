@@ -1,7 +1,7 @@
 <?php
 namespace App\services\data;
 
-use App\modules\Module;
+use App\plugins\Module;
 
 class ModuleData extends Data {
     private $name = '';

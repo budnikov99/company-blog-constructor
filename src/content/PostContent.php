@@ -3,7 +3,7 @@ namespace App\content;
 
 class PostContent extends Content {
     protected function loadData(array $args){
-        if($args['id']){
+        if(array_key_exists('id', $args)){
             
         }
         return true;

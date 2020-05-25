@@ -8,7 +8,7 @@ class PageData extends Data {
     private $title = '';
     private $blocks = [];
 
-    private $page_content_type = 'void';
+    private $page_content_type = 'error';
     private $page_content = [];
 
     private $content = null;

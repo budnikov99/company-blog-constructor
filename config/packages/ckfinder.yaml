@@ -1,0 +1,5 @@
+ckfinder:
+    connector:
+        licenseName: localhost
+        licenseKey: PMTMAEEBLWP8GMOYVVPE4H4DPZ7A4
+        authenticationClass: App\auth\CKFinderAuth
