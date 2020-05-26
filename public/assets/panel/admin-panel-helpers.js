@@ -74,13 +74,9 @@ var popup = {
         }else{
             throw new Error('Popup #'+id+' does not exist.');
         }
-    }
-};
+    },
 
-document.addEventListener('DOMContentLoaded', () => {
-    popup.setTransitionDuration(150);
-
-    document.querySelectorAll('.popup').forEach((elem) => {
+    initPopup(elem){
         if(elem.id){
             elem.addEventListener('mousedown', (evt) => {
                 if(evt.target === elem){
@@ -93,43 +89,81 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             });
         }
-    });
+    }
+};
 
-    document.querySelectorAll('.content-tab-container').forEach((container) => {
-        let tabs = {};
-        let buttons = {};
-
-        container.querySelectorAll('.content-tab').forEach((item) => {
-            if('tabId' in item.dataset){
-                tabs[item.dataset.tabId] = item;
+function queryDirectChildrenAll(elm, sel, first = false){
+    var ret = [], i = 0, l = elm.childNodes.length;
+    for (var i; i < l; ++i){
+        let ch = elm.childNodes[i];
+        if ((ch.matches && ch.matches(sel)) || (ch.matchesSelector && ch.matchesSelector(sel))){
+            if(first){
+                return elm.childNodes[i];
+            }else{
+                ret.push(elm.childNodes[i]);
             }
-        });
-        container.querySelectorAll('.content-tab-button').forEach((item) => {
-            if('tabId' in item.dataset){
-                buttons[item.dataset.tabId] = item;
-
-                item.addEventListener('click', (evt) => {
-                    if(item.dataset.tabId in tabs){
-                        Object.keys(buttons).forEach((id) => { buttons[id].classList.remove('active'); });
-                        Object.keys(tabs).forEach((id) => { tabs[id].classList.remove('show'); });
-                        item.classList.add('active');
-                        tabs[item.dataset.tabId].classList.add('show');
-                    }
-                });
-
-                if(item.classList.contains('active')){
-                    tabs[item.dataset.tabId].classList.add('show');
-                }
-            }
-        });
-    });
-
-    document.querySelectorAll('.fold-header').forEach((elem) => {
-        let fold = elem.parentElement;
-        if(fold.classList.contains('fold')){
-            elem.addEventListener('click', (evt) => {
-                fold.classList.toggle('unfolded');
-            });
         }
-    });
+    }
+    if(first){
+        return null;
+    }else{
+        return ret;
+    }
+}
+
+function queryDirectChildFirst(elm, sel){
+    return queryDirectChildrenAll(elm, sel, true);
+}
+
+let tabs = {
+    tabButtonClickHandler(evt){
+        let item = evt.target;
+        if('tabId' in item.dataset){
+            let buttons = item.parentNode.parentNode;
+            let container = buttons.parentNode;
+            let tabs = queryDirectChildFirst(container, '.content-tabs');
+
+            if(!buttons || !container || !tabs){
+                return;
+            }
+
+            buttons.querySelectorAll('.content-tab-button').forEach((elem) => {elem.classList.remove('active');});
+            queryDirectChildrenAll(tabs, '.content-tab').forEach((elem) => {
+                if('tabId' in elem.dataset && elem.dataset.tabId == item.dataset.tabId){
+                    elem.classList.add('show'); 
+                }else{
+                    elem.classList.remove('show'); 
+                }
+            });
+            item.classList.add('active');
+        }
+    },
+
+    initTabContainer(container){
+        let buttons = queryDirectChildFirst(container, '.content-tab-buttons');
+        buttons.querySelectorAll('.content-tab-button').forEach((item) => {
+            item.addEventListener('click', tabs.tabButtonClickHandler);
+            if(item.classList.contains('active')){
+                item.click();
+            }
+        });
+    },
+};
+
+let folds = {
+    foldHeaderClickHandler(evt){
+        evt.target.parentNode.classList.toggle('unfolded');
+    },
+
+    initFold(fold){
+        queryDirectChildFirst(fold, '.fold-header').addEventListener('click', folds.foldHeaderClickHandler);
+    }
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    popup.setTransitionDuration(150);
+
+    document.querySelectorAll('.popup').forEach((elem) => {popup.initPopup(elem)});
+    document.querySelectorAll('.content-tab-container').forEach((elem) => {tabs.initTabContainer(elem)});
+    document.querySelectorAll('.fold').forEach((elem) => {folds.initFold(elem);});
 });

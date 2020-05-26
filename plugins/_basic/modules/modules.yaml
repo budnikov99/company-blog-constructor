@@ -4,13 +4,12 @@ menu:
   title: 'Меню'
   args:
     menu:                     #может существовать метод menuValidate($value), проверяющий корректность, иначе, любое значение корректно
-      type: list              #string(поле), list(список), number(число) или boolean(галочка)
-                              #file(файл в папке uploads сервера)
+      type: list              #text(поле), list(список), number(число) или boolean(галочка)
+                              #file(url файла в папке uploads сервера)
                               #может быть list, тогда будет вызван метод menuValues() модуля, который возвращает массив строк
                               #и поле будет отбражаться как выпадающий список
                               #если menuValidate($val) не определён, всегда будет возвращаться true, но в случае с типом list,
                               #true будет возвращаться только если полученное значение содержится в списке
-      required: true          #является ли аргумент обязательным
       title: 'Отображаемое меню'
 
 fixed_text:
@@ -19,9 +18,9 @@ fixed_text:
   title: 'Фиксированный текст'
   args:
     text:
-      type: string
-      required: true
+      type: text
       title: 'Текст'
+      
 
 image_url:
   format: ImageFormat
@@ -29,10 +28,20 @@ image_url:
   title: 'Картинка по URL'
   args:
     url:
-      type: string
-      required: true
+      type: text
       title: 'URL картинки'
     alt:
-      type: string
-      required: false
+      type: text
+      title: 'Подпись картинки'
+
+image_file:
+  format: ImageFormat
+  class: ImageURLModule
+  title: 'Картинка с сервера'
+  args:
+    url:
+      type: file
+      title: 'Файл'
+    alt:
+      type: text
       title: 'Подпись картинки'

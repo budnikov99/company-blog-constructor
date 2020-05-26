@@ -56,8 +56,16 @@ class AdminPanelRenderer {
                 $data['active_submenu_item'] = $submenu['active'];
 
                 $ext_data = $extension->getTemplateData($subpath);
+                $ext_urls = [
+                    'panel_url' => '/admin/'.$extension_id,
+                    'assets_url' => '/assets/plugin/'.$plugin,
+                    'controller_url' => '/plugin/'.$plugin,
+                ];
                 if(!empty($ext_data)){
-                    $data['content_html'] = $this->twig->render($ext_data['template'], ['data' => $ext_data['data']]);
+                    $data['content_html'] = $this->twig->render($ext_data['template'], [
+                        'data' => $ext_data['data'], 
+                        'url' => $ext_urls,
+                        ]);
                 }
             }
         }

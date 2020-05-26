@@ -24,6 +24,9 @@ class PageEditor extends AdminPanelExtension {
     }
 
     private function getMode($subpath){
+        if($subpath == 'global'){
+            return 'global';
+        }
         $pageid = $this->getPageId($subpath);
         if(empty($subpath) || $subpath == 'create' || (!empty($pageid) && !$this->isPageEditable($pageid))){
             return 'create';
@@ -37,7 +40,10 @@ class PageEditor extends AdminPanelExtension {
     public function getSubmenu(string $subpath){
         $data = [
             'active' => '',
-            'items' => ['create' => 'Создать страницу'],
+            'items' => [
+                'create' => 'Создать страницу',
+                'global' => 'Общие настройки блоков',
+            ],
         ];
         foreach($this->managers[PageManager::class]->getPageList() as $page){
             if($page == '_global'){
@@ -47,10 +53,10 @@ class PageEditor extends AdminPanelExtension {
         }
 
         $mode = $this->getMode($subpath);
-        if($mode == 'create'){
-            $data['active'] = 'create';
-        }else if($mode == 'edit'){
+        if($mode == 'edit'){
             $data['active'] = $subpath;
+        }else{
+            $data['active'] = $mode;
         }
 
         return $data;
@@ -84,6 +90,7 @@ class PageEditor extends AdminPanelExtension {
             'template' => '_basic/templates/page-editor.html.twig',
             'data' => [
                 'create_mode' => $mode == 'create',
+                'global_mode' => $mode == 'global',
                 'page_id' => $pageid,
                 'page_json' => json_encode($current_page->serialize()),
                 'global_json' => json_encode($global_page->serialize()),

@@ -98,16 +98,26 @@
     font-weight: bold;
     padding: 10px 10px;
 }
-.popup-window-title.error {
-    color: #c20;
-}
 
 .popup-window-label {
     font-family: sans-serif;
 }
-.popup-window-label.error {
-    color: #c20;
+
+.popup-window-title.red,
+.popup-window-label.red {
+    color: var(--panel-color-red);
 }
+
+.popup-window-title.green,
+.popup-window-label.green {
+    color: var(--panel-color-green);
+}
+
+.popup-window-title.blue,
+.popup-window-label.blue {
+    color: var(--panel-color-blue);
+}
+
 
 .popup-window-x-button {
     position: relative;
@@ -177,29 +187,29 @@
 }
 
 .popup-window-bottom-button.red {
-    border-color: #c20;
-    color: #c20;
+    border-color: var(--panel-color-red);
+    color: var(--panel-color-red);
 }
 .popup-window-bottom-button.red:hover {
-    background: #c20;
+    background: var(--panel-color-red);
     color: white;
 }
 
 .popup-window-bottom-button.green {
-    border-color: #0c0;
-    color: #0c0;
+    border-color: var(--panel-color-green);
+    color: var(--panel-color-green);
 }
 .popup-window-bottom-button.green:hover {
-    background: #0c0;
+    background: var(--panel-color-green);
     color: white;
 }
 
 .popup-window-bottom-button.blue {
-    border-color: #08c;
-    color: #08c;
+    border-color: var(--panel-color-blue);
+    color: var(--panel-color-blue);
 }
 .popup-window-bottom-button.blue:hover {
-    background: #08c;
+    background: var(--panel-color-blue);
     color: white;
 }
 

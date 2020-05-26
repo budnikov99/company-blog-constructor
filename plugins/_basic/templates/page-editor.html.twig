@@ -1,6 +1,11 @@
+<script src="/assets/ckeditor.js"></script>
+<script src="/assets/ckeditor-config.js"></script>
+<script type="text/javascript" src="/bundles/cksourceckfinder/ckfinder/ckfinder.js"></script>
+<script>CKFinder.config( { connectorPath: '/ckfinder/connector' } );</script>
 <script>
     var page_id = '{{ data.page_id }}';
     var create_mode = new Boolean('{{ data.create_mode }}').valueOf();
+    var global_mode = new Boolean('{{ data.global_mode }}').valueOf();
 
     var this_page = JSON.parse('{{ data.page_json|escape("js") }}');
     var global_page = JSON.parse('{{ data.global_json|escape("js") }}');
@@ -12,57 +17,465 @@
     <div class="content-container-title big">
         {% if data.create_mode %}
             Создать страницу
+        {% elseif data.global_mode %}
+            Глобальные настройки блоков
         {% else %}
             Изменить страницу {{data.page_id}}
         {% endif %}
     </div>
-    
-    <div class="content-container-block">
-        <div class="content-container-title">
-            Основные данные
-        </div>
-        <form id="create-page-form">
-            <div class="list-line">
+    {% if not data.global_mode %}
+        <div class="content-container-block">
+            <div class="content-container-title">
+                Основные данные
+            </div>
+            <div class="list-line block-margin">
                 <input type="text" id="page-title" class="input-field flex-fill-container" placeholder="Название страницы"/>
             </div> 
-            <div class="list-line">
-                {% if data.create_mode %}
+            <script>
+                (function(){
+                    let title = document.getElementById('page-title');
+                    title.value = this_page.title;
+                    title.oninput = (evt) => {
+                        this_page.title = title.value;
+                    };
+                }());
+            </script>
+            {% if data.create_mode %}
+                <div class="list-line block-margin">
                     <input type="text" id="page-id" class="input-field flex-fill-container" placeholder="Адрес страницы" value="{{data.page_id}}"/>    
                     <input type="button" id="create-button" class="input-button blue" value="Создать" />
-                {% else %}
+                </div>
+                <script>
+                    (function(){
+                        let field = document.getElementById('page-id');
+            
+                        function validate(){
+                            if(admin_helpers.validatePageid(field.value)){
+                                field.classList.remove('error');
+                            }else{
+                                field.classList.add('error');
+                            }
+                        };
+            
+                        validate();
+                        field.oninput = () => {validate();};
+            
+                        document.getElementById('create-button').onclick = (evt) => {
+                            let id = field.value;
+                            if(!admin_helpers.validatePageid(field.value)){
+                                showErrorPopup('Некорректный адрес страницы.');
+                                return;
+                            }
+                            admin_helpers.sendRequest('{{url.controller_url}}/page/'+field.value+'/create').then((response, status) => {
+                                if(response.success){
+                                    savePage(field.value, this_page).then(() => {
+                                        window.location = '{{url.panel_url}}/page/'+id;
+                                    }, () => {
+                                        window.location = '{{url.panel_url}}/page/'+id;
+                                    });
+                                }else{
+                                    showErrorPopup(response.message);
+                                }
+                            }, () => {
+                                showErrorPopup('Неизвестная ошибка.');
+                            });
+                        }
+                    }());
+                </script>
+            {% else %}
+                <div class="list-line block-margin">
                     <input type="text" disabled id="page-id" class="input-field flex-fill-container disabled" placeholder="Адрес страницы" value="{{data.page_id}}"/>
                     <a class="input-button blue" href="/{{data.page_id}}" target="_blank">Перейти</a>
                     <input type="button" id="save-button" class="input-button blue" value="Сохранить" />
                     <input type="button" id="remove-button" class="input-button red" value="Удалить" />
-                {% endif %}
-                
-            </div>  
-        </form>
-    </div>
+                </div>
+                <div id="page-editor-remove-popup" class="popup animation">
+                    <div class="popup-window">
+                        <div class="popup-window-line-center">
+                            <div class="popup-window-title red">
+                                Удалить страницу {{data.page_id}}?
+                            </div>
+                        </div>
+                        <div class="popup-window-line-center">
+                            <div id="page-edit-error-text" class="popup-window-label">
+                                Это действие не может быть отменено.
+                            </div>
+                        </div>
+                        <div class="popup-window-button-line-bottom">
+                            <button id="remove-confirm-button" class="close-button popup-window-bottom-button red">
+                                Удалить
+                            </button>
+                            <button class="close-button popup-window-bottom-button blue">
+                                Отмена
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="page-editor-removed-popup" class="popup animation">
+                    <div class="popup-window">
+                        <div class="popup-window-line-center">
+                            <div class="popup-window-title blue">
+                                Страница {{data.page_id}} успешно удалена.
+                            </div>
+                        </div>
+                        <div class="popup-window-button-line-bottom">
+                            <button id="remove-update-button" class="popup-window-bottom-button blue">
+                                Закрыть
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <script>
+                    (function(){
+                        document.getElementById('remove-button').onclick = (evt) => {
+                            popup.showPopup('page-editor-remove-popup');
+                        };
+                        document.getElementById('remove-confirm-button').onclick = (evt) => {
+                            admin_helpers.sendRequest('{{url.controller_url}}/page/'+page_id+'/remove').then((response, status) => {
+                                if(response.success){
+                                    popup.showPopup('page-editor-removed-popup');
+                                }else{
+                                    showErrorPopup(response.message);
+                                }
+                            }, () => {
+                                showErrorPopup('Неизвестная ошибка.');
+                            });
+                            console.log('removed');
+                        };
 
+                        document.getElementById('remove-update-button').onclick = (evt) => {
+                            location.href = location.href;
+                        };
+
+                        document.getElementById('save-button').onclick = (evt) => {
+                            savePage(page_id, this_page).then(() => {
+                                showSuccessPopup('Страница сохранена.');
+                            }, (message) => {
+                                showErrorPopup(message);
+                            });
+                        };
+                    }());
+                </script>
+            {% endif %}
+        </div>
+    {% endif %}
 {# Блоки #}
-    <div class="content-container-title">
-        Блоки
-    </div>
-    <div class="content-container-block">
-        <div class="fold">
-            <div class="fold-header">
-                Блоки страницы
-            </div>
-            <div class="fold-content">
-                
-            </div>
+    {% if not data.global_mode %}
+        <div class="content-container-title">
+            Блоки
         </div>
-        <div class="fold">
-            <div class="fold-header">
-                Глобальные блоки
-            </div>
-            <div class="fold-content">
-                wefwfwfwf
-            </div>
-        </div>
-    </div>
+    {% endif %}
 
+    <div class="content-container-block flex-container-column">
+        <div id="block-editor-list" class="flex-container-column"></div>
+
+        <script>
+            function wrap(elements, classes){
+                if(!elements){ elements = []; }
+                if(!classes){ classes = []; }
+                if(!Array.isArray(classes)){ classes = [classes]; }
+                if(!Array.isArray(elements)){ elements = [elements]; }
+                let wrapper = document.createElement('div');
+                classes.forEach((classname) => { wrapper.classList.add(classname); });
+                elements.forEach((element) => {
+                    if(typeof element == 'string'){ element = document.createTextNode(element); }
+                    wrapper.appendChild(element);
+                });
+                return wrapper;
+            }
+
+            function getBlankModule(name){
+                let info = modules_info[name];
+                let data = {
+                    'module': name,
+                };
+                Object.keys(info.arguments).forEach((arg) => {
+                    getDefaultFieldValue(info.arguments[arg].type)
+                });
+                return data;
+            }
+
+            function getDefaultFieldValue(type){
+                switch(type){
+                    case 'boolean': return false;
+                    case 'number': return 0;
+                    case 'list': return '';
+                    default: return '';
+                }
+            }
+
+            let block_container = document.getElementById('block-editor-list');
+                
+            Object.keys(block_info).forEach((block_name) => {
+                let block_fold = document.createElement('div');
+                block_fold.classList.add('fold');
+
+                let fold_header = document.createElement('div');
+                fold_header.classList.add('fold-header');
+                fold_header.innerText = block_info[block_name].title+' ('+block_name+')';
+
+                let fold_content = document.createElement('div');
+                fold_content.classList.add('fold-content');
+                fold_content.id = 'block-edit-'+block_name;
+                
+                block_fold.appendChild(fold_header);
+                block_fold.appendChild(fold_content);
+                block_container.appendChild(block_fold);
+                folds.initFold(block_fold);
+
+                updateBlockEdit(block_name);
+            });
+
+            function updateBlockEdit(name){
+                let edit = document.getElementById('block-edit-'+name);
+                let info = block_info[name];
+                let page = global_mode ? global_page : this_page;
+                let block = page.blocks[name];
+
+                if(!edit || !info || !block){
+                    return;
+                }
+                while(edit.lastChild){
+                    edit.removeChild(edit.lastChild);
+                }
+
+                let inherited = !global_mode && (block.active == null);
+                
+                let top_list = wrap([], ['list']);
+
+                if(!global_mode){
+                    let inherit_switch = document.createElement('input');
+                    inherit_switch.type = 'checkbox';
+                    inherit_switch.classList.add('input-checkbox');
+                    inherit_switch.checked = inherited;
+
+                    inherit_switch.onchange = (evt) => {
+                        this_page.blocks[name].active = evt.target.checked ? null : global_page.blocks[name].active;
+                        this_page.blocks[name].modules = JSON.parse(JSON.stringify(global_page.blocks[name].modules));
+                        updateBlockEdit(name);
+                    };
+
+                    top_list.appendChild(
+                        wrap(
+                            [inherit_switch,
+                                wrap(
+                                    'Из общих настроек',
+                                    'list-line-label'
+                                )],
+                            ['list-line','flex-fill-container']
+                        ));
+                }
+                if(inherited){
+                    page = global_page;
+                    block = page.blocks[name];
+                }
+
+                let active_switch = document.createElement('input');
+                active_switch.type = 'checkbox';
+                active_switch.classList.add('input-checkbox');
+                active_switch.checked = block.active;
+                active_switch.disabled = inherited;
+                if(!inherited){
+                    active_switch.onclick = (evt) => {
+                        block.active = evt.target.checked;
+                        updateBlockEdit(name);
+                    };
+                }
+
+                let active_label = wrap(block.active?'Активен':'Выключен','list-line-label');
+                top_list.appendChild(wrap([active_switch,active_label],['list-line','flex-fill-container']));
+                edit.appendChild(top_list);
+                
+                let module_list = wrap([],['flex-container-column','block-padding','block-border','block-margin']);
+                if(inherited){
+                    module_list.classList.add('block-disabled');
+                }
+
+                block.modules.forEach((module, i) => {
+                    let info = modules_info[module.module];
+                    let list = wrap([],['list', 'block-padding', 'block-border', 'block-margin-small']);
+                    
+                    let first_line = wrap(
+                        [wrap(
+                            modules_info[module.module].title+' ('+module.module+')',
+                            ['list-label']
+                        )],
+                        ['list-line', 'flex-self-stretch']
+                    );
+                    let button = document.createElement('input');
+                    button.type = 'button';
+                    button.value = '/\\';
+                    button.classList.add('input-button');
+                    button.classList.add('blue');
+                    button.classList.add('flex-float-right');
+                    button.disabled = inherited || (i <= 0);
+                    if(!button.disabled){
+                        button.onclick = (evt) => {
+                            let m = block.modules[i];
+                            block.modules[i] = block.modules[i-1];
+                            block.modules[i-1] = m;
+                            updateBlockEdit(name);
+                        };
+                    }
+                    first_line.appendChild(button);
+
+                    button = document.createElement('input');
+                    button.type = 'button';
+                    button.value = '\\/';
+                    button.classList.add('input-button');
+                    button.classList.add('blue');
+                    button.disabled = inherited || (i >= block.modules.length-1);
+                    if(!button.disabled){
+                        button.onclick = (evt) => {
+                            let m = block.modules[i];
+                            block.modules[i] = block.modules[i+1];
+                            block.modules[i+1] = m;
+                            updateBlockEdit(name);
+                        };
+                    }
+                    first_line.appendChild(button);
+
+                    button = document.createElement('input');
+                    button.type = 'button';
+                    button.value = 'X';
+                    button.classList.add('input-button');
+                    button.classList.add('red');
+                    button.disabled = inherited;
+                    if(!button.disabled){
+                        button.onclick = (evt) => {
+                            block.modules.splice(i,1);
+                            updateBlockEdit(name);
+                        };
+                    }
+                    first_line.appendChild(button);
+                    list.appendChild(first_line);
+
+                    Object.keys(info.arguments).forEach((arg) => {
+                        let arg_info = info.arguments[arg];
+                        type = arg_info.type;
+                        if(!module[arg]){
+                            module[arg] = getDefaultFieldValue(type);
+                        }
+                        
+                        let line = wrap([],['list-line','flex-self-stretch']);
+                        line.appendChild(wrap(arg_info.title,['list-label','size-30']));
+
+                        let input = document.createElement('input');
+                        if(type == 'number' || type == 'text' || type == 'file'){
+                            input.type = type == 'file' ? 'text' : type;
+                            input.classList.add('input-field');
+                            input.value = module[arg];
+                            input.disabled = inherited;
+                            if(type == 'file'){
+                                input.disabled = true;
+                                input.id = 'block-module-file-input-'+name+'-'+i+'-'+arg;
+                            }
+                            if(!inherited){
+                                input.oninput = (evt) => {
+                                    module[arg] = evt.target.value;
+                                };
+                            }
+                            input.classList.add('flex-fill-container');
+                        }else if(type == 'boolean'){
+                            line.classList.add('no-spread');
+                            input.type = 'checkbox';
+                            input.classList.add('input-checkbox')
+                            input.checked = module[arg];
+                            input.disabled = inherited;
+                            if(!inherited){
+                                input.oninput = (evt) => {
+                                    module[arg] = evt.target.checked;
+                                };
+                            }
+                        }else if(type == 'list'){
+                            input = document.createElement('select');
+                            input.classList.add('input-field');
+                            if(arg_info.list){
+                                arg_info.list.forEach((listitem) => {
+                                    let option = document.createElement('option');
+                                    option.value = listitem;
+                                    option.innerText = listitem;
+                                    input.appendChild(option);
+                                });
+                            }
+                            input.value = module[arg];
+                            input.disabled = inherited;
+                            if(!inherited){
+                                input.oninput = (evt) => {
+                                    module[arg] = evt.target.value;
+                                };
+                            }
+                            input.classList.add('flex-fill-container');
+                        }
+
+                        line.appendChild(input);
+
+                        if(type == 'file'){
+                            let button = document.createElement('input'); 
+                            button.type = 'button';
+                            button.value = '...';
+                            button.disabled = inherited;
+                            if(!inherited){
+                                button.onclick = (evt) => {
+                                    selectFileWithCKFinder((url) => {
+                                        input.value = url;
+                                        module[arg] = url;
+                                    });
+                                };
+                            }
+                            button.classList.add('input-button');
+                            line.appendChild(button);
+                        }
+                        list.appendChild(line);
+                    });
+
+                    module_list.appendChild(list);
+                });
+                edit.appendChild(module_list);
+
+                let add_module_select = document.createElement('select');
+                add_module_select.classList.add('input-field');
+                add_module_select.classList.add('flex-resize');
+                add_module_select.disabled = inherited;
+
+                Object.keys(modules_info).filter(
+                    (module_name) => info.accepted_formats.includes(modules_info[module_name].format)
+                ).forEach((module_name) => {
+                    let option = document.createElement('option');
+                    option.value = module_name;
+                    option.innerText = modules_info[module_name].title+' ('+module_name+')';
+                    add_module_select.appendChild(option);
+                });
+                
+                let add_module_button = document.createElement('button');
+                add_module_button.classList.add('input-button');
+                add_module_button.classList.add('green');
+                add_module_button.innerText = 'Добавить';
+                add_module_button.disabled = inherited || (block.modules.length != 0 && !info.multiple);
+                if(!add_module_button.disabled){
+                    add_module_button.onclick = (evt) => {
+                        block.modules.push(getBlankModule(add_module_select.value));
+                        updateBlockEdit(name);
+                    };
+                }
+
+                edit.appendChild(wrap([add_module_select, add_module_button],['list-line']));
+            } 
+        </script>
+        {% if data.global_mode %}
+            <input id="block-editor-global-save" type="button" class="input-button blue big flex-fill-container block-margin" value="Сохранить"/>
+            <script>
+                document.getElementById('block-editor-global-save').onclick = (evt) => {
+                    savePage('_global', global_page).then(() => {
+                        showSuccessPopup('Общие настройки сохранены.');
+                    }, (message) => {
+                        showErrorPopup(message);
+                    });
+                };
+            </script>
+        {% endif %}
+    </div>
+{% if not data.global_mode %}
 {# ТИП СТРАНИЦЫ #}
     <div class="content-container-title">
         Тип страницы
@@ -71,9 +484,7 @@
         <div class="content-tabs">
             <div data-tab-id="content" class="content-tab flex-fill-container">
                 <div class="flex-container-column">
-                    <div id="page-content-editor" class="input-textarea">
-                        <p>Содержимое страницы.</p>
-                    </div>
+                    <div id="page-content-editor" class="input-textarea"></div>
                     <script>
                         if(!create_mode && this_page.page_content.type == 'static'){
                             document.getElementById('page-content-editor').innerHTML = this_page.page_content.content;
@@ -86,13 +497,13 @@
             </div>
         </div>
         <div class="content-tab-buttons">
-            <div id="page-type-static" data-tab-id="content" class="content-tab-button">
-                <div class="content-tab-button-inside">
+            <div class="content-tab-button-wrapper">
+                <div id="page-type-static" data-tab-id="content"  class="content-tab-button">
                     Статичная страница
                 </div>
             </div>
-            <div id="page-type-posts" data-tab-id="blocks" class="content-tab-button">
-                <div class="content-tab-button-inside">
+            <div class="content-tab-button-wrapper">
+                <div id="page-type-posts" data-tab-id="blocks" class="content-tab-button">
                     Список публикаций
                 </div>
             </div>
@@ -103,14 +514,35 @@
             }else if(this_page.page_content.type == 'posts'){
                 document.getElementById('page-type-posts').classList.add('active');
             }
+
+            (async function(){
+                let ckeditor = await ClassicEditor.create(document.getElementById('page-content-editor'), ckeditorConfig());      
+               
+                ckeditor.model.document.on('change:data', (evt) => {
+                    if(this_page.page_content.type == 'static'){
+                        this_page.page_content.content = ckeditor.getData();
+                    }
+                });
+
+                document.getElementById('page-type-static').onclick = (evt) => {
+                    this_page.page_content = {};
+                    this_page.page_content.type = 'static';
+                    this_page.page_content.content = ckeditor.getData();
+                };
+                document.getElementById('page-type-posts').onclick = (evt) => {
+                    this_page.page_content = {};
+                    this_page.page_content.type = 'posts';
+                };
+            }());
         </script>
     </div>
 </div>
+{% endif %}
 
 <div id="page-edit-error-popup" class="popup animation">
     <div class="popup-window">
         <div class="popup-window-line-center">
-            <div class="popup-window-title error">
+            <div class="popup-window-title red">
                 Ошибка
             </div>
         </div>
@@ -126,63 +558,60 @@
         </div>
     </div>
 </div>
-<script src="/assets/ckeditor.js"></script>
-<script src="/assets/ckeditor-config.js"></script>
-<script type="text/javascript" src="/bundles/cksourceckfinder/ckfinder/ckfinder.js"></script>
-<script>CKFinder.config( { connectorPath: '/ckfinder/connector' } );</script>
+<div id="page-editor-success-popup" class="popup animation">
+    <div class="popup-window">
+        <div class="popup-window-line-center">
+            <div id="page-editor-success-popup-text" class="popup-window-title green">
+                Сохранено!
+            </div>
+        </div>
+        <div class="popup-window-button-line-bottom">
+            <button class="close-button popup-window-bottom-button green">
+                Закрыть
+            </button>
+        </div>
+    </div>
+</div>
 <script>
+    function savePage(id, page){
+        return new Promise((resolve, reject) => {
+            admin_helpers.sendRequest('{{url.controller_url}}/page/'+id+'/update',page).then((response, status) => {
+                if(response.success){
+                    resolve();
+                }else{
+                    reject(response.message);
+                }
+            }, () => {
+                reject('Неизвестная ошибка.');
+            });
+        });
+    }
+
     function showErrorPopup(text) {
-        document.getElementById('page-edit-error-text').innerHTML = text;
+        document.getElementById('page-edit-error-text').innerText = text;
         popup.showPopup('page-edit-error-popup');
     }   
-    (async function(){
-        let field = document.getElementById('page-id');
 
-        let editor = await ClassicEditor.create(document.getElementById('page-content-editor'), ckeditorConfig());
-        
-        document.getElementById('page-type-static').onclick = (evt) => {
-            this_page.page_content = {};
-            this_page.page_content.type = 'static';
-            this_page.page_content.content = editor.getData();
-        };
-        document.getElementById('page-type-posts').onclick = (evt) => {
-            this_page.page_content = {};
-            this_page.page_content.type = 'posts';
-        };
-    }());
-</script>
-{% if data.create_mode %}
-    <script>
-        (function(){
-            let field = document.getElementById('page-id');
+    function showSuccessPopup(text) {
+        document.getElementById('page-editor-success-popup-text').innerText = text;
+        popup.showPopup('page-editor-success-popup');
+    }   
 
-            function validate(){
-                if(admin_helpers.validatePageid(field.value)){
-                    field.classList.remove('error');
-                }else{
-                    field.classList.add('error');
-                }
-            };
-
-            validate();
-            field.oninput = () => {validate();};
-
-            document.getElementById('create-button').onclick = (evt) => {
-                let id = field.value;
-                if(!admin_helpers.validatePageid(field.value)){
-                    showErrorPopup('Некорректный адрес страницы.');
-                    return;
-                }
-                admin_helpers.sendRequest('/plugin/_basic/page/'+field.value+'/create').then((response, status) => {
-                    if(response.success){
-                        window.location = '/admin/_basic/page_editor/page/'+id;
-                    }else{
-                        showErrorPopup(response.message);
-                    }
-                }, () => {
-                    showErrorPopup('Неизвестная ошибка.');
+    function selectFileWithCKFinder(handler) {
+        CKFinder.modal({
+            chooseFiles: true,
+            width: 800,
+            height: 600,
+            onInit: function(finder) {
+                finder.on('files:choose', function(evt) {
+                    var file = evt.data.files.first();
+                    handler(file.getUrl());
+                });
+    
+                finder.on('file:choose:resizedImage', function(evt) {
+                    handler(evt.data.resizedUrl);
                 });
             }
-        }());
-    </script>
-{% endif %}
+        });
+    }
+</script>

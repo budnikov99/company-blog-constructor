@@ -3,9 +3,9 @@ page_content:
     type: static
     content: ''
 blocks:
-    favicon: { active: true, modules: [{ module: _basic/image_url, url: /userfiles/images/favicon.png, alt: '' }] }
-    header_image: { active: true, modules: [{ module: _basic/image_url, url: /userfiles/images/header-image.jpg, alt: '' }] }
+    favicon: { active: true, modules: [{ module: _basic/image_file, url: /userfiles/images/favicon.png, alt: '' }] }
+    header_image: { active: true, modules: [{ module: _basic/image_file, url: /userfiles/images/header-image.jpg, alt: '' }] }
     header_menu: { active: true, modules: [{ module: _basic/menu, menu: pages_menu }] }
     left_sidebar: { active: true, modules: [{ module: _basic/menu, menu: menu1 }, { module: _basic/menu, menu: menu2 }] }
     footer_copyright: { active: true, modules: [{ module: _basic/fixed_text, text: '© 2020 Test inc.' }] }
-    header_title: { active: null, modules: {  } }
+    header_title: { active: false, modules: [{ module: _basic/fixed_text, text: Страница }] }

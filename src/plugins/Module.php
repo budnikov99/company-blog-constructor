@@ -16,7 +16,7 @@ abstract class Module {
         $this->format = $format;
         $this->title = $title;
         foreach($arglist as $name => $data){
-            $this->arglist[$name] = new ModuleArgument($this, $name, $data['type'], $data['title'], $data['required']);    
+            $this->arglist[$name] = new ModuleArgument($this, $name, $data['type'], $data['title']);    
         }
     }
 
