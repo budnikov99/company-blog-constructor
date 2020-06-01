@@ -1,23 +1,48 @@
 security:
+    encoders:
+        App\Entity\Admin:
+            algorithm: auto
+
     # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
     providers:
-        in_memory: { memory: null }
-
+        # used to reload user from session & other features (e.g. switch_user)
+        app_admin_provider:
+            entity:
+                class: App\Entity\Admin
+                property: username
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
+        admin_panel:
+            pattern: ^/(admin|plugin)
+            anonymous: lazy
+
+            form_login:
+                login_path: /admin
+                check_path: /admin/login
+                default_target_path: /admin
+                always_use_default_target_path: true
+
+            logout:
+                path:   /admin/logout
+
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 86400 
+                path: /
         main:
             anonymous: lazy
 
-            # activate different ways to authenticate
-            # https://symfony.com/doc/current/security.html#firewalls-authentication
-
-            # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
 
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/constructor, roles: ROLE_CONSTRUCTOR }
+        - { path: ^/plugin, roles: ROLE_PANEL }
+    role_hierarchy:
+        ROLE_MODERATOR: ROLE_PANEL
+        ROLE_PUBLISHER: ROLE_PANEL
+        ROLE_CONSTRUCTOR: ROLE_PANEL
+        ROLE_PLUGINS: ROLE_PANEL
+        ROLE_ACCOUNTS: ROLE_PANEL
+        ROLE_SUPER_ADMIN: [ROLE_PANEL, ROLE_MODERATOR, ROLE_PUBLISHER, ROLE_CONSTRUCTOR, ROLE_PLUGINS, ROLE_ACCOUNTS]

@@ -87,7 +87,7 @@
                     <input type="text" disabled id="page-id" class="input-field flex-fill-container disabled" placeholder="Адрес страницы" value="{{data.page_id}}"/>
                     <a class="input-button blue" href="/{{data.page_id}}" target="_blank">Перейти</a>
                     <input type="button" id="save-button" class="input-button blue" value="Сохранить" />
-                    <input type="button" id="remove-button" class="input-button red" value="Удалить" />
+                    <input {{(data.page_id|first == '_')?'disabled'}} type="button" id="remove-button" class="input-button red" value="Удалить" />
                 </div>
                 <div id="page-editor-remove-popup" class="popup animation">
                     <div class="popup-window">
@@ -575,7 +575,7 @@
 <script>
     function savePage(id, page){
         return new Promise((resolve, reject) => {
-            admin_helpers.sendRequest('{{url.controller_url}}/page/'+id+'/update',page).then((response, status) => {
+            admin_helpers.sendRequest('{{url.controller_url}}/page/'+id+'/update',JSON.stringify(page)).then((response, status) => {
                 if(response.success){
                     resolve();
                 }else{

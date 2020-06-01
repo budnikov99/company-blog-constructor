@@ -1,5 +1,5 @@
 <?php
-namespace App\plugins;
+namespace App\Plugins;
 
 use Exception;
 

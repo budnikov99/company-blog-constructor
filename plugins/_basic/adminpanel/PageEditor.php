@@ -1,11 +1,11 @@
 <?php
 namespace Plugins\_basic\adminpanel;
 
-use App\plugins\AdminPanelExtension;
-use App\services\data\ModuleData;
-use App\services\PageManager;
-use App\services\PluginManager;
-use App\services\ThemeManager;
+use App\Plugins\AdminPanelExtension;
+use App\Services\Data\ModuleData;
+use App\Services\PageManager;
+use App\Services\PluginManager;
+use App\Services\ThemeManager;
 
 class PageEditor extends AdminPanelExtension {
     private function getPageId($subpath){

@@ -1,13 +1,19 @@
 <?php
 namespace App\Controller;
 
-use App\services\AdminPanelRenderer;
-use App\services\PageRenderer;
+use App\Services\AdminPanelRenderer;
+use App\Services\PageRenderer;
+use App\Services\PostManager;
+use App\Services\SiteManager;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use PDO;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Security\Core\Security;
 
 class MainController extends AbstractController
 {
@@ -18,13 +24,7 @@ class MainController extends AbstractController
         $this->page_generator = $pg;
     }
 
-    public function getPage($pageid)
-    {
-        if($pageid[0] == '_' && !true){
-            //Страницы, id которых начинается с "_" должны обрабатываться отдельно.
-            throw new NotFoundHttpException();
-        }
-
+    private function loadPage(string $pageid){
         $page = $this->page_generator->getPage($pageid);
         if(is_null($page)){
             throw $this->createNotFoundException('Страницы не существует.');
@@ -32,27 +32,25 @@ class MainController extends AbstractController
         return new Response($page);
     }
 
-    public function index(){
-        $page = $this->page_generator->getIndexPage();
-        if(is_null($page)){
-            throw $this->createNotFoundException('Страницы не существует.');
+    public function getPage($pageid){
+        if($pageid[0] == '_'){
+            //Страницы, id которых начинается с "_" должны обрабатываться отдельно.
+            throw new NotFoundHttpException();
         }
-        return new Response($page);
+
+        return $this->loadPage($pageid);
     }
 
-    public function getAdminPanel(AdminPanelRenderer $admin, $path){
-        return new Response($admin->render($path));
+    public function index(){
+        return $this->loadPage('index');
     }
 
-    public function getAdminPanelMain(AdminPanelRenderer $admin){
-        return $this->getAdminPanel($admin, null);
+    public function getPost(PageRenderer $pr, $category, $id){
+        return $pr->getPost($category, $id);
     }
 
-    public function adminLogin(Request $request){
-        return new RedirectResponse('/admin');
-    }
-
-    public function adminLogout(){
-        return new RedirectResponse('/');
+    public function test(PostManager $pm, EntityManagerInterface $em, SiteManager $sm){
+        
+        return new Response();
     }
 }

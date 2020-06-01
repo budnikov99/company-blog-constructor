@@ -1,7 +1,7 @@
 <?php
-namespace App\services\data;
+namespace App\Services\Data;
 
-use App\services\StaticLogger;
+use App\Services\StaticLogger;
 use AssertionError;
 use Monolog\Logger;
 use PhpParser\Node\Stmt\TryCatch;

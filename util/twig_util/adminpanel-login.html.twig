@@ -1,1 +1,33 @@
-Login
+<html lang="ru">
+    <head>
+        <title>Панель администратора</title>
+        <link rel="stylesheet" href="/assets/reset.css" />
+        <link rel="stylesheet" href="/assets/panel/admin-panel.css" />
+        <link rel="stylesheet" href="/assets/panel/admin-panel-popups.css" />
+        <script src="/assets/panel/admin-panel-helpers.js"></script>
+    </head>
+    <body>
+        <div class="admin-panel flex-container-column flex-container-justify-center flex-container-align-center block-gray">
+            <div class="content-container-block flex-container-column">
+                <div class="content-container-title">Панель администратора</div>
+                <form id="login-form" class="list block-margin" method="POST" action="/admin/login">
+                    {% if error %}
+                        <div class="list-line">
+                            <div class="list-label error">
+                                Неверный логин или пароль.
+                            </div>
+                        </div>
+                    {% endif %}
+                    <div class="list-line flex-self-stretch">
+                        <input id="login-username" name="_username" type="text" class="input-field flex-resize" value="{{ username }}" placeholder="Логин"/>
+                    </div>
+                    <div class="list-line flex-self-stretch">
+                        <input id="login-password" name="_password" type="password" class="input-field flex-resize" placeholder="Пароль"/>
+                    </div>
+                    <input type="submit" class="input-button blue flex-self-stretch block-margin-small" value="Войти"/>
+                </form>
+                <a class="input-button red" href="/">Назад на сайт</a>
+            </div>
+        </div>
+    </body>
+</html>

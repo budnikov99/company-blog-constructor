@@ -3,13 +3,8 @@ menu:
   class: MenuModule
   title: 'Меню'
   args:
-    menu:                     #может существовать метод menuValidate($value), проверяющий корректность, иначе, любое значение корректно
-      type: list              #text(поле), list(список), number(число) или boolean(галочка)
-                              #file(url файла в папке uploads сервера)
-                              #может быть list, тогда будет вызван метод menuValues() модуля, который возвращает массив строк
-                              #и поле будет отбражаться как выпадающий список
-                              #если menuValidate($val) не определён, всегда будет возвращаться true, но в случае с типом list,
-                              #true будет возвращаться только если полученное значение содержится в списке
+    menu:                     
+      type: list                                 
       title: 'Отображаемое меню'
 
 fixed_text:
@@ -21,7 +16,6 @@ fixed_text:
       type: text
       title: 'Текст'
       
-
 image_url:
   format: ImageFormat
   class: ImageURLModule

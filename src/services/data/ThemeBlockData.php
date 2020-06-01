@@ -1,5 +1,5 @@
 <?php
-namespace App\services\data;
+namespace App\Services\Data;
 
 class ThemeBlockData extends Data {
     private $title = 'Блок без названия';

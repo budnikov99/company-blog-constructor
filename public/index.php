@@ -1,11 +1,9 @@
 <?php
-set_time_limit(0);
 
 use App\Kernel;
 use Symfony\Component\ErrorHandler\Debug;
 use Symfony\Component\HttpFoundation\Request;
 
-define('SERVER_ROOT', dirname(__DIR__));
 
 require dirname(__DIR__).'/config/bootstrap.php';
 require_once __DIR__.'/../vendor/autoload.php';

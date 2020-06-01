@@ -2,7 +2,7 @@
 namespace Plugins\_basic\modules;
 
 use App\formats\MenuFormat;
-use App\plugins\Module;
+use App\Plugins\Module;
 
 class MenuModule extends Module {
     protected function generateData($args){

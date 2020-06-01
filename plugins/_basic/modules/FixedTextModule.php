@@ -2,7 +2,7 @@
 namespace Plugins\_basic\modules;
 
 use App\formats\TextFormat;
-use App\plugins\Module;
+use App\Plugins\Module;
 
 class FixedTextModule extends Module {
     protected function generateData($args){

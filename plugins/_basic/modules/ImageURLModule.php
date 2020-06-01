@@ -2,7 +2,7 @@
 namespace Plugins\_basic\modules;
 
 use App\formats\ImageFormat;
-use App\plugins\Module;
+use App\Plugins\Module;
 
 class ImageURLModule extends Module {
     protected function generateData($args){

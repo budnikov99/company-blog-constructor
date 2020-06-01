@@ -1,5 +1,6 @@
 <html lang="ru">
     <head>
+        <title>{{data.active_extension_name ?: 'Панель администратора'}}</title>
         <link rel="stylesheet" href="/assets/reset.css" />
         <link rel="stylesheet" href="/assets/panel/admin-panel.css" />
         <link rel="stylesheet" href="/assets/panel/admin-panel-popups.css" />
@@ -11,7 +12,7 @@
                 <div class="admin-panel-sidebar flex-container-column"> 
                     <div class="sidebar-header flex-container-row">
                         <div class="sidebar-header-item sidebar-header-user">
-                            {{'admin'}}
+                            {{data.username}}
                         </div>
                         <a class="sidebar-header-item sidebar-header-link flex-float-right" href="/admin/logout">
                             Выход

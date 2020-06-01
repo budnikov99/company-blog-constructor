@@ -25,6 +25,14 @@ body, html {
     flex-direction: row;
 }
 
+.flex-container-justify-center {
+    justify-content: center;
+}
+
+.flex-container-align-center {
+    align-items: center;
+}
+
 .flex-float-right {
     margin-left: auto;
 }
@@ -162,6 +170,10 @@ body, html {
     font-weight: bold;
 }
 
+.list-label.error {
+    color: var(--panel-color-red);
+}
+
 /* tabs */
 
 .content-tab-container {
@@ -207,6 +219,9 @@ body, html {
     overflow: hidden;
     cursor: pointer;
 
+    display: flex;
+    flex-direction: column;
+
     margin: -5px;
     margin-bottom: 0;
 }
@@ -214,6 +229,7 @@ body, html {
 .content-tab-button-wrapper > .content-tab-button {
     margin: 5px;
     margin-bottom: 0;
+    flex: 1;
     padding: 10px;
     color: #666;
     background-color: transparent;
@@ -310,6 +326,7 @@ body, html {
     cursor: pointer;
     font-weight: bold;
     text-decoration: none;
+    text-align: center;
 }
 
 .input-button.big {
@@ -442,6 +459,10 @@ body, html {
     border: 1px solid #ccc;
 }
 
+.block-gray {
+    background: #eee;
+}
+
 .block-padding {
     padding: 5px 10px;
 }
@@ -527,7 +548,7 @@ body, html {
 }
 
 .sidebar-menu-item.active .sidebar-menu-item-title {
-    background-color: #0099cc;
+    background: #0099cc;
 }
 
 .sidebar-submenu {

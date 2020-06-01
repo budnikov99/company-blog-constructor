@@ -1,9 +1,9 @@
 <?php
-namespace App\services;
+namespace App\Services;
 
 use App\content\Content;
-use App\services\data\ModuleData;
-use App\services\data\PageData;
+use App\Services\Data\ModuleData;
+use App\Services\Data\PageData;
 use Twig\Environment;
 use \Twig\Loader\FilesystemLoader;
 use Psr\Log\LoggerInterface;
@@ -14,14 +14,16 @@ use Symfony\Component\Yaml\Yaml;
 
 class PageRenderer {
     private $themem = null;
-    private $plugins = null;
+    private $postm = null;
     private $pagem = null;
     private $twig = null;
+    private $sitem = null;
 
-    public function __construct(Environment $twig, ThemeManager $themem, PluginManager $plugins, PageManager $pagem){
+    public function __construct(Environment $twig, ThemeManager $themem, PostManager $postm, PageManager $pagem, SiteManager $sitem){
         $this->themem = $themem;
-        $this->modules = $plugins;
+        $this->postm = $postm;
         $this->pagem = $pagem;
+        $this->sitem = $sitem;
 
         $this->twig = $twig;
         $loader = $this->twig->getLoader();
@@ -86,29 +88,47 @@ class PageRenderer {
     }
 
     public function getPage($pageid){
+        if(!$this->sitem->isInstalled()){
+            return $this->sitem->renderInstaller();
+        }
+
         $page = $this->getPageData($pageid);
         if(is_null($page)){
             throw new NotFoundHttpException();
         }
 
-        //Контент для технических страниц генерируется отдельно
-        if($pageid[0] != '_'){
-            $page->createContentFromArgs();
-            if(is_null($page->getContent()) || !$page->getContent()->isLoaded()){
-                throw new InternalErrorException('Ошибка при загрузке контента');
-            }
+        $page->createContentFromArgs();
+        if(is_null($page->getContent()) || !$page->getContent()->isLoaded()){
+            throw new InternalErrorException('Ошибка при загрузке контента');
         }
     
         return $this->renderPage($this->generateTemplateData($pageid, $page));
     }
 
-    public function getIndexPage(){
-        return $this->getPage('index');
-    }
-
     public function renderPage($data){
         $template_name = $this->themem->getMainTemplate();
         return $this->twig->render($template_name, $data);
+    }
+
+    public function getPost(string $category, $id){
+        if(!$this->sitem->isInstalled()){
+            return $this->sitem->renderInstaller();
+        }
+
+        $post = $this->postm->loadPost($id);
+
+        if(is_null($post) || $post->getCategory()->getName() != $category){
+            throw new NotFoundHttpException();
+        }
+
+        $page = $this->getPageData('_post');
+
+        $page->setContentType('post');
+        $page->setContentArgs($post->generateContentArgs());
+        $page->createContentFromArgs();
+
+        $data = $this->generateTemplateData('_post', $page);
+        return $this->renderPage($data);
     }
 
 }

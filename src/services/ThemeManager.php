@@ -1,7 +1,7 @@
 <?php
-namespace App\services;
+namespace App\Services;
 
-use App\services\data\ThemeBlockData;
+use App\Services\Data\ThemeBlockData;
 use ScssPhp\ScssPhp\Compiler;
 use ScssPhp\Server\Server;
 use Symfony\Component\Mime\MimeTypes;

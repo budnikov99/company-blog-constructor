@@ -6,12 +6,19 @@ var admin_helpers = {
      * @param {string} address - url для запроса.
      * @param {object|null} data - Данные в запросе. Если data == null, будет выполнен GET запрос, иначе, POST с содержимым
      */
-    sendRequest(address, data){
+    sendRequest(address, data, headers = {'Content-Type': 'application/json'}){
         return new Promise((resolve, reject) => {
             let xhr = new XMLHttpRequest();
 
             xhr.open(data==null?'GET':'POST', address, true);
+
             xhr.responseType = 'json';
+
+            if(headers){
+                Object.keys(headers).forEach((item) => {
+                    xhr.setRequestHeader(item, headers[item]);
+                });
+            }
 
             xhr.onload = () => {
                 if(xhr.status == 200){
@@ -25,7 +32,7 @@ var admin_helpers = {
                 reject(xhr.response, xhr.status);
             };
 
-            xhr.send(data!=null?JSON.stringify(data):null);
+            xhr.send(data);
         });
     },
 

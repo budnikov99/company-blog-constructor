@@ -1,7 +1,7 @@
 <?php
 namespace App\content;
 
-use App\services\PageManager;
+use App\Services\PageManager;
 
 class StaticContent extends Content {
     private $html = null;

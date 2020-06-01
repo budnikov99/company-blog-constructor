@@ -1,10 +1,10 @@
 <?php
-namespace App\services;
+namespace App\Services;
 
 use App\content\Content;
-use App\services\data\BlockData;
-use App\services\data\BlockModuleData;
-use App\services\data\PageData;
+use App\Services\Data\BlockData;
+use App\Services\Data\BlockModuleData;
+use App\Services\Data\PageData;
 use Exception;
 use Symfony\Component\Yaml\Yaml;
 
@@ -17,12 +17,13 @@ class PageManager extends Manager {
         $this->themem = $themem;
         $this->global_settings = $this->loadGlobalPage();
         if(is_null($this->global_settings)){
-            StaticLogger::critical('Ошибка в файле глобальной конфигурации страниц _global.yaml');
-            throw new Exception('Ошибка в файле глобальной конфигурации страниц _global.yaml');
+            StaticLogger::error('Ошибка в файле глобальной конфигурации страниц _global.yaml');
         }
-        foreach(scandir($this->getPageDir()) as $file){
-            if(substr($file, -5) == '.yaml'){
-                $this->page_list []= substr($file, 0, -5);
+        if(file_exists($this->getPageDir())){
+            foreach(scandir($this->getPageDir()) as $file){
+                if(substr($file, -5) == '.yaml'){
+                    $this->page_list []= substr($file, 0, -5);
+                }
             }
         }
     }
@@ -36,7 +37,11 @@ class PageManager extends Manager {
     }
 
     private function loadGlobalPage(){
-        $data = PageData::deserialize(Yaml::parseFile(SERVER_ROOT.'/data/pages/_global.yaml'));
+        $data = new PageData('Глобальная конфигурация', 'static');
+        $data->setContentArgs(['content' => '']);
+        if(file_exists(SERVER_ROOT.'/data/pages/_global.yaml')){
+            $data = PageData::deserialize(Yaml::parseFile(SERVER_ROOT.'/data/pages/_global.yaml'));
+        }
 
         $theme_blocks = $this->themem->getBlocks();
 
@@ -97,6 +102,8 @@ class PageManager extends Manager {
             'assets',
             'plugin',
             'plugins',
+            'post',
+            'install',
         ];
         if(in_array($page_id, $reserved)){
             return false;

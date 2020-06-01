@@ -24,33 +24,44 @@ plugin_asset:
 
 #ADMIN PANEL
 
+install:
+    path: /install
+    controller: App\Controller\AdminController::installSite
+
+initialize:
+    path: /install/init
+    controller: App\Controller\AdminController::initSite
+
+db_check:
+    path: /install/checkdb
+    controller: App\Controller\AdminController::checkDatabase
+
 plugin_routes:
     resource: app.manager.plugin::loadPluginRoutes
     type: service
 
-admin_logout:
-    path: admin/logout
-    controller: App\Controller\MainController::adminLogout
-
-admin_login:
-    path: admin/login
-    controller: App\Controller\MainController::adminLogin
-
 admin_panel:
-    path: admin/
-    controller: App\Controller\MainController::getAdminPanelMain
+    path: admin
+    controller: App\Controller\AdminController::getPanelMain
 
 admin_panel_path:
     path: admin/{path}
-    controller: App\Controller\MainController::getAdminPanel
+    controller: App\Controller\AdminController::getPanel
     defaults:
         path: ''
     requirements:
         path: .+
 
 
+test:
+    path: /test
+    controller: App\Controller\MainController::test
 
 ##################
+post:
+    path: /post/{category}/{id}
+    controller: App\Controller\MainController::getPost
+
 page:
     path: /{pageid}
     controller: App\Controller\MainController::getPage

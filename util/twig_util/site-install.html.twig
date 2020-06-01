@@ -1,0 +1,200 @@
+<html lang="ru">
+    <head>
+        <title>Установка блога</title>
+        <link rel="stylesheet" href="/assets/reset.css" />
+        <link rel="stylesheet" href="/assets/panel/admin-panel.css" />
+        <link rel="stylesheet" href="/assets/panel/admin-panel-popups.css" />
+        <script src="/assets/panel/admin-panel-helpers.js"></script>
+        <script>
+            var db_info = {
+                'db_host': '127.0.0.1',
+                'db_port': 3306,
+                'db_login': '',
+                'db_password': '',
+                'db_name': 'my_blog',
+            };
+        </script>
+    </head>
+    <body>
+        <div class="admin-panel flex-container-column flex-container-justify-center flex-container-align-center block-gray">
+            <div class="content-container-title big">
+                Установка блога
+            </div>
+            <div class="content-tab-container">
+                <div class="content-tabs">
+                    <div data-tab-id="db-tab" class="content-tab">
+                        <div class="content-container-title block-margin">
+                            Соединение с базой данных
+                        </div>
+                        <div class="list">
+                            <div class="list-line flex-self-stretch">
+                                <div class="list-label size-20">Адрес</div>
+                                <input type="text" id="db-host" class="input-field flex-fill-container" placeholder="Адрес сервера" value="127.0.0.1"/>
+                                <div class="list-label bold">:</div>
+                                <input type="number" id="db-port" class="input-field" style="width: 80px;" placeholder="Порт" value="3306" />
+                            </div>
+                            <div class="list-line  flex-self-stretch">
+                                <div class="list-label size-20">Логин</div>
+                                <input type="text" id="db-login" class="input-field flex-resize" placeholder="Логин" />
+                            </div>
+                            <div class="list-line flex-self-stretch">
+                                <div class="list-label size-20">Пароль</div>
+                                <input type="password" id="db-password" class="input-field flex-resize" placeholder="Пароль" />
+                            </div>
+                            <input type="button" id="db-check" class="input-button blue flex-self-stretch block-margin-small" value="Проверить соединение"/>
+                            <div class="list-line flex-self-stretch">
+                                <div class="list-label">Название базы данных</div>
+                                <input type="text" id="db-name" class="input-field flex-resize" placeholder="Название БД" value="my_blog" />
+                            </div>
+                        </div>
+                    </div>
+                    <script>
+                        document.getElementById('db-check').onclick = (evt) => {
+                            checkDatabase().then(() => {
+                                document.getElementById('tab-button-admin').click();
+                            }, () => {
+                                showErrorPopup('Не удалось соединиться с базой данных');
+                            });
+                        };
+
+                    </script>
+                    <div data-tab-id="admin-tab" class="content-tab">
+                        <div class="content-container-title block-margin">
+                            Учётная запись администратора
+                        </div>
+                        <div class="list align-self-stretch">
+                            <div class="list-line flex-self-stretch">
+                                <div class="list-label size-30">Логин</div>
+                                <input type="text" id="admin-login" class="input-field flex-fill-container" placeholder="Логин" value="admin"/>
+                            </div>
+                            <div class="list-line flex-self-stretch">
+                                <div class="list-label size-30">Пароль</div>
+                                <input type="password" id="admin-password" class="input-field flex-fill-container" placeholder="Пароль" />
+                            </div>
+                            <div class="list-line flex-self-stretch">
+                                <div class="list-label size-30">Повтор пароля</div>
+                                <input type="password" id="admin-password-repeat" class="input-field flex-fill-container" placeholder="Повтор пароля" />
+                            </div>
+                            <input type="button" id="site-install" class="input-button green big flex-self-stretch block-margin-small" value="Установить"/>
+                        </div>
+                    </div>
+                    <script>
+                        function checkPasswordRepeat(){
+                            let pass = document.getElementById('admin-password');
+                            let repeat = document.getElementById('admin-password-repeat');
+                            if(!pass || !repeat){
+                                return false;
+                            }
+                            if(!pass.value){
+                                pass.classList.add('error');
+                                return false;
+                            }
+                            document.getElementById('admin-password').classList.remove('error');
+                            if(!repeat.value || pass.value != repeat.value){
+                                repeat.classList.add('error');
+                                return false;
+                            }
+                            repeat.classList.remove('error');
+                            return true;
+                        }
+                        document.getElementById('admin-password').oninput = () => {
+                            checkPasswordRepeat();
+                        };
+                        document.getElementById('admin-password-repeat').oninput = () => {
+                            checkPasswordRepeat();
+                        };
+                        checkPasswordRepeat();
+                    </script>
+                </div>   
+                <div class="content-tab-buttons">
+                    <div class="content-tab-button-wrapper">
+                        <div id="tab-button-db" data-tab-id="db-tab"  class="content-tab-button active">
+                            База данных
+                        </div>
+                    </div>
+                    <div class="content-tab-button-wrapper">
+                        <div id="tab-button-admin" data-tab-id="admin-tab" class="content-tab-button">
+                            Администратор
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="error-popup" class="popup animation">
+            <div class="popup-window">
+                <div class="popup-window-line-center">
+                    <div id="error-title" class="popup-window-title red">
+                        Ошибка
+                    </div>
+                </div>
+                <div class="popup-window-line-center">
+                    <div id="error-text" class="popup-window-label">
+                        Ошибка
+                    </div>
+                </div>
+                <div class="popup-window-button-line-bottom">
+                    <button class="close-button popup-window-bottom-button red">
+                        Закрыть
+                    </button>
+                </div>
+            </div>
+        </div>
+        <script>
+            function showErrorPopup(text, title = 'Ошибка'){
+                document.getElementById('error-title').innerText = title;
+                document.getElementById('error-text').innerText = text;
+                popup.showPopup('error-popup');
+            }
+
+            function updateDbInfo(){
+                db_info['db_host'] = document.getElementById('db-host').value;
+                db_info['db_port'] = document.getElementById('db-port').value;
+                db_info['db_login'] = document.getElementById('db-login').value;
+                db_info['db_password'] = document.getElementById('db-password').value;
+                db_info['db_name'] = document.getElementById('db-name').value;
+            }
+
+            function checkDatabase(){
+                updateDbInfo();
+                return new Promise((resolve, reject) => {
+                    admin_helpers.sendRequest('/install/checkdb', JSON.stringify(db_info)).then((response, status) => {
+                        resolve();
+                    }, (response, status) => {
+                        reject();
+                    });
+                });
+            }
+
+            document.getElementById('site-install').onclick = () => {
+                if(!checkPasswordRepeat()){
+                    document.getElementById('tab-button-admin').click();
+                    if(!document.getElementById('admin-password').value){
+                        showErrorPopup('Недопустимый пароль администратора');
+                    }else{
+                        showErrorPopup('Пароли не соответствуют');
+                    }
+                    return;
+                }
+                if(!document.getElementById('admin-login').value){
+                    showErrorPopup('Недопустимый логин администратора');
+                }
+                checkDatabase().then(() => {
+                    updateDbInfo();
+                    db_info['admin_login'] = document.getElementById('admin-login').value;
+                    db_info['admin_password'] = document.getElementById('admin-password').value;
+                    admin_helpers.sendRequest('/install', JSON.stringify(db_info)).then((response, status) => {
+                        location.href = '/admin';
+                    }, (response, status) => {
+                        try{
+                            showErrorPopup(response.message);
+                        }catch(ex){
+                            showErrorPopup('Произошла ошибка');
+                        }
+                    });
+                }, () => {
+                    showErrorPopup('Не удалось соединиться с базой данных');
+                });
+            };
+        </script>
+    </body>
+</html>

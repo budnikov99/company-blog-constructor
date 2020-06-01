@@ -1,5 +1,5 @@
 <?php
-namespace App\services\data;
+namespace App\Services\Data;
 
 class BlockData extends Data {
     private $active = null;

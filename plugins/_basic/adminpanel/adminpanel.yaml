@@ -1,3 +1,11 @@
 page_editor:
   title: 'Страницы'
   class: PageEditor
+  roles:
+    - ROLE_CONSTRUCTOR
+
+ckfinder:
+  title: 'Файловый менеджер'
+  class: FileManager
+  roles:
+    - ROLE_PANEL

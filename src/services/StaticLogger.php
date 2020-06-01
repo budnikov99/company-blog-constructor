@@ -1,5 +1,5 @@
 <?php
-namespace App\services;
+namespace App\Services;
 
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger;

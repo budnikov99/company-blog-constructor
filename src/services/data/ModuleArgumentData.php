@@ -1,7 +1,7 @@
 <?php
-namespace App\services\data;
+namespace App\Services\Data;
 
-use App\plugins\ModuleArgument;
+use App\Plugins\ModuleArgument;
 
 class ModuleArgumentData extends Data {
     private $name = '';

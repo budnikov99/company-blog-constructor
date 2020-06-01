@@ -1,9 +1,10 @@
 <?php
-namespace App\services;
+namespace App\Services;
 
-use App\plugins\AdminPanelExtension;
+use App\Plugins\AdminPanelExtension;
 use Symfony\Component\Yaml\Yaml;
-use App\plugins\Module;
+use App\Plugins\Module;
+use Doctrine\ORM\EntityManagerInterface;
 use Psr\Container\ContainerInterface;
 
 class PluginManager extends Manager {
@@ -12,10 +13,10 @@ class PluginManager extends Manager {
 
     public function __construct(
         AssetManager $am, 
-        DatabaseManager $dm, 
-        PageManager $pm, 
+        PageManager $pgm, 
         SiteManager $sm, 
-        ThemeManager $tm
+        ThemeManager $tm,
+        PostManager $psm
     ){
         $plugin_dir = SERVER_ROOT.'/plugins';
 
@@ -23,11 +24,11 @@ class PluginManager extends Manager {
 
         $managers = [
             AssetManager::class => $am,
-            DatabaseManager::class => $dm,
-            PageManager::class => $pm,
+            PageManager::class => $pgm,
             PluginManager::class => $this,
             SiteManager::class => $sm,
             ThemeManager::class => $tm,
+            PostManager::class => $psm,
         ];
 
         foreach($plugins as $pname){
@@ -97,7 +98,7 @@ class PluginManager extends Manager {
                     continue;
                 }
 
-                $extension = new $classname($plugin, $name, $title, $managers);
+                $extension = new $classname($plugin, $name, $title, $value['roles']??[], $managers);
 
                 if(!is_subclass_of($extension, AdminPanelExtension::class)){
                     StaticLogger::error('Расширение не унаследовано от AdminPanelExtension.', [
@@ -134,6 +135,56 @@ class PluginManager extends Manager {
         return $this->adminpanel_extensions;
     }
 
+    private function createRoute(string $id, array $data, string $id_pref, string $route_pref, string $namespace_pref){
+        if(empty($data['path']) || empty($data['controller'])){
+            StaticLogger::warning('Ошибка в route плагина', [
+                'plugin' => $id_pref,
+                'route' => $id
+            ]);
+            return null;
+        }
+        $id = $id_pref.$id;
+        $path = $data['path'][0] == '/' ? substr($data['path'], 1):$data['path'];
+        if(strlen($path) == 0){
+            StaticLogger::warning('Ошибка в route плагина', [
+                'plugin' => $id_pref,
+                'route' => $id
+            ]);
+            return null;
+        }
+        $path = $route_pref.$path;
+
+        $controller = explode('::', $data['controller']);
+        if(count($controller) != 2){
+            StaticLogger::warning('Ошибка в route плагина', [
+                'plugin' => $id_pref,
+                'route' => $id
+            ]);
+            return null;
+        }
+        $controller[0] = $namespace_pref.$controller[0];
+        if(!method_exists($controller[0], $controller[1])){
+            StaticLogger::warning('Ошибка в route плагина. Метод или контроллер не существует', [
+                'plugin' => $id_pref,
+                'route' => $id,
+                'class' => $controller[0],
+                'method' => $controller[1]
+            ]);
+            return null;
+        }
+        
+        return new \Symfony\Component\Routing\Route(
+            $path, 
+            ['_controller' => $controller[0].'::'.$controller[1]],
+            $data['requirements']??[],
+            $data['options']??[],
+            $data['host']??'',
+            $data['schemes']??[],
+            $data['methods']??[],
+            $data['condition']??null                        
+        );
+    }
+
     public function loadPluginRoutes(){
         $routes = new \Symfony\Component\Routing\RouteCollection();
 
@@ -151,55 +202,20 @@ class PluginManager extends Manager {
                     $route_data = Yaml::parseFile($dir.'/controllers/routes.yaml')??[];
 
                     foreach($route_data as $id => $data){
-                        if(empty($data['path']) || empty($data['controller'])){
-                            StaticLogger::warning('Ошибка в route плагина', [
-                                'plugin' => $pname,
-                                'route' => $id
-                            ]);
-                            continue;
+                        $route = $this->createRoute($id, $data, $pname.'_', 'plugin/'.$pname.'/', '\\Plugins\\'.$pname.'\\controllers\\');
+                        if($route){
+                            $routes->add($id, $route);
                         }
-                        $id = $pname.'_'.$id;
-                        $path = $data['path'][0] == '/' ? substr($data['path'], 1):$data['path'];
-                        if(strlen($path) == 0){
-                            StaticLogger::warning('Ошибка в route плагина', [
-                                'plugin' => $pname,
-                                'route' => $id
-                            ]);
-                            continue;
-                        }
-                        $path = 'plugin/'.$pname.'/'.$path;
+                    }
+                }
+                if(file_exists($dir.'/public_controllers/routes.yaml')){
+                    $route_data = Yaml::parseFile($dir.'/public_controllers/routes.yaml')??[];
 
-                        $controller = explode('::', $data['controller']);
-                        if(count($controller) != 2){
-                            StaticLogger::warning('Ошибка в route плагина', [
-                                'plugin' => $pname,
-                                'route' => $id
-                            ]);
-                            continue;
+                    foreach($route_data as $id => $data){
+                        $route = $this->createRoute($id, $data, $pname.'_public_', 'public/plugin/'.$pname.'/', '\\Plugins\\'.$pname.'\\public_controllers\\');
+                        if($route){
+                            $routes->add($id, $route);
                         }
-                        $controller[0] = '\\Plugins\\'.$pname.'\\controllers\\'.$controller[0];
-                        if(!method_exists($controller[0], $controller[1])){
-                            StaticLogger::warning('Ошибка в route плагина. Метод или контроллер не существует', [
-                                'plugin' => $pname,
-                                'route' => $id,
-                                'class' => $controller[0],
-                                'method' => $controller[1]
-                            ]);
-                            continue;
-                        }
-                        
-                        $route = new \Symfony\Component\Routing\Route(
-                            $path, 
-                            ['_controller' => $controller[0].'::'.$controller[1]],
-                            $data['requirements']??[],
-                            $data['options']??[],
-                            $data['host']??'',
-                            $data['schemes']??[],
-                            $data['methods']??[],
-                            $data['condition']??null                        
-                        );
-
-                        $routes->add($id, $route);
                     }
                 }
             }

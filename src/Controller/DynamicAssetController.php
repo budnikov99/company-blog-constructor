@@ -1,11 +1,11 @@
 <?php
 namespace App\Controller;
 
-use App\services\AssetManager;
+use App\Services\AssetManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Yaml\Yaml;
-use App\services\ThemeManager;
+use App\Services\ThemeManager;
 
 class DynamicAssetController extends AbstractController {
     private $assetm = null;

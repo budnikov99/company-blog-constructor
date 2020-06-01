@@ -1,16 +1,18 @@
 <?php
-namespace App\plugins;
+namespace App\Plugins;
 
-use App\services\PluginManager;
+use App\Services\PluginManager;
 
 abstract class AdminPanelExtension {
     private $name = 'plugin/extension';
     private $title = 'Расширение';
+    private $roles = [];
     protected $managers = [];
 
-    public function __construct(string $plugin, string $name, string $title, array $managers){
+    public function __construct(string $plugin, string $name, string $title, array $roles, array $managers){
         $this->name = $plugin.'/'.$name;
         $this->title = $title;
+        $this->roles = $roles;
         $this->managers = $managers;
     }
 
@@ -37,5 +39,9 @@ abstract class AdminPanelExtension {
 
     public function getTitle(){
         return $this->title;
+    }
+
+    public function getRoles(){
+        return $this->roles;
     }
 }

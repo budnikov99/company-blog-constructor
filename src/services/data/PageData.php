@@ -1,5 +1,5 @@
 <?php
-namespace App\services\data;
+namespace App\Services\Data;
 
 use App\content\Content;
 
@@ -69,6 +69,11 @@ class PageData extends Data {
     public function getContentArgs(){
         return $this->page_content;
     } 
+
+    public function setContentType(string $type){
+        $this->page_content_type = $type;
+        $this->page_content['type'] = $type;
+    }
 
     public function setContentArgs(array $args){
         $this->page_content = $args;
