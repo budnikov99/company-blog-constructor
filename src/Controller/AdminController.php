@@ -58,12 +58,12 @@ class AdminController extends AbstractController
         }
     }
 
-    public function getPanel(AdminPanelRenderer $admin, $path){
-        return new Response($admin->render($path));
+    public function getPanel(AdminPanelRenderer $admin, Request $request, $path){
+        return new Response($admin->render($path, $request));
     }
 
-    public function getPanelMain(AdminPanelRenderer $admin){
-        return $this->getPanel($admin, null);
+    public function getPanelMain(AdminPanelRenderer $admin, Request $request){
+        return new Response($admin->render(null, $request));
     }
 
 }

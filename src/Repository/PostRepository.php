@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Post;
 use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -20,36 +21,46 @@ class PostRepository extends ServiceEntityRepository
         parent::__construct($registry, Post::class);
     }
     
-    public function findByCategoriesAndDate(int $start_from = -1, int $limit = 0, array $catlist = null, DateTimeInterface $start = null, DateTimeInterface $end = null){
-        $qb = $this->createQueryBuilder('p');
-
-        $flag = false;
+    private function configureQuery(QueryBuilder $qb, int $start_from = 0, int $limit = 0, $catlist = null, DateTimeInterface $begin = null, DateTimeInterface $end = null){
         if(!is_null($catlist)){
+            if(!is_array($catlist)){
+                $catlist = [$catlist];
+            }
             $qb->andWhere('p.category IN(:catlist)')
             ->setParameter('catlist', $catlist);
-            $flag = true;
         }
 
-        if(!is_null($start) && !is_null($end)){
+        if(!is_null($begin) && !is_null($end)){
             $qb->andWhere('p.creation_date BETWEEN :start AND :end')
-            ->setParameter('start', $start)
+            ->setParameter('start', $begin)
             ->setParameter('end', $end);
-            $flag = true;
         }
 
-        if($start_from >= 0){
-            $qb->andWhere('p.id >= :startFrom')
-            ->setParameter('startFrom', $start_from);
+        if($start_from > 0){
+            $qb->setFirstResult($start_from);
         }
 
         if($limit > 0){
             $qb->setMaxResults($limit);
         }
 
-        if($flag){
-            return $qb->getQuery()->getResult();
-        }else{
-            return null;
-        }
+        $qb->orderBy('p.id', 'ASC');
+    }
+
+    public function countByCategoriesAndDate($catlist = null, DateTimeInterface $begin = null, DateTimeInterface $end = null){
+        $qb = $this->createQueryBuilder('p');
+        $qb->select('count(p.id)');
+
+        $this->configureQuery($qb, 0, 0, $catlist, $begin, $end);
+        
+        return $qb->getQuery()->getSingleScalarResult();
+    }
+
+    public function findByCategoriesAndDate(int $start_from = 0, int $limit = 0, $catlist = null, DateTimeInterface $begin = null, DateTimeInterface $end = null){
+        $qb = $this->createQueryBuilder('p');
+
+        $this->configureQuery($qb, $start_from, $limit, $catlist, $begin, $end);
+        
+        return $qb->getQuery()->getResult();
     }
 }

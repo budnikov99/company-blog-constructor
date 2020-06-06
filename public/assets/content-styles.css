@@ -15,3 +15,7 @@
 .image.image_resized > figcaption {
     display: block;
 }
+
+.image.image-style-side {
+    float: right;
+}

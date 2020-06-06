@@ -38,6 +38,11 @@ class Post
     private $preview;
 
     /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $image;
+
+    /**
      * @ORM\ManyToOne(targetEntity=PostCategory::class, inversedBy="posts")
      * @ORM\JoinColumn(nullable=false, name="category", referencedColumnName="name")
      */
@@ -96,6 +101,18 @@ class Post
         return $this;
     }
 
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(?string $image): self
+    {
+        $this->image = $image;
+
+        return $this;
+    }
+
     public function getCategory(): ?PostCategory
     {
         return $this->category;
@@ -108,13 +125,14 @@ class Post
         return $this;
     }
 
-    public function generateContentArgs(){
+    public function serialize(){
         return [
             'id' => $this->id,
             'title' => $this->title,
             'created' => $this->creation_date,
             'content' => $this->content,
             'preview' => $this->preview,
+            'image' => $this->image,
             'category' => $this->category->getTitle(),
         ];
     }

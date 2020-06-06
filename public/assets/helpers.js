@@ -22,28 +22,19 @@ var admin_helpers = {
 
             xhr.onload = () => {
                 if(xhr.status == 200){
-                    resolve(xhr.response, xhr.status);
+                    resolve({'data': xhr.response, 'status': xhr.status});
                 }else{
-                    reject(xhr.response, xhr.status);
+                    reject({'data': xhr.response, 'status': xhr.status});
                 }
             };
 
             xhr.onerror = () => {
-                reject(xhr.response, xhr.status);
+                reject({'data': null, 'status': 0});
             };
 
             xhr.send(data);
         });
     },
-
-    validatePageid(page_id) {
-        let forbidden = [' ', '/', '\\', ':', '*', '?', '\"', '\'', '<', '>', '|'];
-        if(!page_id || typeof page_id != 'string' || page_id.charAt(0) == '_' || !forbidden.every((char) => page_id.indexOf(char) == -1)){
-            return false;
-        }else{
-            return true;
-        }
-    }
 };
 
 
@@ -85,11 +76,13 @@ var popup = {
 
     initPopup(elem){
         if(elem.id){
-            elem.addEventListener('mousedown', (evt) => {
-                if(evt.target === elem){
-                    elem.classList.remove('show');
-                }
-            });
+            if(elem.classList.contains('close-button')){
+                elem.addEventListener('mousedown', (evt) => {
+                    if(evt.target === elem){
+                        elem.classList.remove('show');
+                    }
+                });
+            }
             elem.querySelectorAll('.close-button').forEach((btn) => {
                 btn.addEventListener('click', () => {
                     elem.classList.remove('show');
@@ -123,32 +116,49 @@ function queryDirectChildFirst(elm, sel){
 }
 
 let tabs = {
+    selectTab(container, tab_id){
+        if(!container){
+            return;
+        }
+
+        let buttons = queryDirectChildFirst(container, '.tab-buttons');
+        let tabs = queryDirectChildFirst(container, '.tabs');
+
+        if(!buttons || !tabs){
+            return;
+        }
+
+        buttons.querySelectorAll('.tab-button').forEach((elem) => {
+            if('tabId' in elem.dataset && elem.dataset.tabId == tab_id){
+                elem.classList.add('active'); 
+            }else{
+                elem.classList.remove('active'); 
+            }
+        });
+        queryDirectChildrenAll(tabs, '.tab').forEach((elem) => {
+            if('tabId' in elem.dataset && elem.dataset.tabId == tab_id){
+                elem.classList.add('show'); 
+            }else{
+                elem.classList.remove('show'); 
+            }
+        });
+    },
+
     tabButtonClickHandler(evt){
         let item = evt.target;
         if('tabId' in item.dataset){
-            let buttons = item.parentNode.parentNode;
-            let container = buttons.parentNode;
-            let tabs = queryDirectChildFirst(container, '.content-tabs');
+            let container = item.parentNode;
+            while(container && !container.classList.contains('tab-container')){
+                container = container.parentNode;
+            }   
 
-            if(!buttons || !container || !tabs){
-                return;
-            }
-
-            buttons.querySelectorAll('.content-tab-button').forEach((elem) => {elem.classList.remove('active');});
-            queryDirectChildrenAll(tabs, '.content-tab').forEach((elem) => {
-                if('tabId' in elem.dataset && elem.dataset.tabId == item.dataset.tabId){
-                    elem.classList.add('show'); 
-                }else{
-                    elem.classList.remove('show'); 
-                }
-            });
-            item.classList.add('active');
+            tabs.selectTab(container, item.dataset.tabId);            
         }
     },
 
     initTabContainer(container){
-        let buttons = queryDirectChildFirst(container, '.content-tab-buttons');
-        buttons.querySelectorAll('.content-tab-button').forEach((item) => {
+        let buttons = queryDirectChildFirst(container, '.tab-buttons');
+        buttons.querySelectorAll('.tab-button').forEach((item) => {
             item.addEventListener('click', tabs.tabButtonClickHandler);
             if(item.classList.contains('active')){
                 item.click();
@@ -171,6 +181,6 @@ document.addEventListener('DOMContentLoaded', () => {
     popup.setTransitionDuration(150);
 
     document.querySelectorAll('.popup').forEach((elem) => {popup.initPopup(elem)});
-    document.querySelectorAll('.content-tab-container').forEach((elem) => {tabs.initTabContainer(elem)});
+    document.querySelectorAll('.tab-container').forEach((elem) => {tabs.initTabContainer(elem)});
     document.querySelectorAll('.fold').forEach((elem) => {folds.initFold(elem);});
 });

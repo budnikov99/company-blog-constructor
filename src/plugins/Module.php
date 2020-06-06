@@ -9,12 +9,15 @@ abstract class Module {
     private $format = '';
     private $title = '';
     private $arglist = array();
+    protected $managers = [];
 
-    public function __construct(string $name, string $title, string $format, array $arglist)
+    public function __construct(string $name, string $title, string $format, array $arglist, array $managers)
     {
         $this->name = $name;
         $this->format = $format;
         $this->title = $title;
+        $this->managers = $managers;
+        
         foreach($arglist as $name => $data){
             $this->arglist[$name] = new ModuleArgument($this, $name, $data['type'], $data['title']);    
         }

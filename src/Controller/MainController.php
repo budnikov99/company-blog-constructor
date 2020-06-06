@@ -46,10 +46,14 @@ class MainController extends AbstractController
     }
 
     public function getPost(PageRenderer $pr, $category, $id){
-        return $pr->getPost($category, $id);
+        return new Response($pr->getPost($category, $id));
     }
 
     public function test(PostManager $pm, EntityManagerInterface $em, SiteManager $sm){
+        $pm->createCategory('test10', 'Тестовая категория 10');
+        foreach(range(1, 20) as $i){
+            $pm->createPost('1т10-'.$i, 'пост', null, 'test10');
+        }
         
         return new Response();
     }

@@ -2,6 +2,7 @@
 namespace App\Plugins;
 
 use App\Services\PluginManager;
+use Symfony\Component\HttpFoundation\Request;
 
 abstract class AdminPanelExtension {
     private $name = 'plugin/extension';
@@ -22,7 +23,7 @@ abstract class AdminPanelExtension {
      * @param string $subpath - строка, идущая за /admin/<плагин>/<название>/
      * @return array - ['active' => 'id', 'items' => ['id' => 'Подпись', 'id2' => 'Подпись']]
      */
-    public abstract function getSubmenu(string $subpath);
+    public abstract function getSubmenu(string $subpath, Request $request);
 
     /**
      * Переопределяемая функция возвращает путь к шаблону произвольные данные, передаваемые в шаблон
@@ -31,7 +32,7 @@ abstract class AdminPanelExtension {
      * @param string $subpath - строка, идущая за /admin/<плагин>/<название>/
      * @return array|null - ['template' => 'путь к шаблону', 'data' => произвольный объект данных]
      */
-    public abstract function getTemplateData(string $subpath);
+    public abstract function getTemplateData(string $subpath, Request $request);
 
     public function getName(){
         return $this->name;

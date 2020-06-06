@@ -1,0 +1,169 @@
+<div class="content-container">
+    <script>
+        var posts_current_offset = Number.parseInt('{{data.offset}}');
+        var posts_limit = Number.parseInt('{{data.limit}}');
+        var posts_count = Number.parseInt('{{data.count}}');
+    </script>
+    <div class="content-container-title big">
+        Список статей
+    </div>
+    <div class="content-container-block">
+        <div class="list flex-container-align-stretch">
+            <div class="list-line">
+                <div class="list-label">Категория:</div>
+                <select id="posts-category" class="input-field flex-fill-container">
+                    <option value="">Любая</option>
+                    {% for category in data.categories %}
+                        <option {{data.category == category.name ? 'selected'}} value="{{category.name}}">{{category.title}}</option>
+                    {% endfor %}
+                </select>
+                <div class="list-label"></div>
+                <div class="list-label">с:</div>
+                <input id="posts-from" class="input-field" value="{{data.from_date}}" style="width: 8em" placeholder="1970-01-31" />
+                <div class="list-label">по:</div>
+                <input id="posts-to" class="input-field" value="{{data.to_date}}" style="width: 8em" placeholder="2038-12-31" />
+            </div>
+        </div>
+        <div class="list-line">
+            <div class="list-label">Показано {{(data.limit > (data.count - data.offset) or data.limit == 0) ? (data.count - data.offset) : data.limit}} из {{data.count}}</div>
+            <div class="flex-float-right">
+                {% if data.count > data.limit %}
+                    {% if data.count // data.limit > 10 %}
+                        <input {{data.offset == data.limit * 0 ? 'disabled'}} type="button" class="input-button blue posts-page-button" data-offset="{{data.limit * 0}}" value="{{1}}">
+                        <input {{data.offset == data.limit * 1 ? 'disabled'}} type="button" class="input-button blue posts-page-button" data-offset="{{data.limit * 1}}" value="{{2}}">
+                        {% if data.offset > data.limit * 4 %}
+                            ...
+                        {% endif %}
+                        {% for i in range(max(data.offset - (data.limit * 2), data.limit * 2), 
+                            min(data.offset + (data.limit * 2), (data.count // data.limit - 2) * data.limit), 
+                            data.limit) 
+                        %}
+                            <input {{data.offset == i ? 'disabled'}} type="button" class="input-button blue posts-page-button" data-offset="{{i // data.limit * data.limit}}" value="{{ (i // data.limit) + 1 }}">
+                        {% endfor %}
+                        {% if data.offset < data.limit * (data.count // data.limit - 4) %}
+                            ...
+                        {% endif %}
+                        <input {{data.offset == data.limit * (data.count // data.limit - 1) ? 'disabled'}} type="button" class="input-button blue posts-page-button" data-offset="{{(data.count // data.limit - 1) * data.limit}}" value="{{data.count // data.limit}}">
+                        <input {{data.offset == data.limit * (data.count // data.limit) ? 'disabled'}} type="button" class="input-button blue posts-page-button" data-offset="{{(data.count // data.limit) * data.limit}}" value="{{data.count // data.limit + 1}}">
+                    {% else %}
+                        {% for i in range(0, ((data.count - 1) // data.limit) * data.limit, data.limit) %}
+                            <input {{data.offset == i ? 'disabled'}} type="button" class="input-button blue posts-page-button" data-offset="{{i}}" value="{{ (i // data.limit) + 1 }}">
+                        {% endfor %}
+                    {% endif %}
+                {% endif %}
+            </div>
+            <input type="number" id="posts-page" class="input-field flex-float-right" value="{{data.offset // data.limit + 1}}" style="width: 4em" />
+            <input type="button" id="posts-filter-apply" class="input-button blue" value="Применить">
+        </div>
+    </div>
+    <script>
+        document.getElementById('posts-from').oninput = (evt) => {
+            let date = new Date(evt.target.value);
+            if(isNaN(date.getTime())){
+                evt.target.classList.add('error');
+            }else{
+                evt.target.classList.remove('error');
+            }
+        }
+
+        document.getElementById('posts-to').oninput = (evt) => {
+            let date = new Date(evt.target.value);
+            if(isNaN(date.getTime())){
+                evt.target.classList.add('error');
+            }else{
+                evt.target.classList.remove('error');
+            }
+        }
+
+        for(let elem of document.getElementsByClassName('posts-page-button')){
+            elem.onclick = (evt) => {
+                gotoPage(evt.target.dataset.offset);
+            };
+        }
+
+        document.getElementById('posts-page').oninput = (evt) => {
+            let offset = (evt.target.value-1) * posts_limit;
+            if(offset < 0 || offset >= posts_count){
+                evt.target.classList.add('error');
+            }else{
+                evt.target.classList.remove('error');
+            }
+        }
+
+        document.getElementById('posts-filter-apply').onclick = (evt) => {
+            let offset = document.getElementById('posts-page') * posts_limit;
+            if(offset < 0 || offset >= posts_count){
+                gotoPage(offset);
+            }else{
+                gotoPage(-1);
+            }
+        };
+
+        function gotoPage(offset){
+            if(offset < 0){
+                offset = posts_current_offset;
+            }
+
+            let category = document.getElementById('posts-category').value;
+            let from_date = document.getElementById('posts-from').value;
+            let to_date = document.getElementById('posts-to').value;
+            let params = new URLSearchParams();
+            if(offset){
+                params.append('offset', offset);
+            }
+            if(category){
+                params.append('category', category);
+            }
+            if(from_date && to_date){
+                params.append('from_date', from_date);
+                params.append('to_date', to_date);
+            }
+
+            location.href = "{{url.panel_url}}/posts?"+params.toString();
+        }
+    </script>
+
+    <div class="content-container-block">
+        {% for post in data.posts %}
+            <div class="fold">
+                <div class="fold-header">
+                    "{{post.title}}" ({{post.category.title}}) ({{post.creationDate.format('Y-m-d')}})
+                    <div class="flex-container-row flex-float-right">
+                        <a href="{{url.panel_url}}/post/{{post.id}}" class="input-button blue" style="margin-left: 5px">id:{{post.id}}</a>
+                        <input type="button" id="posts-remove-{{post.id}}" class="input-button red" value="X" style="margin-left: 5px"/>
+                        <script>
+                            document.getElementById('posts-remove-{{post.id}}').onclick = (evt) => {
+                                confirmPopup('Действительно удалить статью?<br>Это действие нельзя отменить.', () => {
+                                    admin_helpers.sendRequest('{{url.controller_url}}/post/{{post.id}}/remove').then((response) => {
+                                        if(response){
+                                            if(response.data.success){
+                                                let fold = evt.target.parentNode.parentNode.parentNode;
+                                                fold.removeChild(queryDirectChildFirst(fold,'.fold-content'));
+                                                fold.removeChild(queryDirectChildFirst(fold,'.fold-content-placeholder'));
+                                                evt.target.parentNode.parentNode.innerText = '<удалено-id:{{post.id}}>';
+                                            }else{
+                                                errorPopup(response.data.message);
+                                            }
+                                        }else{
+                                            errorPopup('Не удалось удалить статью');
+                                        }
+                                    });
+                                });
+                            };
+                        </script>
+                    </div>
+                </div>
+                <div class="fold-content-placeholder">
+                    {{post.preview|raw}}
+                </div>
+                <div class="fold-content">
+                    {{post.content|raw}}
+                </div>
+            </div>
+        {% else %}
+            Нет результатов.
+        {% endfor %}
+    </div>
+</div>
+
+

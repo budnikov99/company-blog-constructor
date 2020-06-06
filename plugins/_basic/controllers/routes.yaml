@@ -35,3 +35,35 @@ page_remove:
 page_create:
     path: page/{page_id}/create
     controller: PageEditController::createPage
+
+#SETTINGS
+
+settings_reinstall_db:
+    path: settings/reinstall
+    controller: SiteSettingsController::reinstallDB
+
+settings_apply:
+    path: settings/apply
+    controller: SiteSettingsController::applySettings
+
+#POST
+
+post_save:
+    path: post/{id}/save
+    controller: PostController::savePost
+
+post_load:
+    path: post/load
+    controller: PostController::loadPosts
+
+post_remove:
+    path: post/{id}/remove
+    controller: PostController::removePost
+
+category_create:
+    path: category/{name}/create
+    controller: PostController::createCategory
+
+category_remove:
+    path: category/{name}/remove
+    controller: PostController::removeCategory

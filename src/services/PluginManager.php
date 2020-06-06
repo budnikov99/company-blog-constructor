@@ -37,13 +37,13 @@ class PluginManager extends Manager {
             }
             $dir = $plugin_dir.'/'.$pname;
             if(is_dir($dir)){
-                $this->loadPluginModules($pname);             
+                $this->loadPluginModules($pname, $managers);             
                 $this->loadAdminPanelExtensions($pname, $managers);   
             }
         } 
     }
 
-    private function loadPluginModules($plugin){
+    private function loadPluginModules($plugin, $managers){
         $dir = SERVER_ROOT.'/plugins/'.$plugin.'/modules/';
 
         if(file_exists($dir.'modules.yaml')){
@@ -65,7 +65,7 @@ class PluginManager extends Manager {
                     continue;
                 }
 
-                $module = new $classname($key, $title, $format, $arglist);
+                $module = new $classname($key, $title, $format, $arglist, $managers);
 
                 if(!is_subclass_of($module, Module::class)){
                     StaticLogger::error('Модуль не унаследован от Module.', [
@@ -200,7 +200,6 @@ class PluginManager extends Manager {
             if(is_dir($dir)){
                 if(file_exists($dir.'/controllers/routes.yaml')){
                     $route_data = Yaml::parseFile($dir.'/controllers/routes.yaml')??[];
-
                     foreach($route_data as $id => $data){
                         $route = $this->createRoute($id, $data, $pname.'_', 'plugin/'.$pname.'/', '\\Plugins\\'.$pname.'\\controllers\\');
                         if($route){

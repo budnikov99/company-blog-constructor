@@ -1,0 +1,69 @@
+<html lang="ru">
+    <head>
+        <link rel="stylesheet" href="/assets/reset.css">
+        <link rel="stylesheet" href="/assets/theme/css/base.scss">
+
+        {% if data.blocks.favicon.active %}
+            <link rel="icon" href="{{data.blocks.favicon.modules[0].data.url}}">
+        {% endif %}
+
+        <title>{{data.title}}</title>
+    </head>
+    <body>
+        {{ 
+            include('block-include.twig', {
+                'block_obj': data.blocks.header_image, 
+                'block_file': 'header-image'
+            }, with_context = false) 
+        }}
+        <div class="sticky">
+            {{ 
+                include('block-include.twig', {
+                    'block_obj': data.blocks.header_menu, 
+                    'block_file': 'header-menu'
+                }, with_context = false) 
+            }}  
+        </div>
+        {#
+        <script src="/theme/js/stickyfill.min.js"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                let elements = document.getElementsByClassName('sticky');
+                Stickyfill.add(elements);
+            });
+        </script>
+        #}
+        <main>
+            <div class="content-container">
+                <link rel="stylesheet" href="/assets/content-styles.css">
+                {{ 
+                    include('block-include.twig', {
+                        'block_obj': data.blocks.left_sidebar, 
+                        'block_file': 'left-sidebar'
+                    }, with_context = false) 
+                }}
+                <div class="content">
+                    {{ 
+                        include('content-include.twig', {
+                            'data': data.content, 
+                            'page': data
+                        }, with_context = false) 
+                    }}    
+                </div>
+            </div>
+        </main>
+        <footer>
+            <div class="footer__copyright">
+                {{ 
+                    include('block-include.twig', {
+                        'block_obj': data.blocks.footer_copyright, 
+                        'block_file': 'footer-copyright'
+                    }, with_context = false) 
+                }} 
+            </div>
+            <div class="footer__buttons">
+
+            </div>
+        </footer>
+    </body>
+</html>

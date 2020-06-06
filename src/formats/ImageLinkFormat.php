@@ -3,7 +3,7 @@ namespace App\formats;
 
 use App\formats\Format;
 
-class ButtonFormat extends Format {
+class ImageLinkFormat extends Format {
     public $href = '';
     public $text = '';
     public $img = null;
@@ -16,12 +16,6 @@ class ButtonFormat extends Format {
         $this->text = $text;
     }
 
-    /**
-     * Устанавливает картинку кнопки. Если картинка установлена, текст кнопки игнорируется.
-     *
-     * @param string $img - URL картинки
-     * @return void
-     */
     public function setImg(string $img){
         $this->img = $img;
     }

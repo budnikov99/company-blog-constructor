@@ -1,8 +1,20 @@
+site_settings:
+  title: 'Настройки'
+  class: SiteSettings
+  roles:
+    - ROLE_CONSTRUCTOR
+
 page_editor:
   title: 'Страницы'
   class: PageEditor
   roles:
     - ROLE_CONSTRUCTOR
+
+post_editor:
+  title: 'Статьи'
+  class: PostEditor
+  roles:
+    - ROLE_PUBLISHER
 
 ckfinder:
   title: 'Файловый менеджер'

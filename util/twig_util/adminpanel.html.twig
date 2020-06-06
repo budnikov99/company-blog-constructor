@@ -2,9 +2,12 @@
     <head>
         <title>{{data.active_extension_name ?: 'Панель администратора'}}</title>
         <link rel="stylesheet" href="/assets/reset.css" />
+        <link rel="stylesheet" href="/assets/flex-util.css" />
         <link rel="stylesheet" href="/assets/panel/admin-panel.css" />
         <link rel="stylesheet" href="/assets/panel/admin-panel-popups.css" />
-        <script src="/assets/panel/admin-panel-helpers.js"></script>
+        <link rel="stylesheet" href="/assets/content-styles.css">
+        <script src="/assets/jquery.min.js"></script>
+        <script src="/assets/helpers.js"></script>
     </head>
     <body>
         <div class="admin-panel flex-container-column">
@@ -56,5 +59,120 @@
                 </div>
             </div>
         </div>
+        <div id="loading-popup" class="popup animation">
+            <style>
+                .install-loading-icon {
+                    width: 100px;
+                    height: 100px;
+                    fill: white;
+                    animation: loading-spin 1.25s infinite linear;
+                }
+
+                @keyframes loading-spin {
+                    from {transform: rotate(0deg);}
+                    50% {transform: rotate(-180deg);}
+                    to {transform: rotate(-360deg);}
+                }
+            </style>
+            <svg version="1.1" class="install-loading-icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                    viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
+                <rect x="226" width="60" height="105"/>
+                <rect x="82.1" y="59.609" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -46.4391 112.1023)" width="59.999" height="104.999"/>
+                <rect y="226" width="105" height="60"/>
+                <rect x="59.604" y="369.895" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -249.934 196.3955)" width="104.999" height="59.999"/>
+                <rect x="226" y="407" width="60" height="105"/>
+                <rect x="369.9" y="347.392" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -165.6379 399.8979)" width="59.999" height="104.999"/>
+                <rect x="407" y="226" width="105" height="60"/>
+            </svg>
+        </div>
+        <div id="error-popup" class="popup animation close-button">
+            <div class="popup-window">
+                <div class="popup-window-line-center">
+                    <div id="error-title" class="popup-window-title red">
+                        Ошибка
+                    </div>
+                </div>
+                <div class="popup-window-line-center">
+                    <div id="error-text" class="popup-window-label">
+                        Ошибка
+                    </div>
+                </div>
+                <div class="popup-window-button-line-bottom">
+                    <button class="close-button popup-window-bottom-button red">
+                        Закрыть
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div id="success-popup" class="popup animation">
+            <div class="popup-window">
+                <div class="popup-window-line-center">
+                    <div id="success-text" class="popup-window-title green">
+                        Успешно
+                    </div>
+                </div>
+                <div class="popup-window-button-line-bottom">
+                    <button class="close-button popup-window-bottom-button green">
+                        Закрыть
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div id="confirm-popup" class="popup animation close-button">
+            <div class="popup-window">
+                <div class="popup-window-line-center">
+                    <div class="popup-window-title blue">
+                        Подтвердите действие
+                    </div>
+                </div>
+                <div class="popup-window-line-center">
+                    <div id="confirm-text" class="popup-window-label">
+                        Вы уверены?
+                    </div>
+                </div>
+                <div class="popup-window-button-line-bottom">
+                    <button id="confirm-button" class="close-button popup-window-bottom-button red">
+                        Подтвердить
+                    </button>
+                    <button class="close-button popup-window-bottom-button blue">
+                        Отмена
+                    </button>
+                </div>
+            </div>
+        </div>
+        <script>
+            function showLoadingScreen(){
+                popup.showPopup('loading-popup');
+            }
+
+            function hideLoadingScreen(){
+                popup.hidePopup('loading-popup');
+            }
+
+            function errorPopup(text, title = 'Ошибка'){
+                document.getElementById('error-text').innerHTML = text;
+                document.getElementById('error-title').innerHTML = title;
+                popup.showPopup('error-popup');
+            }
+
+            function successPopup(text){
+                document.getElementById('success-text').innerHTML = text;
+                popup.showPopup('success-popup');
+            }
+    
+            function confirmPopup(html, action){
+                if(typeof action == 'function'){
+                    confirm_action = action;
+                    document.getElementById('confirm-text').innerHTML = html;
+                    popup.showPopup('confirm-popup');
+                }    
+            }
+            var confirm_action = function(){};
+            document.getElementById('confirm-button').onclick = () => {
+                if(typeof confirm_action == 'function'){
+                    confirm_action();
+                }
+            };
+        </script>
     </body>
 </html>

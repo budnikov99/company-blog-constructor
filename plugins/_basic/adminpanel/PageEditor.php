@@ -5,7 +5,9 @@ use App\Plugins\AdminPanelExtension;
 use App\Services\Data\ModuleData;
 use App\Services\PageManager;
 use App\Services\PluginManager;
+use App\Services\PostManager;
 use App\Services\ThemeManager;
+use Symfony\Component\HttpFoundation\Request;
 
 class PageEditor extends AdminPanelExtension {
     private function getPageId($subpath){
@@ -37,7 +39,7 @@ class PageEditor extends AdminPanelExtension {
         }
     }
 
-    public function getSubmenu(string $subpath){
+    public function getSubmenu(string $subpath, Request $request){
         $data = [
             'active' => '',
             'items' => [
@@ -62,7 +64,7 @@ class PageEditor extends AdminPanelExtension {
         return $data;
     }
 
-    public function getTemplateData(string $subpath){
+    public function getTemplateData(string $subpath, Request $request){
         $pageid = $this->getPageId($subpath)??'';
         $mode = $this->getMode($subpath);
 
@@ -96,6 +98,7 @@ class PageEditor extends AdminPanelExtension {
                 'global_json' => json_encode($global_page->serialize()),
                 'blockinfo_json' => json_encode($blocks_serialized),
                 'modules_json' => json_encode($modules_serialized),
+                'categories' => $this->managers[PostManager::class]->loadCategories(),
                 ],
             ];
         }

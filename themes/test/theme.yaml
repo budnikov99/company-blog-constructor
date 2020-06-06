@@ -1,0 +1,37 @@
+main_template: 'page.html.twig'
+blocks:
+  header_title:
+    title: 'Заголовок страницы'
+    multiple: false
+    accepted_formats:
+      - TextFormat
+  favicon:
+    title: 'Иконка вкладки'
+    multiple: false
+    accepted_formats:
+      - ImageFormat
+  header_image:
+    title: 'Картинка в шапке'
+    multiple: false
+    accepted_formats:
+      - ImageFormat
+  header_menu:
+    title: 'Меню в шапке'
+    multiple: false
+    accepted_formats:
+      - MenuFormat
+  left_sidebar:
+    title: 'Левая панель'
+    multiple: true
+    accepted_formats:
+      - TextFormat
+      - TextListFormat
+      - MenuFormat
+  footer_copyright:
+    title: 'Копирайт в футере'
+    multiple: false
+    accepted_formats:
+      - TextFormat
+      - ImageFormat
+      - MenuFormat
+

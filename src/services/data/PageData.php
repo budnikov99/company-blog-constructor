@@ -23,6 +23,10 @@ class PageData extends Data {
         return $this->title;
     }
 
+    public function setTitle(string $title){
+        $this->title = $title;
+    }
+
     public function getBlocks(){
         return $this->blocks;
     }

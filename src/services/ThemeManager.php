@@ -39,6 +39,14 @@ class ThemeManager extends Manager {
         return $this->blocks;
     }
 
+    public function getSettings(){
+        if(array_key_exists('settings', $this->theme_data)){
+            return $this->theme_data['settings'];
+        }else{
+            return [];
+        }
+    }
+
     public function getMainTemplate(){
         return $this->theme_data['main_template'];
     }

@@ -1,69 +1,97 @@
+<!DOCTYPE html>
 <html lang="ru">
-    <head>
-        <link rel="stylesheet" href="/assets/reset.css">
-        <link rel="stylesheet" href="/assets/theme/css/base.scss">
+<head>
+    <meta charset="UTF-8">
+    {#<meta name="viewport" content="width=device-width, initial-scale=1.0"> Мобильная версия потом #}
+    <title>{{data.title}}</title>
 
-        {% if data.blocks.favicon.active %}
-            <link rel="icon" href="{{data.blocks.favicon.modules[0].data.url}}">
-        {% endif %}
+    <script src="/assets/ckeditor.js"></script>
 
-        <title>{{data.title}}</title>
-    </head>
-    <body>
-        {{ 
-            include('block-include.twig', {
-                'block_obj': data.blocks.header_image, 
-                'block_file': 'header-image'
-            }, with_context = false) 
-        }}
-        <div class="sticky">
-            {{ 
-                include('block-include.twig', {
-                    'block_obj': data.blocks.header_menu, 
-                    'block_file': 'header-menu'
-                }, with_context = false) 
-            }}  
+    <link rel="stylesheet" href="/assets/reset.css">
+    <link rel="stylesheet" href="/assets/theme/css/base.scss">
+    <link rel="stylesheet" href="/assets/theme/css/icons.css">
+    <link rel="stylesheet" href="/assets/flex-util.css" />
+
+    <script src="/assets/helpers.js"></script>
+    {#<script src="/assets/theme/jquery/jquery.min.js"></script>#}
+    
+    {% if data.blocks.favicon.active %}
+    <link rel="icon" href="{{data.blocks.favicon.modules[0].data.url}}">
+    {% endif %}
+
+    <style>
+        :root {
+            --color-main: {{ theme_settings.main_color.value }};
+        }
+    </style>
+</head>
+<body class="flex-container-column">
+    <header class="flex-container-column">
+        <div class="flex-container-row flex-container-align-center header-row font-size-header">
+            {% if data.blocks.header_logo.active %}
+            <a href="/" class="header-logo">
+                <img src="{{data.blocks.header_logo.modules[0].data.url}}" height="100%" alt="{{data.blocks.header_logo.modules[0].data.alt}}"/>
+            </a>
+            {% endif %}
+            {% if data.blocks.header_title.active %}
+            <a href="/" class="header-title color-main">
+                {{data.blocks.header_title.modules[0].data.text}}
+            </a>
+            {% endif %}
+            {% if data.blocks.header_info.active %}
+            <div class="flex-container-column flex-float-right">
+                {% for module in data.blocks.header_info.modules %}
+                <div class="header-info-line">{{module.data.text|raw}}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
         </div>
-        {#
-        <script src="/theme/js/stickyfill.min.js"></script>
-        <script>
-            document.addEventListener("DOMContentLoaded", () => {
-                let elements = document.getElementsByClassName('sticky');
-                Stickyfill.add(elements);
-            });
-        </script>
-        #}
-        <main>
-            <div class="content-container">
-                <link rel="stylesheet" href="assets/content-styles.css">
-                {{ 
-                    include('block-include.twig', {
-                        'block_obj': data.blocks.left_sidebar, 
-                        'block_file': 'left-sidebar'
-                    }, with_context = false) 
-                }}
-                <div class="content">
-                    {{ 
-                        include('content-include.twig', {
-                            'data': data.content, 
-                            'page': data
-                        }, with_context = false) 
-                    }}    
+        {% if data.blocks.header_menu.active or data.blocks.header_search.active %}
+        <nav class="flex-container-row header-menu flex-container-align-center background-color-main flex-container-wrap">
+            {% if data.blocks.header_menu.active %}
+            {% for item in data.blocks.header_menu.modules[0].data.items %}
+            {% if item.children is defined %}
+            <div class="header-menu-item dropdown-menu-item dropdown-menu-item-icon">
+                <div class="header-menu-item-label">
+                    {{item.text|e}}
+                </div>
+                <div class="dropdown-submenu flex-container-column header-submenu">
+                    {% for child in item.children %}
+                    <a class="header-menu-item" href="{{child.url}}">
+                        {{child.text|e}}
+                    </a>
+                    {% endfor %}
                 </div>
             </div>
-        </main>
-        <footer>
-            <div class="footer__copyright">
-                {{ 
-                    include('block-include.twig', {
-                        'block_obj': data.blocks.footer_copyright, 
-                        'block_file': 'footer-copyright'
-                    }, with_context = false) 
-                }} 
-            </div>
-            <div class="footer__buttons">
-
-            </div>
-        </footer>
-    </body>
+            {% else %}
+            <a class="header-menu-item" href="{{item.url}}">
+                <div class="header-menu-item-label">
+                    {{item.text|e}}
+                </div>
+            </a>
+            {% endif %}
+            {% endfor %}
+            {% endif %}
+            {% if data.blocks.header_search.active %}
+            <form class="flex-container-row flex-container-align-center flex-container-justify-center flex-float-right" action="/search">
+                <input name="q" type="search" class="header-input-field" placeholder="Поиск...">
+                <input type="submit" id="header-search-field" class="input-button-blank icon-search-white" value="">
+            </form>
+            {% endif %}
+        </nav>
+        {% endif %}
+    </header>  
+    <main class="flex-resize content ck-content">
+        {% if data.content.type == 'static' %}
+        {{data.content.html|raw}}
+        {% elseif data.content.type == 'posts' %}
+        posts
+        {% elseif data.content.type == 'post' %}
+        post
+        {% endif %}
+    </main>
+    <footer class="background-color-main">
+        footer
+    </footer>
+</body>
 </html>

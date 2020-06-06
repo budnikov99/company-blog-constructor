@@ -27,6 +27,9 @@ class SiteManager extends Manager {
 
         if(file_exists(SERVER_ROOT.'/data/settings.yaml')){
             $this->settings = Yaml::parseFile(SERVER_ROOT.'/data/settings.yaml');
+            if(!array_key_exists('public', $this->settings)){
+                $this->settings['public'] = [];
+            }
         }
     }
 
@@ -66,6 +69,15 @@ class SiteManager extends Manager {
         ]));
         file_put_contents(SERVER_ROOT.'/data/pages/_post.yaml', Yaml::dump([
             'title' => 'Страница отображения публикаций',
+            'page_content' => [
+                'type' => 'static',
+                'content' => '',
+            ],
+            'blocks' => null
+        ]));
+
+        file_put_contents(SERVER_ROOT.'/data/pages/_search.yaml', Yaml::dump([
+            'title' => 'Результаты поиска',
             'page_content' => [
                 'type' => 'static',
                 'content' => '',
@@ -136,12 +148,22 @@ class SiteManager extends Manager {
     public function initializeDBScheme(){
         try{
             $tool = new SchemaTool($this->entitym);
-            $tool->createSchema($this->entitym->getMetadataFactory()->getAllMetadata());
+            $tool->updateSchema($this->entitym->getMetadataFactory()->getAllMetadata());
         }catch(\Throwable $th){
-            throw $th;
             return false;
         }
         return true;
+    }
+
+    public function removeAdminAccount(string $username){
+        $admin = $this->entitym->getRepository(Admin::class)->findOneBy(['username' => $username]);
+        if(!$admin){
+            return null;
+        }
+
+        $this->entitym->remove($admin);
+        $this->entitym->flush();
+        return $admin;
     }
 
     public function createAdminAccount(string $username, string $password, array $roles = ['ROLE_PANEL']){
@@ -170,6 +192,55 @@ class SiteManager extends Manager {
             'admin_login' => '',
             'admin_password' => '',
         ];
+    }
+
+    public function setSetting(string $name, $value){
+        if(!is_null($value) && !empty($name) && $name != 'public'){
+            $this->settings[$name] = $value;
+        }
+    }
+
+    public function getSetting(string $name){
+        if($name != 'public' && array_key_exists($name, $this->settings)){
+            return $this->settings[$name];
+        }
+        return null;
+    }
+
+    public function setPublicSettingValue(string $name, $value){
+        if(!is_null($value) && !empty($name)){
+            if(!is_array($this->settings['public'][$name]??null)){
+                $this->settings['public'][$name] = ['title' => 'Параметр', 'value' => ''];
+            }
+            $this->settings['public'][$name]['value'] = $value;
+        }
+    }
+
+    public function setPublicSettingTitle(string $name, string $title){
+        if(!empty($title) && !empty($name)){
+            if(!is_array($this->settings['public'][$name]??null)){
+                $this->settings['public'][$name] = ['title' => 'Параметр', 'value' => ''];
+            }
+            $this->settings['public'][$name]['title'] = $title;
+        }
+    }
+
+    public function createPublicSetting(string $name, string $title, $value){
+        $this->settings['public'][$name] = [
+            'title' => $title,
+            'value' => $value,
+        ];
+    }
+
+    public function getPublicSettingList(){
+        return $this->settings['public'];
+    }
+
+    public function getPublicSetting(string $name){
+        if(array_key_exists($name, $this->settings['public'])){
+            return $this->settings['public'][$name];
+        }
+        return null;
     }
 
     public function saveSettings(){
@@ -228,7 +299,10 @@ class SiteManager extends Manager {
             throw new Exception('Не удалось создать таблицы в базе данных');
         }
         
+        $this->removeAdminAccount($settings['admin_login']);
         $this->createAdminAccount($settings['admin_login'], $settings['admin_password'], ['ROLE_SUPER_ADMIN']);
+
+        $this->createPublicSetting('site_name', 'Название сайта', 'Блог');
         
         $settings['installed'] = true;
         $this->settings = $settings;

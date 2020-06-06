@@ -4,7 +4,7 @@ namespace App\Services;
 use App\content\Content;
 use App\Services\Data\ModuleData;
 use App\Services\Data\PageData;
-use Twig\Environment;
+use \Twig\Environment;
 use \Twig\Loader\FilesystemLoader;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\CssSelector\Exception\InternalErrorException;
@@ -16,14 +16,16 @@ class PageRenderer {
     private $themem = null;
     private $postm = null;
     private $pagem = null;
+    private $pluginm = null;
     private $twig = null;
     private $sitem = null;
 
-    public function __construct(Environment $twig, ThemeManager $themem, PostManager $postm, PageManager $pagem, SiteManager $sitem){
+    public function __construct(Environment $twig, ThemeManager $themem, PluginManager $pluginm, PostManager $postm, PageManager $pagem, SiteManager $sitem){
         $this->themem = $themem;
         $this->postm = $postm;
         $this->pagem = $pagem;
         $this->sitem = $sitem;
+        $this->pluginm = $pluginm;
 
         $this->twig = $twig;
         $loader = $this->twig->getLoader();
@@ -45,7 +47,7 @@ class PageRenderer {
             if($block->getActive()){
                 foreach($block->getModules() as $module){
 
-                    if(is_null($this->modules->getModule($module->getName()))){
+                    if(is_null($this->pluginm->getModule($module->getName()))){
                         StaticLogger::error('На странице запрошен несуществующий модуль', [
                             'module' => $module->getName(),
                             'block' => $name
@@ -54,13 +56,13 @@ class PageRenderer {
                         continue;
                     }
 
-                    if(in_array($this->modules->getModule($module->getName())->getFormat(), $formats)){
-                        $module->setData($this->modules->getModule($module->getName())->getData($module->getArgs()));
+                    if(in_array($this->pluginm->getModule($module->getName())->getFormat(), $formats)){
+                        $module->setData($this->pluginm->getModule($module->getName())->getData($module->getArgs()));
                     }else{
                         StaticLogger::error('Блок не поддерживает формат данных модуля ', [
                             'block' => $name,
                             'module' => $module->getName(),
-                            'format' => $this->modules->getModule($module->getName())->getFormat()
+                            'format' => $this->pluginm->getModule($module->getName())->getFormat()
                         ]);
                     }
                 }
@@ -81,7 +83,10 @@ class PageRenderer {
 
         $data = [
             'page_id' => $pageid,
-            'data' => $page_data,            
+            'data' => $page_data,   
+            'data_json' => json_encode($page_data->serialize()),
+            'site_settings' => $this->sitem->getPublicSettingList(),
+            'theme_settings' => $this->themem->getSettings(),         
         ];
 
         return $data;
@@ -115,16 +120,17 @@ class PageRenderer {
             return $this->sitem->renderInstaller();
         }
 
-        $post = $this->postm->loadPost($id);
+        $post = $this->postm->getPost($id);
 
         if(is_null($post) || $post->getCategory()->getName() != $category){
             throw new NotFoundHttpException();
         }
 
         $page = $this->getPageData('_post');
+        $page->setTitle($post->getTitle());
 
         $page->setContentType('post');
-        $page->setContentArgs($post->generateContentArgs());
+        $page->setContentArgs($post->serialize());
         $page->createContentFromArgs();
 
         $data = $this->generateTemplateData('_post', $page);

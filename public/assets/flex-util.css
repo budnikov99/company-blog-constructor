@@ -1,0 +1,116 @@
+.position-relative {
+    position: relative !important;
+}
+
+.position-absolute {
+    position: absolute !important;
+}
+
+.flex-container-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.flex-container-row {
+    display: flex;
+    flex-direction: row;
+}
+
+.flex-container-justify-center {
+    justify-content: center !important;
+}
+
+.flex-container-justify-start {
+    justify-content: start !important;
+}
+
+.flex-container-justify-end {
+    justify-content: end !important;
+}
+
+.flex-container-justify-between {
+    justify-content: space-between !important;
+}
+
+.flex-container-justify-around {
+    justify-content: space-around !important;
+}
+
+.flex-container-align-start {
+    align-items: flex-start !important;
+}
+
+.flex-container-align-end {
+    align-items: flex-end !important;
+}
+
+.flex-container-align-center {
+    align-items: center !important;
+}
+
+.flex-container-align-stretch {
+    align-items: stretch !important;
+}
+
+.flex-container-wrap {
+    flex-wrap: wrap !important;
+}
+
+.flex-float-right {
+    margin-left: auto !important;
+}
+
+.flex-float-bottom {
+    margin-top: auto !important;
+}
+
+.flex-resize {
+    flex: 1 !important;
+}
+
+.flex-rigid {
+    flex: 0 !important;
+}
+
+/* Заставляет элемент принимать максимальный размер, не выходя за пределы контейнера */
+.flex-fill-container {
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+}
+
+.flex-self-center {
+    align-self: center;
+}
+
+.flex-self-start {
+    align-self: flex-start;
+}
+
+.flex-self-end {
+    align-self: flex-end;
+}
+
+.flex-self-stretch {
+    align-self: stretch;
+}
+
+.overflow-x-hidden {
+    overflow-x: hidden;
+}
+
+.scroller-vertical {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.scroller-horizontal {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+}
+
+.scroller-item {
+    flex: 0 0 auto;
+}

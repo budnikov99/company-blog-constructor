@@ -3,6 +3,7 @@ namespace App\Services;
 
 use App\Services\Data\ModuleData;
 use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Security;
@@ -31,7 +32,7 @@ class AdminPanelRenderer {
     }
 
 
-    public function render($path){
+    public function render($path, Request $request){
         if(!$this->sitem->isInstalled()){
             return $this->sitem->renderInstaller();
         }
@@ -93,11 +94,12 @@ class AdminPanelRenderer {
                 $data['active_extension'] = $extension_id;
                 $data['active_extension_name'] = $extension->getTitle();
 
-                $submenu = $extension->getSubmenu($subpath);
+                $submenu = $extension->getSubmenu($subpath, $request);
+                $ext_data = $extension->getTemplateData($subpath, $request);
                 $data['active_submenu_items'] = $submenu['items'];
-                $data['active_submenu_item'] = $submenu['active'];
+                $data['active_submenu_item'] = $ext_data['active'] ?? $submenu['active'];
 
-                $ext_data = $extension->getTemplateData($subpath);
+                
                 $ext_urls = [
                     'panel_url' => '/admin/'.$extension_id,
                     'assets_url' => '/assets/plugin/'.$plugin,

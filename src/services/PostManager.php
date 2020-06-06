@@ -24,16 +24,54 @@ class PostManager extends Manager {
         $this->postcatr = $postcatr;        
     }
 
-    public function createPost(string $title, string $content, string $preview = null, string $category = null){
+    public function createCategory(string $name, string $title){
+        $cat = new PostCategory();
+        $cat->setName($name);
+        $cat->setTitle($title);
+
+        $this->entitym->persist($cat);
+        $this->entitym->flush();
+        return $cat;
+    }
+
+    public function getCategory(string $name) {
+        return $this->postcatr->find($name);
+    }
+
+    public function loadCategories(){
+        return $this->postcatr->findAll();
+    }
+
+    public function removeCategory(string $name){
+        if($name == PostManager::$UNCATEGORIZED_NAME){
+            return false;
+        }
+        $cat = $this->getCategory($name);
+        if($cat){
+            $this->entitym->remove($cat);
+            $this->entitym->flush();
+            return true;
+        }
+        return false;
+    }
+
+    private function createUncategorizedCategory(){
+        $uncat = new PostCategory();
+        $uncat->setName(PostManager::$UNCATEGORIZED_NAME);
+        $uncat->setTitle('Без категории');
+        return $uncat;
+    }
+
+    public function createPost(string $title, string $content, string $preview = null, string $image = null, string $category = null){
         if(is_null($category)){
-            $category = $this->postcatr->findOneBy(['name' => PostManager::$UNCATEGORIZED_NAME]);
+            $category = $this->getCategory(PostManager::$UNCATEGORIZED_NAME);
             
         }else{
             if(gettype($category) == 'string'){
-                $category = $this->postcatr->findOneBy(['name' => $category]);
+                $category = $this->getCategory($category);
             }
         }
-        if(is_null($category)){
+        if(is_null($category) || get_class($category) != PostCategory::class){
             return null;
         }
 
@@ -44,35 +82,37 @@ class PostManager extends Manager {
 
         $post->setCreationDate(new DateTime());
         $post->setPreview($preview);
+        $post->setImage($image);
 
         $this->entitym->persist($post);
         $this->entitym->flush();
         return $post;
     }
 
-    public function createCategory(string $name){
-        $cat = new PostCategory();
-        $cat->setName($name);
-
-        $this->entitym->persist($cat);
-        $this->entitym->flush();
-        return $cat;
+    public function loadPosts(int $start_from = 0, int $limit = 0, $catlist = null, DateTimeInterface $begin = null, DateTimeInterface $end = null){
+        return $this->postr->findByCategoriesAndDate($start_from, $limit, $catlist, $begin, $end);
     }
 
-    private function createUncategorizedCategory(){
-        $uncat = new PostCategory();
-        $uncat->setName(PostManager::$UNCATEGORIZED_NAME);
-        $uncat->setTitle('Без категории');
-        return $uncat;
+    public function countPosts($catlist = null, DateTimeInterface $begin = null, DateTimeInterface $end = null){
+        return $this->postr->countByCategoriesAndDate($catlist, $begin, $end);
     }
 
-
-    public function loadPosts(int $start_from = -1, int $limit = 0, array $catlist = null, DateTimeInterface $start = null, DateTimeInterface $end = null){
-        return $this->postr->findByCategoriesAndDate($start_from, $limit, $catlist, $start, $end);
-    }
-
-    public function loadPost($id){
+    public function getPost($id){
         return $this->postr->find($id);
+    }
+
+    public function removePost($id){
+        $post = $this->getPost($id);
+        if($post){
+            $this->entitym->remove($post);
+            $this->entitym->flush();
+            return true;
+        }
+        return false;
+    }
+
+    public function flushDB(){
+        $this->entitym->flush();
     }
 
     public function initializeDB()

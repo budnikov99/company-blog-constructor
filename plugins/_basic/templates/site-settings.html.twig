@@ -1,0 +1,83 @@
+<div class="flex-fill-container content-container">
+    <div class="flex-fill-container content-container-title big">
+        Настройки сайта
+    </div>
+    <div class="flex-fill-container content-container-block">
+        <div class="list flex-container-align-stretch">
+            {% for name, setting in data.settings %}
+                <div class="list-line">
+                    <div class="list-label size-30">{{setting.title}}</div>
+                    {% if setting.value is same as(true) or setting.value is same as(false) %}
+                        <input type="checkbox" {{ setting.value ? 'checked' }} data-setting-name="{{name}}" class="setting-editor-setting-field input-checkbox" style="margin-right: auto"/>
+                    {% elseif setting.value matches '/^\\d+$/' or setting.value matches '/^[-+]?[0-9]*\\.?[0-9]+$/' %}
+                        <input type="number" data-setting-name="{{name}}" class="setting-editor-setting-field input-field flex-resize" value="{{setting.value}}"/>
+                    {% else %}
+                        <input type="text" data-setting-name="{{name}}" class="setting-editor-setting-field input-field flex-resize" value="{{setting.value}}"/>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <input type="button" id="settings-apply" class="input-button blue block-margin" value="Сохранить" />
+        </div>
+        <script>
+            document.getElementById('settings-apply').onclick = () => {
+                let values = {};
+                let fields = document.getElementsByClassName('setting-editor-setting-field');
+
+                if(!fields || fields.length == 0){
+                    errorPopup('Значений не обнаружено');
+                    return;
+                }
+                for(let i = 0; i<fields.length; i++){
+                    let item = fields.item(i);
+                    if(item.type == 'checkbox'){
+                        values[item.dataset.settingName] = item.checked;
+                    }else{
+                        values[item.dataset.settingName] = item.value;
+                    }
+                }
+                admin_helpers.sendRequest('{{url.controller_url}}/settings/apply', JSON.stringify(values)).then((response) => {
+                    successPopup('Сохранено!');
+                }, (response) => {
+                    if(response.response){
+                        errorPopup(response.response.message);
+                    }else{
+                        errorPopup('Произошла ошибка');
+                    }
+                });
+            };
+        </script>
+    </div>
+    <div class="flex-fill-container content-container-title big">
+        Действия
+    </div>
+    <div class="flex-fill-container content-container-block flex-container-row">
+        <div class="list">
+            <div class="list-line">
+                <input type="button" id="site-reinstall" class="input-button red big" value="Переустановить сайт" />
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('site-reinstall').onclick = () => {
+            confirmPopup(
+                'Вы уверены, что хотите переустановить сайт?<br>\
+                Вы можете указать или создать новую базу данных при переустановке.<br>\
+                Это действие может повредить текущую базу данных.'
+            , () => {
+                admin_helpers.sendRequest('{{url.controller_url}}/settings/reinstall').then((response) => {
+                    location.href = location.href;
+                }, (response) => {
+                    if(response.response){
+                        errorPopup(response.response.message);
+                    }else if(response.status == 403){
+                        errorPopup('Недостаточно прав');
+                    }else{
+                        errorPopup('Произошла ошибка');
+                    }
+                });
+            });
+        };
+    </script>
+</div>
+
+

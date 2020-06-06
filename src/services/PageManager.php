@@ -104,6 +104,7 @@ class PageManager extends Manager {
             'plugins',
             'post',
             'install',
+            'search',
         ];
         if(in_array($page_id, $reserved)){
             return false;
@@ -147,6 +148,12 @@ class PageManager extends Manager {
                 $page->setBlock($block_name, new BlockData(null));
             }else if(count($page->getBlock($block_name)->getModules()) == 0){
                 $page->getBlock($block_name)->setActive(null);
+            }
+        }
+
+        foreach($page->getBlocks() as $block_name => $block){
+            if(is_null($this->global_settings->getBlock($block_name))){
+                $page->removeBlock($block_name);
             }
         }
 

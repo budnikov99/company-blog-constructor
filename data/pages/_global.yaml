@@ -3,9 +3,9 @@ page_content:
     type: static
     content: ''
 blocks:
-    header_title: { active: false, modules: null }
-    favicon: { active: false, modules: null }
-    header_image: { active: false, modules: null }
-    header_menu: { active: false, modules: null }
-    left_sidebar: { active: false, modules: null }
-    footer_copyright: { active: false, modules: null }
+    favicon: { active: true, modules: [{ module: _basic/image_file, url: /userfiles/images/horns-n-hooves.png, alt: '' }] }
+    header_logo: { active: true, modules: [{ module: _basic/image_file, url: /userfiles/images/horns-n-hooves.png, alt: '' }] }
+    header_title: { active: true, modules: [{ module: _basic/fixed_text, text: 'ООО "Рога и Копыта"' }] }
+    header_info: { active: true, modules: [{ module: _basic/fixed_text, text: 'Тел.: <b>8 (800) 555-35-35</b>' }, { module: _basic/fixed_text, text: 'г. Москва, ул. Пушкина 69, кв. 420' }] }
+    header_menu: { active: true, modules: [{ module: _basic/menu, menu: pages_menu }] }
+    header_search: { active: true, modules: {  } }

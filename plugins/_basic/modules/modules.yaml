@@ -39,3 +39,33 @@ image_file:
     alt:
       type: text
       title: 'Подпись картинки'
+
+image_link_url:
+  format: ImageLinkFormat
+  class: ImageLinkModule
+  title: 'Картинка-ссылка по URL'
+  args:
+    img:
+      type: text
+      title: 'URL картинки'
+    text:
+      type: text
+      title: 'Текст ссылки'
+    href:
+      type: text
+      title: 'Ссылка'
+
+image_link_file:
+  format: ImageLinkFormat
+  class: ImageLinkModule
+  title: 'Картинка-ссылка с сервера'
+  args:
+    img:
+      type: file
+      title: 'Файл картинки'
+    text:
+      type: text
+      title: 'Текст ссылки'
+    href:
+      type: text
+      title: 'Ссылка'

@@ -1,0 +1,201 @@
+<script src="/assets/ckeditor.js"></script>
+<script src="/assets/ckeditor-config.js"></script>
+<script type="text/javascript" src="/bundles/cksourceckfinder/ckfinder/ckfinder.js"></script>
+<script>CKFinder.config( { connectorPath: '/ckfinder/connector' } );</script>
+<script>
+    var post_data = JSON.parse('{{ data.post_json|escape("js") }}');
+    var post_id = Number.parseInt('{{ data.post ? data.post.id  :-1 }}');
+</script>
+<div class="content-container">
+    {% if data.mode == 'post' %}
+    <div class="content-container-title big">
+        Редактировать статью
+    </div>
+    {% else %}
+    <div class="content-container-title big">
+        Создать статью
+    </div>
+    {% endif %}
+    <div class="content-container-block">
+        <div class="list flex-self-stretch">
+            <div class="list-line flex-self-stretch">
+                <input id="post-title" class="input-field flex-resize" value="{{ data.post ? data.post.title }}" placeholder="Название статьи" />
+                {% if not data.post is null %}
+                <div class="input-field">id:{{data.post.id}}</div>
+                <div class="input-field">{{data.post.creationDate.format('Y-m-d')}}</div>
+                {% endif %}
+            </div>
+            <div class="list-line flex-self-stretch">
+                <div class="list-label">
+                    Картинка статьи
+                </div>
+                <input id="post-image" class="input-field flex-resize" value="{{ data.post ? data.post.image }}" placeholder="URL картинки предпросмотра" />
+                <input type="button" id="post-image-select" class="input-button" value="..." />
+            </div>
+            <script>
+                document.getElementById('post-image').oninput = (evt) => {
+                    post_data.image = evt.target.value;
+                };
+                document.getElementById('post-image-select').onclick = (evt) => {
+                    selectFileWithCKFinder((url) => {
+                        document.getElementById('post-image').value = url;
+                        post_data.image = url;
+                    });
+                };
+            </script>
+            <div class="list-line flex-self-stretch">
+                <select id="post-category" class="input-field flex-fill-container">
+                    {% for category in data.categories %}
+                    <option {{(data.post and data.post.category.name == category.name) or 
+                        (data.post is null and category.name == 'uncategorized') ? 'selected'}} value="{{category.name}}">{{category.title}}</option>
+                    {% endfor %}
+                </select>
+                {% if data.post is null %}
+                <input id="post-save-button" class="input-button blue" type="button" value="Создать" />
+                {% else %}
+                <a href="/post/{{data.post.category.name}}/{{data.post.id}}" class="input-button blue">Открыть</a>
+                <input id="post-save-button" class="input-button blue" type="button" value="Сохранить" />
+                <input id="post-remove-button" class="input-button red" type="button" value="Удалить" />
+                {% endif %}
+            </div>
+            <script>
+                document.getElementById('post-save-button').onclick = (evt) => {
+                    admin_helpers.sendRequest('{{url.controller_url}}/post/'+post_id+'/save', JSON.stringify(post_data)).then((response) => {
+                        if(response){
+                            if(response.data.success){
+                                if(post_id == -1){
+                                    if(response.data.post_id){
+                                        location.href = '{{url.panel_url}}/post/'+response.data.post_id;
+                                    }else{
+                                        location.href = '{{url.panel_url}}/posts';
+                                    }
+                                }else{
+                                    successPopup('Статья сохранена');
+                                }
+                            }else{
+                                errorPopup(response.data.message);
+                            }
+                        }else{
+                            errorPopup('Не удалось сохранить статью');
+                        }
+                    });
+                }
+
+                document.getElementById('post-title').oninput = (evt) => {
+                    post_data.title = evt.target.value;
+                }
+                post_data.category = document.getElementById('post-category').value;
+                document.getElementById('post-category').oninput = (evt) => {
+                    post_data.category = evt.target.value;
+                }
+            </script>
+            {% if not data.post is null %}
+            <script>
+                document.getElementById('post-remove-button').onclick = (evt) => {
+                    confirmPopup('Действительно удалить статью?<br>Это действие нельзя отменить.', () => {
+                        admin_helpers.sendRequest('{{url.controller_url}}/post/{{data.post.id}}/remove').then((response) => {
+                            if(response){
+                                if(response.data.success){
+                                    location.href = '{{url.panel_url}}/posts';
+                                }else{
+                                    errorPopup(response.data.message);
+                                }
+                            }else{
+                                errorPopup('Не удалось удалить статью');
+                            }
+                        });
+                    });
+                }
+            </script>
+            {% endif %}
+        </div>
+    </div>
+    <div class="content-container-block">
+        <div class="fold {{not data.post is null ? 'unfolded'}}">
+            <div class="fold-header">
+                Краткая форма
+            </div>
+            <div class="fold-content flex-container-column">
+                <div class="list-line flex-self-start">
+                    <div class="list-label">Генерировать автоматически</div>
+                    <input type="checkbox" id="post-preview-auto" class="input-checkbox" {{data.post is null ? 'checked'}}/>
+                </div>
+                <div id="preview-editor-container">
+                    <div id="preview-editor"></div>
+                </div>
+            </div>
+        </div>
+        <div id="content-editor"></div>
+        <script>
+            (async function(){
+                function generatePreview(content = ''){
+                    let container = document.createElement('div');
+                    container.innerHTML = content;
+
+                    let preview = document.createElement('div');
+
+                    let max_count = 200;
+                    let count = 0;
+                    let child = container.firstChild;
+                    while(child){
+                        if(child.tagName == 'P'){
+                            let size = child.innerText ? child.innerText.length : 0;
+                            preview.appendChild(child);
+                            if(count + size > max_count){
+                                let text = child.innerText.substr(0, child.innerText.indexOf(' ', max_count-count)) + '...';
+                                child.innerText = text;  
+                                return preview.innerHTML;
+                            }
+                            count += size;
+                        }else{
+                            container.removeChild(child);
+                        }
+                        child = container.firstChild;
+                    }
+
+                    return preview.innerHTML;
+                }
+                let auto_checkbox = document.getElementById('post-preview-auto');
+
+                document.getElementById('preview-editor').innerHTML = post_data.preview;
+                let preview_editor = await ClassicEditor.create(document.getElementById('preview-editor'), ckeditorConfig());
+                preview_editor.model.document.on('change:data', (evt) => {
+                    post_data.preview = preview_editor.getData();
+                });
+
+                document.getElementById('content-editor').innerHTML = post_data.content;
+                let content_editor = await ClassicEditor.create(document.getElementById('content-editor'), ckeditorConfig());
+                content_editor.model.document.on('change:data', (evt) => {
+                    post_data.content = content_editor.getData();
+                    if(auto_checkbox.checked){
+                        preview_editor.setData(generatePreview(post_data.content));
+                    }
+                });
+
+                auto_checkbox.onchange = (evt) => {
+                    if(auto_checkbox.checked){
+                        preview_editor.setData(generatePreview(post_data.content));
+                    }
+                }
+            }())
+
+            function selectFileWithCKFinder(handler) {
+                CKFinder.modal({
+                    chooseFiles: true,
+                    width: 800,
+                    height: 600,
+                    onInit: function(finder) {
+                        finder.on('files:choose', function(evt) {
+                            var file = evt.data.files.first();
+                            handler(file.getUrl());
+                        });
+            
+                        finder.on('file:choose:resizedImage', function(evt) {
+                            handler(evt.data.resizedUrl);
+                        });
+                    }
+                });
+            }
+        </script>
+    </div>
+</div>

@@ -2,9 +2,10 @@
     <head>
         <title>Установка блога</title>
         <link rel="stylesheet" href="/assets/reset.css" />
+        <link rel="stylesheet" href="/assets/flex-util.css" />
         <link rel="stylesheet" href="/assets/panel/admin-panel.css" />
         <link rel="stylesheet" href="/assets/panel/admin-panel-popups.css" />
-        <script src="/assets/panel/admin-panel-helpers.js"></script>
+        <script src="/assets/helpers.js"></script>
         <script>
             var db_info = {
                 'db_host': '127.0.0.1',
@@ -20,9 +21,9 @@
             <div class="content-container-title big">
                 Установка блога
             </div>
-            <div class="content-tab-container">
-                <div class="content-tabs">
-                    <div data-tab-id="db-tab" class="content-tab">
+            <div class="content-tab-container tab-container">
+                <div class="content-tabs tabs">
+                    <div data-tab-id="db-tab" class="content-tab tab">
                         <div class="content-container-title block-margin">
                             Соединение с базой данных
                         </div>
@@ -58,7 +59,7 @@
                         };
 
                     </script>
-                    <div data-tab-id="admin-tab" class="content-tab">
+                    <div data-tab-id="admin-tab" class="content-tab tab">
                         <div class="content-container-title block-margin">
                             Учётная запись администратора
                         </div>
@@ -106,21 +107,47 @@
                         checkPasswordRepeat();
                     </script>
                 </div>   
-                <div class="content-tab-buttons">
+                <div class="content-tab-buttons tab-buttons">
                     <div class="content-tab-button-wrapper">
-                        <div id="tab-button-db" data-tab-id="db-tab"  class="content-tab-button active">
+                        <div id="tab-button-db" data-tab-id="db-tab"  class="content-tab-button tab-button active">
                             База данных
                         </div>
                     </div>
                     <div class="content-tab-button-wrapper">
-                        <div id="tab-button-admin" data-tab-id="admin-tab" class="content-tab-button">
+                        <div id="tab-button-admin" data-tab-id="admin-tab" class="content-tab-button tab-button">
                             Администратор
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div id="error-popup" class="popup animation">
+        <div id="loading-popup" class="popup animation">
+            <style>
+                .install-loading-icon {
+                    width: 100px;
+                    height: 100px;
+                    fill: white;
+                    animation: loading-spin 1.25s infinite linear;
+                }
+
+                @keyframes loading-spin {
+                    from {transform: rotate(0deg);}
+                    50% {transform: rotate(-180deg);}
+                    to {transform: rotate(-360deg);}
+                }
+            </style>
+            <svg version="1.1" class="install-loading-icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                    viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
+                <rect x="226" width="60" height="105"/>
+                <rect x="82.1" y="59.609" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -46.4391 112.1023)" width="59.999" height="104.999"/>
+                <rect y="226" width="105" height="60"/>
+                <rect x="59.604" y="369.895" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -249.934 196.3955)" width="104.999" height="59.999"/>
+                <rect x="226" y="407" width="60" height="105"/>
+                <rect x="369.9" y="347.392" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -165.6379 399.8979)" width="59.999" height="104.999"/>
+                <rect x="407" y="226" width="105" height="60"/>
+            </svg>
+        </div>
+        <div id="error-popup" class="popup animation close-button">
             <div class="popup-window">
                 <div class="popup-window-line-center">
                     <div id="error-title" class="popup-window-title red">
@@ -178,6 +205,7 @@
                 if(!document.getElementById('admin-login').value){
                     showErrorPopup('Недопустимый логин администратора');
                 }
+                popup.showPopup('loading-popup');
                 checkDatabase().then(() => {
                     updateDbInfo();
                     db_info['admin_login'] = document.getElementById('admin-login').value;
@@ -185,6 +213,7 @@
                     admin_helpers.sendRequest('/install', JSON.stringify(db_info)).then((response, status) => {
                         location.href = '/admin';
                     }, (response, status) => {
+                        popup.hidePopup('loading-popup');
                         try{
                             showErrorPopup(response.message);
                         }catch(ex){
@@ -192,6 +221,7 @@
                         }
                     });
                 }, () => {
+                    popup.hidePopup('loading-popup');
                     showErrorPopup('Не удалось соединиться с базой данных');
                 });
             };

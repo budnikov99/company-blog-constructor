@@ -15,80 +15,6 @@ body, html {
 Общие классы
 //////////*/
 
-.flex-container-column {
-    display: flex;
-    flex-direction: column;
-}
-
-.flex-container-row {
-    display: flex;
-    flex-direction: row;
-}
-
-.flex-container-justify-center {
-    justify-content: center;
-}
-
-.flex-container-align-center {
-    align-items: center;
-}
-
-.flex-float-right {
-    margin-left: auto;
-}
-
-.flex-float-bottom {
-    margin-top: auto;
-}
-
-.flex-resize {
-    flex: 1;
-}
-
-/* Заставляет элемент принимать максимальный размер, не выходя за пределы контейнера */
-.flex-fill-container {
-    flex: 1;
-    min-height: 0;
-    min-width: 0;
-}
-
-.flex-self-center {
-    align-self: center;
-}
-
-.flex-self-start {
-    align-self: start;
-}
-
-.flex-self-end {
-    align-self: end;
-}
-
-.flex-self-stretch {
-    align-self: stretch;
-}
-
-.overflow-x-hidden {
-    overflow-x: hidden;
-}
-
-.scroller-vertical {
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
-}
-
-.scroller-horizontal {
-    display: flex;
-    flex-direction: row;
-    overflow-x: auto;
-}
-
-.scroller-item {
-    flex: 0 0 auto;
-}
-
-
 /* стили контента */
 
 .content-container {
@@ -98,13 +24,13 @@ body, html {
 .content-container-title {
     font-family: sans-serif;
     color: #555;
-    font-size: 24px;
+    font-size: 1.5em;
     font-weight: bold;
 }
 
 .content-container-title.big {
     color: #888;
-    font-size: 36px;
+    font-size: 2.25em;
 }
 
 .content-container-block {
@@ -123,11 +49,20 @@ body, html {
     align-items: start;
 }
 
+.list.flex-container-align-stretch {
+    align-items: stretch;
+}
+
+.list.flex-container-align-center {
+    align-items: center;
+}
+
 .list-title {
     font-family: sans-serif;
     color: #555;
-    font-size: 18px;
+    font-size: 1.2em;
     font-weight: bold;
+    margin: 10px 0px;
 }
 
 .list-line {
@@ -164,6 +99,14 @@ body, html {
 
 .list-label.size-30 {
     min-width: 30%;
+}
+
+.list-label.size-40 {
+    min-width: 40%;
+}
+
+.list-label.size-50 {
+    min-width: 50%;
 }
 
 .list-label.bold {
@@ -257,8 +200,9 @@ body, html {
     display: flex;
     align-items: center;
 
-    padding-left: 40px;
-    height: 40px;
+    padding: 0.75em;
+    padding-left: 2.5em;
+    padding-right: 20px;
 
     font-weight: bold;
     color: #777;
@@ -276,16 +220,18 @@ body, html {
 
 .fold-header:before {
     content: '>';
-    font-family: sans-serif;
-    font-size: 30px;
-    font-weight: bold;
-    color: #888;
 
     position: absolute;
     top: 0;
+    top: calc(50% - 0.7em);
     left: 0;
-    height: 40px;
-    width: 40px;
+    height: 1.4em;
+    width: 1.4em;
+
+    font-family: sans-serif;
+    font-size: 1.85em;
+    font-weight: bold;
+    color: #888;
 
     display: flex;
     justify-content: center;
@@ -303,9 +249,19 @@ body, html {
 
 .fold-content {
     padding: 10px;
+    border-top: 1px solid #ccc;
 }
 
 .fold:not(.unfolded) > .fold-content {
+    display: none;
+}
+
+.fold-content-placeholder {
+    padding: 10px;
+    border-top: 1px solid #ccc;
+}
+
+.fold.unfolded .fold-content-placeholder {
     display: none;
 }
 

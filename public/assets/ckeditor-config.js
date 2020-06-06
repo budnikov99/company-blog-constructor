@@ -3,11 +3,11 @@ function ckeditorConfig() {
         toolbar: [ 
             'heading', 'Alignment', '|', 
             'FontFamily', 'FontSize', 'FontColor', 'FontBackgroundColor', '|',
-            'bold', 'italic', 'link', '|',
+            'bold', 'italic', 'underline', 'strikethrough', 'subscript', 'superscript', 'link', '|',
             'bulletedList', 'numberedList', '|',
-            'indent', 'outdent', 'HorizontalLine', '|',
+            'indent', 'outdent', 'HorizontalLine', 'specialCharacters', '|',
             'blockQuote', 'insertTable', 'mediaEmbed', 'CKFinder', '|',
-            'undo', 'redo' ],
+            'undo', 'redo'],
         mediaEmbed: {
             previewsInData: true,
         },
@@ -17,6 +17,10 @@ function ckeditorConfig() {
         },
         image: {
             resizeUnit: 'px',
+            toolbar: [ 'imageStyle:full', 'imageStyle:side', '|', 'imageTextAlternative' ]
+        },
+        table: {
+            contentToolbar: [ 'tableRow', 'tableColumn', 'mergeTableCells' ]
         },
         ckfinder: {
             uploadUrl: '/ckfinder/connector'

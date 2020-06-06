@@ -34,12 +34,15 @@ class ThemeBlockData extends Data {
     protected static function deserialize_raw(array $data){
         Data::assertValueType($data['title'], 'string');
         Data::assertValueType($data['multiple'], 'boolean');
-        Data::assertValueType($data['accepted_formats'], 'array');
 
         $block = new ThemeBlockData($data['title']);
 
         $block->setMultiple($data['multiple']);
-        $block->setAcceptedFormats($data['accepted_formats']);
+        $formats = $data['accepted_formats']??[];
+        if(!is_array($formats)){
+            $formats = [];
+        }
+        $block->setAcceptedFormats($formats);
         return $block;
     }
 
@@ -47,7 +50,7 @@ class ThemeBlockData extends Data {
         $data = [
             'title' => $this->title,
             'multiple' => $this->multiple,
-            'accepted_formats' => $this->accepted_formats
+            'accepted_formats' => $this->accepted_formats??[]
         ];
 
         return $data;

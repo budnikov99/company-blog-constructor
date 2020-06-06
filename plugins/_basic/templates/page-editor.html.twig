@@ -47,10 +47,20 @@
                 </div>
                 <script>
                     (function(){
+
+                        function validatePageid(page_id){
+                            let forbidden = [' ', '/', '\\', ':', '*', '?', '\"', '\'', '<', '>', '|'];
+                            if(!page_id || typeof page_id != 'string' || page_id.charAt(0) == '_' || !forbidden.every((char) => page_id.indexOf(char) == -1)){
+                                return false;
+                            }else{
+                                return true;
+                            }
+                        }
+                        
                         let field = document.getElementById('page-id');
             
                         function validate(){
-                            if(admin_helpers.validatePageid(field.value)){
+                            if(validatePageid(field.value)){
                                 field.classList.remove('error');
                             }else{
                                 field.classList.add('error');
@@ -62,19 +72,19 @@
             
                         document.getElementById('create-button').onclick = (evt) => {
                             let id = field.value;
-                            if(!admin_helpers.validatePageid(field.value)){
+                            if(!validatePageid(field.value)){
                                 showErrorPopup('Некорректный адрес страницы.');
                                 return;
                             }
-                            admin_helpers.sendRequest('{{url.controller_url}}/page/'+field.value+'/create').then((response, status) => {
-                                if(response.success){
+                            admin_helpers.sendRequest('{{url.controller_url}}/page/'+field.value+'/create').then((response) => {
+                                if(response.response.success){
                                     savePage(field.value, this_page).then(() => {
                                         window.location = '{{url.panel_url}}/page/'+id;
                                     }, () => {
                                         window.location = '{{url.panel_url}}/page/'+id;
                                     });
                                 }else{
-                                    showErrorPopup(response.message);
+                                    showErrorPopup(response.response.message);
                                 }
                             }, () => {
                                 showErrorPopup('Неизвестная ошибка.');
@@ -131,11 +141,11 @@
                             popup.showPopup('page-editor-remove-popup');
                         };
                         document.getElementById('remove-confirm-button').onclick = (evt) => {
-                            admin_helpers.sendRequest('{{url.controller_url}}/page/'+page_id+'/remove').then((response, status) => {
-                                if(response.success){
+                            admin_helpers.sendRequest('{{url.controller_url}}/page/'+page_id+'/remove').then((response) => {
+                                if(response.response.success){
                                     popup.showPopup('page-editor-removed-popup');
                                 }else{
-                                    showErrorPopup(response.message);
+                                    showErrorPopup(response.response.message);
                                 }
                             }, () => {
                                 showErrorPopup('Неизвестная ошибка.');
@@ -436,30 +446,29 @@
                 let add_module_select = document.createElement('select');
                 add_module_select.classList.add('input-field');
                 add_module_select.classList.add('flex-resize');
-                add_module_select.disabled = inherited;
-
-                Object.keys(modules_info).filter(
+            
+                let allowed_module_list = Object.keys(modules_info).filter(
                     (module_name) => info.accepted_formats.includes(modules_info[module_name].format)
-                ).forEach((module_name) => {
+                )
+                allowed_module_list.forEach((module_name) => {
                     let option = document.createElement('option');
                     option.value = module_name;
-                    option.innerText = modules_info[module_name].title+' ('+module_name+')';
+                    option.innerText = 'Добавить источник: '+modules_info[module_name].title+' ('+module_name+')';
                     add_module_select.appendChild(option);
                 });
-                
-                let add_module_button = document.createElement('button');
-                add_module_button.classList.add('input-button');
-                add_module_button.classList.add('green');
-                add_module_button.innerText = 'Добавить';
-                add_module_button.disabled = inherited || (block.modules.length != 0 && !info.multiple);
-                if(!add_module_button.disabled){
-                    add_module_button.onclick = (evt) => {
+
+                add_module_select.disabled = inherited || allowed_module_list.length == 0 || (block.modules.length != 0 && !info.multiple);
+                if(!add_module_select.disabled){
+                    add_module_select.onchange = (evt) => {
                         block.modules.push(getBlankModule(add_module_select.value));
                         updateBlockEdit(name);
                     };
+                    add_module_select.onfocus = (evt) => {
+                        add_module_select.selectedIndex = -1;
+                    };
                 }
-
-                edit.appendChild(wrap([add_module_select, add_module_button],['list-line']));
+                
+                edit.appendChild(wrap([add_module_select],['list-line']));
             } 
         </script>
         {% if data.global_mode %}
@@ -475,14 +484,14 @@
             </script>
         {% endif %}
     </div>
-{% if not data.global_mode %}
+{% if not (data.global_mode or data.page_id|first == "_")  %}
 {# ТИП СТРАНИЦЫ #}
     <div class="content-container-title">
         Тип страницы
     </div>
-    <div class="content-tab-container flex-resize">
-        <div class="content-tabs">
-            <div data-tab-id="content" class="content-tab flex-fill-container">
+    <div class="content-tab-container tab-container flex-resize">
+        <div class="content-tabs tabs">
+            <div data-tab-id="content" class="content-tab tab flex-fill-container">
                 <div class="flex-container-column">
                     <div id="page-content-editor" class="input-textarea"></div>
                     <script>
@@ -492,18 +501,118 @@
                     </script>
                 </div>
             </div>
-            <div data-tab-id="blocks" class="content-tab flex-fill-container">
-                TODO
+            <div data-tab-id="blocks" class="content-tab tab flex-fill-container">
+                <div class="flex-container-row">
+                    <div class="flex-container-column flex-resize">
+                        <div class="list" id="page-content-category-list">
+                            <div class="list-title">
+                                Отображаемые категории
+                            </div>
+                            {% for category in data.categories %}
+                            <div class="list-line">
+                                <input type="checkbox" data-category-name="{{category.name}}" class="input-checkbox page-content-category-checkbox"/>
+                                <div class="list-label">
+                                    {{category.title}}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <script>
+                            (function(){
+                                if(this_page.page_content.type == 'posts'){
+                                    document.getElementById('page-content-category-list').
+                                    querySelectorAll('.page-content-category-checkbox').forEach((item) => {
+                                        if(this_page.page_content.categories.indexOf(item.dataset.categoryName) != -1){
+                                            item.checked = true;
+                                        }
+                                        
+                                        item.onclick = (evt) => {
+                                            if(this_page.page_content.type == 'posts'){ 
+                                                this_page.page_content.categories = getPostsCategories();
+                                            }
+                                        }
+                                    });
+                                }
+                            }());
+
+                            function getPostsCategories(){
+                                let array = [];
+                                document.getElementById('page-content-category-list').
+                                querySelectorAll('.page-content-category-checkbox').forEach((item) => {
+                                    if(item.checked){
+                                        array.push(item.dataset.categoryName);
+                                    }
+                                });
+                                return array;
+                            }
+                        </script>
+                    </div>
+                    <div class="flex-container-column flex-resize">
+                        <div class="list flex-resize">
+                            <div class="list-title">
+                                Фильтр по датам
+                            </div>
+                            <div class="list-line flex-self-stretch"> 
+                                <input id="posts-content-date-start" class="input-field flex-resize" size="10" placeholder="1970-01-31" />
+                                <div class="list-label">-</div>
+                                <input id="posts-content-date-end" class="input-field flex-resize" size="10" placeholder="2038-12-31" />
+                            </div>
+                        </div>
+                        <script>
+                            (function(){
+                                let date_start = document.getElementById('posts-content-date-start');
+                                let date_end = document.getElementById('posts-content-date-end');
+                                if(this_page.page_content.type == 'posts'){
+                                    date_start.value = this_page.page_content.date_start;
+                                    date_end.value = this_page.page_content.date_end;
+                                }
+
+                                date_start.oninput = (evt) => {
+                                    if(this_page.page_content.type != 'posts'){
+                                        return;
+                                    }
+                                    if(!evt.target.value || validateDate(evt.target.value)){
+                                        evt.target.classList.remove('error');
+                                        this_page.page_content.date_start = evt.target.value;
+                                    }else{
+                                        evt.target.classList.add('error');
+                                    }
+                                };
+
+                                date_end.oninput = (evt) => {
+                                    if(this_page.page_content.type != 'posts'){
+                                        return;
+                                    }
+                                    if(!evt.target.value || validateDate(evt.target.value)){
+                                        evt.target.classList.remove('error');
+                                        this_page.page_content.date_end = evt.target.value;
+                                    }else{
+                                        evt.target.classList.add('error');
+                                    }
+                                };
+
+                                function validateDate(date){
+                                    date = new Date(date);
+                                    if(isNaN(date.getTime())){
+                                        return false;
+                                    }
+                                    return true;
+                                }
+                            }());
+                            
+                        </script>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="content-tab-buttons">
+        <div class="content-tab-buttons tab-buttons">
             <div class="content-tab-button-wrapper">
-                <div id="page-type-static" data-tab-id="content"  class="content-tab-button">
+                <div id="page-type-static" data-tab-id="content"  class="content-tab-button tab-button">
                     Статичная страница
                 </div>
             </div>
             <div class="content-tab-button-wrapper">
-                <div id="page-type-posts" data-tab-id="blocks" class="content-tab-button">
+                <div id="page-type-posts" data-tab-id="blocks" class="content-tab-button tab-button">
                     Список публикаций
                 </div>
             </div>
@@ -532,6 +641,9 @@
                 document.getElementById('page-type-posts').onclick = (evt) => {
                     this_page.page_content = {};
                     this_page.page_content.type = 'posts';
+                    this_page.page_content.categories = getPostsCategories();
+                    this_page.page_content.date_start = document.getElementById('posts-content-date-start').value;
+                    this_page.page_content.date_end = document.getElementById('posts-content-date-end').value;
                 };
             }());
         </script>
@@ -575,11 +687,11 @@
 <script>
     function savePage(id, page){
         return new Promise((resolve, reject) => {
-            admin_helpers.sendRequest('{{url.controller_url}}/page/'+id+'/update',JSON.stringify(page)).then((response, status) => {
-                if(response.success){
+            admin_helpers.sendRequest('{{url.controller_url}}/page/'+id+'/update',JSON.stringify(page)).then((response) => {
+                if(response.data.success){
                     resolve();
                 }else{
-                    reject(response.message);
+                    reject(response.data.message);
                 }
             }, () => {
                 reject('Неизвестная ошибка.');
