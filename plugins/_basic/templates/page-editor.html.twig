@@ -76,15 +76,15 @@
                                 showErrorPopup('Некорректный адрес страницы.');
                                 return;
                             }
-                            admin_helpers.sendRequest('{{url.controller_url}}/page/'+field.value+'/create').then((response) => {
-                                if(response.response.success){
+                            helpers.sendRequest('{{url.controller_url}}/page/'+field.value+'/create').then((response) => {
+                                if(response.data.success){
                                     savePage(field.value, this_page).then(() => {
                                         window.location = '{{url.panel_url}}/page/'+id;
                                     }, () => {
                                         window.location = '{{url.panel_url}}/page/'+id;
                                     });
                                 }else{
-                                    showErrorPopup(response.response.message);
+                                    showErrorPopup(response.data.message);
                                 }
                             }, () => {
                                 showErrorPopup('Неизвестная ошибка.');
@@ -141,11 +141,11 @@
                             popup.showPopup('page-editor-remove-popup');
                         };
                         document.getElementById('remove-confirm-button').onclick = (evt) => {
-                            admin_helpers.sendRequest('{{url.controller_url}}/page/'+page_id+'/remove').then((response) => {
-                                if(response.response.success){
+                            helpers.sendRequest('{{url.controller_url}}/page/'+page_id+'/remove').then((response) => {
+                                if(response.data.success){
                                     popup.showPopup('page-editor-removed-popup');
                                 }else{
-                                    showErrorPopup(response.response.message);
+                                    showErrorPopup(response.data.message);
                                 }
                             }, () => {
                                 showErrorPopup('Неизвестная ошибка.');
@@ -303,11 +303,19 @@
 
                 block.modules.forEach((module, i) => {
                     let info = modules_info[module.module];
+                    if(!info){
+                        info = {
+                            'name': module.module,
+                            'title': 'Несуществующий модуль',
+                            'format': 'ErrorFormat',
+                            'arguments': {},
+                        };
+                    }
                     let list = wrap([],['list', 'block-padding', 'block-border', 'block-margin-small']);
                     
                     let first_line = wrap(
                         [wrap(
-                            modules_info[module.module].title+' ('+module.module+')',
+                            info.title+' ('+module.module+')',
                             ['list-label']
                         )],
                         ['list-line', 'flex-self-stretch']
@@ -403,8 +411,8 @@
                             if(arg_info.list){
                                 arg_info.list.forEach((listitem) => {
                                     let option = document.createElement('option');
-                                    option.value = listitem;
-                                    option.innerText = listitem;
+                                    option.value = listitem.value;
+                                    option.innerText = listitem.title;
                                     input.appendChild(option);
                                 });
                             }
@@ -557,14 +565,36 @@
                                 <div class="list-label">-</div>
                                 <input id="posts-content-date-end" class="input-field flex-resize" size="10" placeholder="2038-12-31" />
                             </div>
+                            <div class="list-line">
+                                <div class="list-label">Сначала: старые</div>
+                                <input type="checkbox" id="posts-content-order" class="input-checkbox" />
+                                <div class="list-label">новые</div>
+                            </div>
+                            <div class="list-line flex-self-stretch">
+                                <div class="list-label size-50">Статей на странице</div>
+                                <input type="number" id="posts-content-page-size" class="input-field flex-resize" value="30" />
+                            </div>
+                            <div class="list-line flex-self-stretch">
+                                <div class="list-label size-50">Загружать статей (0-все)</div>
+                                <input type="number" id="posts-content-amount" class="input-field flex-resize" value="0" />
+                            </div>
                         </div>
                         <script>
                             (function(){
                                 let date_start = document.getElementById('posts-content-date-start');
                                 let date_end = document.getElementById('posts-content-date-end');
+                                let order_checkbox = document.getElementById('posts-content-order');
+
+                                let page_size = document.getElementById('posts-content-page-size');
+                                let post_amount = document.getElementById('posts-content-amount');
+
                                 if(this_page.page_content.type == 'posts'){
                                     date_start.value = this_page.page_content.date_start;
                                     date_end.value = this_page.page_content.date_end;
+                                    order_checkbox.checked = this_page.page_content.order;
+
+                                    page_size.value = this_page.page_content.page_size;
+                                    post_amount.value = this_page.page_content.amount;
                                 }
 
                                 date_start.oninput = (evt) => {
@@ -590,6 +620,18 @@
                                         evt.target.classList.add('error');
                                     }
                                 };
+
+                                order_checkbox.onchange = (evt) => {
+                                    this_page.page_content.order = evt.target.checked;
+                                }
+
+                                page_size.oninput = (evt) => {
+                                    this_page.page_content.page_size = evt.target.value;
+                                }
+
+                                post_amount.oninput = (evt) => {
+                                    this_page.page_content.amount = evt.target.value;
+                                }
 
                                 function validateDate(date){
                                     date = new Date(date);
@@ -644,6 +686,10 @@
                     this_page.page_content.categories = getPostsCategories();
                     this_page.page_content.date_start = document.getElementById('posts-content-date-start').value;
                     this_page.page_content.date_end = document.getElementById('posts-content-date-end').value;
+                    this_page.page_content.order = document.getElementById('posts-content-order').checked;
+
+                    this_page.page_content.page_size = document.getElementById('posts-content-page-size').value;
+                    this_page.page_content.amount = document.getElementById('posts-content-amount').value;
                 };
             }());
         </script>
@@ -687,7 +733,7 @@
 <script>
     function savePage(id, page){
         return new Promise((resolve, reject) => {
-            admin_helpers.sendRequest('{{url.controller_url}}/page/'+id+'/update',JSON.stringify(page)).then((response) => {
+            helpers.sendRequest('{{url.controller_url}}/page/'+id+'/update',JSON.stringify(page)).then((response) => {
                 if(response.data.success){
                     resolve();
                 }else{

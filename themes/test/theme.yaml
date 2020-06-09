@@ -1,3 +1,4 @@
+title: 'Тестовая тема'
 main_template: 'page.html.twig'
 blocks:
   header_title:

@@ -1,0 +1,227 @@
+{% set create_dis = data.mode == 'create' ? 'disabled' %}
+<style>
+    .menu-item-left-border {
+        border-left: 3px solid #666;
+    }
+
+    .button-small {
+        font-size: 0.75em;
+        padding: 0px 5px;
+    }
+</style>
+<script>
+    var menu_data = JSON.parse('{{ data.menu_json|raw|escape("js") }}');
+    var menu_name = '{{ data.menu_name }}';
+    var existing_menus = JSON.parse('{{ data.existing_menus_json|raw|escape("js") }}');
+    var existing_pages = JSON.parse('{{ data.page_list_json|raw|escape("js") }}');
+    
+    function rebuildItemList(){
+        let container = document.getElementById('items-container');
+        if(container){
+            while(container.lastChild){
+                container.removeChild(container.lastChild);
+            }
+            container.appendChild(renderItemList(menu_data.items, 1));
+        }
+    }
+
+    function renderItemList(list, children_depth = 0){
+        let container = helpers.wrap([],['flex-container-column','block-padding', 'menu-item-left-border', 'block-border']);
+
+        function makebtn(text, color, handler){
+            let btn = document.createElement('input');
+            btn.type = 'button';
+            btn.value = text;
+            btn.classList.add('input-button');
+            btn.classList.add(color);
+            btn.onclick = handler;
+            return btn;
+        }
+
+        if(list){
+            list.forEach((menu_item, i) => {
+                let text = document.createElement('input');
+                text.type = 'text';
+                text.value = menu_item.text;
+                text.placeholder = 'Текст пункта';
+                text.classList.add('input-field');
+                text.classList.add('flex-resize');
+                text.oninput = (evt) => {
+                    menu_item.text = evt.target.value;
+                };
+
+                let href = document.createElement('input');
+                href.type = 'text';
+                href.value = menu_item.href;
+                href.placeholder = 'URL ссылки';
+                href.classList.add('input-field');
+                href.classList.add('flex-resize');
+                href.oninput = (evt) => {
+                    menu_item.href = evt.target.value;
+                };
+
+                let up_btn = null;
+                let down_btn = null;
+
+                if(list.length > 1 && i > 0){
+                    up_btn = makebtn('/\\', 'blue', () => {
+                        let tmp = list[i];
+                        list[i] = list[i-1];
+                        list[i-1] = tmp;
+                        rebuildItemList();
+                    });
+                }
+                if(list.length > 1 && i < list.length-1){
+                    down_btn = makebtn('\\/', 'blue', () => {
+                        let tmp = list[i];
+                        list[i] = list[i+1];
+                        list[i+1] = tmp;
+                        rebuildItemList();
+                    });
+                }
+                let remove_btn = makebtn('X', 'red', () => {
+                    list.splice(i, 1);
+                    rebuildItemList();
+                });
+
+                let item_container = helpers.wrap(
+                    helpers.wrap(
+                        [text,href,up_btn,down_btn,remove_btn],
+                        ['list-line']
+                    ),
+                    ['flex-container-column','block-padding','block-margin-small','block-border']
+                );
+                if(children_depth > 0){
+                    item_container.appendChild(renderItemList(menu_item.children, children_depth-1));
+                }
+
+                container.appendChild(item_container);
+            });
+        }
+
+        let add_btn = makebtn('+ + +','green',() => {
+            list.push({
+                'text': '',
+                'href': '',
+                'children': [],
+            });
+            rebuildItemList();
+        });
+        add_btn.classList.add('button-small');
+        container.appendChild(add_btn);
+
+        return container;
+    }
+</script>
+<div class="content-container">
+    {% if data.mode == 'edit' %}
+    <div class="content-container-title big">
+        Редактировать меню
+    </div>
+    {% else %}
+    <div class="content-container-title big">
+        Создать меню
+    </div>
+    {% endif %}
+    <div class="content-container-block">
+        <div class="list">
+            <div class="list-line flex-self-stretch">
+                <input id="menu-title" class="input-field flex-resize" value="{{data.menu.title}}" placeholder="Название"/>
+                <input type="button" id="menu-save-button" class="input-button blue" value="Сохранить" >
+                <input {{create_dis}} type="button" id="menu-remove-button" class="input-button red" value="Удалить" >
+            </div>
+            <script>
+                document.getElementById('menu-title').oninput = (evt) => {
+                    if(evt.target.value){
+                        evt.target.classList.remove('error');
+                    }else{
+                        evt.target.classList.add('error');
+                    }
+                    menu_data.title = evt.target.value;
+
+                    if('{{data.mode == "create"}}'){
+                        menu_name = helpers.transliterateRu(evt.target.value);
+                    }
+                };
+
+                document.getElementById('menu-save-button').onclick = (evt) => {
+                    if(!menu_name || !menu_data.title){
+                        errorPopup('Не задано название меню');
+                        return;
+                    }
+                    let send_name = menu_name;
+                    if('{{data.mode == "create"}}'){
+                        let n = 2;
+                        while(existing_menus.indexOf(send_name) != -1){
+                            send_name = menu_name+'-'+n;
+                            n++;
+                        }         
+                    }
+
+                    helpers.sendRequest('{{url.controller_url}}/save/'+send_name, JSON.stringify(menu_data)).then((response) => {
+                        if(response.data){
+                            if(response.data.success){
+                                if('{{data.mode == "create"}}'){
+                                    location.href = '{{url.panel_url}}/'+send_name;
+                                }else{
+                                    successPopup('Сохранено');
+                                }
+                            }else{
+                                errorPopup(response.data.message);
+                            }
+                        }else{
+                            errorPopup('Произошла ошибка');
+                        }
+                    }, (response) => {
+                        if(response.data){
+                            errorPopup(response.data.message);
+                        }else{
+                            errorPopup('Произошла ошибка');
+                        }
+                    });
+                };
+
+                document.getElementById('menu-remove-button').onclick = (evt) => {
+                    helpers.sendRequest('{{url.controller_url}}/remove/'+menu_name).then((response) => {
+                        if(response.data){
+                            if(response.data.success){
+                                location.href = location.href;
+                            }else{
+                                errorPopup(response.data.message);
+                            }
+                        }else{
+                            errorPopup('Произошла ошибка');
+                        }
+                    }, (response) => {
+                        if(response.data){
+                            errorPopup(response.data.message);
+                        }else{
+                            errorPopup('Произошла ошибка');
+                        }
+                    });
+                };
+            </script>
+        </div>
+        <div id="items-container" class="flex-container-column">
+            ...
+        </div>
+        <div class="block-margin flex-container-column">
+            <input type="button" id="menu-from-pages-button" class="input-button blue" value="Меню из списка страниц" >
+        </div>
+        <script>
+            document.getElementById('menu-from-pages-button').onclick = (evt) => {
+                let items = [];
+                existing_pages.forEach((page) => {
+                    items.push({
+                        'text': page,
+                        'href': '/'+page,
+                        'children': [],
+                    });
+                });
+                menu_data.items = items;
+                rebuildItemList();
+            };
+            rebuildItemList();
+        </script>
+    </div>
+</div>

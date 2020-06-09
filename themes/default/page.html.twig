@@ -21,51 +21,57 @@
 
     <style>
         :root {
-            --color-main: {{ theme_settings.main_color.value }};
+            --color-main: {{theme_settings.main_color.value}};
+            --color-second: {{theme_settings.second_color.value}};
         }
     </style>
 </head>
 <body class="flex-container-column">
     <header class="flex-container-column">
-        <div class="flex-container-row flex-container-align-center header-row font-size-header">
-            {% if data.blocks.header_logo.active %}
-            <a href="/" class="header-logo">
-                <img src="{{data.blocks.header_logo.modules[0].data.url}}" height="100%" alt="{{data.blocks.header_logo.modules[0].data.alt}}"/>
-            </a>
-            {% endif %}
-            {% if data.blocks.header_title.active %}
-            <a href="/" class="header-title color-main">
-                {{data.blocks.header_title.modules[0].data.text}}
-            </a>
-            {% endif %}
-            {% if data.blocks.header_info.active %}
-            <div class="flex-container-column flex-float-right">
-                {% for module in data.blocks.header_info.modules %}
-                <div class="header-info-line">{{module.data.text|raw}}</div>
-                {% endfor %}
+        <div class="position-relative flex-resize background-color-second">
+            <div class="header-background" {{data.blocks.header_background.active ? 'style=background-image:url('~data.blocks.header_background.modules[0].data.url~')'}}></div>
+            <div class="flex-container-row flex-container-align-center font-size-header position-relative">
+                <div class="flex-container-row flex-container-align-center">
+                    {% if data.blocks.header_logo.active %}
+                    <a href="/" class="header-logo header-row">
+                        <img src="{{data.blocks.header_logo.modules[0].data.url}}" height="100%" alt="{{data.blocks.header_logo.modules[0].data.alt}}"/>
+                    </a>
+                    {% endif %}
+                    {% if data.blocks.header_title.active %}
+                    <a href="/" class="header-title color-main">
+                        {{data.blocks.header_title.modules[0].data.text}}
+                    </a>
+                    {% endif %}
+                </div>
+                {% if data.blocks.header_info.active %}
+                <div class="flex-container-column flex-container-justify-center header-row flex-float-right flex-self-stretch">
+                    {% for module in data.blocks.header_info.modules %}
+                    <div class="header-info-line color-main">{{module.data.text|raw}}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
             </div>
-            {% endif %}
         </div>
         {% if data.blocks.header_menu.active or data.blocks.header_search.active %}
-        <nav class="flex-container-row header-menu flex-container-align-center background-color-main flex-container-wrap">
+        <nav class="flex-container-row header-menu flex-container-align-center background-color-main flex-container-wrap box-shadow">
             {% if data.blocks.header_menu.active %}
             {% for item in data.blocks.header_menu.modules[0].data.items %}
             {% if item.children is defined %}
             <div class="header-menu-item dropdown-menu-item dropdown-menu-item-icon">
-                <div class="header-menu-item-label">
+                <div class="header-menu-item-label color-second">
                     {{item.text|e}}
                 </div>
                 <div class="dropdown-submenu flex-container-column header-submenu">
                     {% for child in item.children %}
                     <a class="header-menu-item" href="{{child.url}}">
-                        {{child.text|e}}
+                        <span class="color-second">{{child.text|e}}</span>
                     </a>
                     {% endfor %}
                 </div>
             </div>
             {% else %}
             <a class="header-menu-item" href="{{item.url}}">
-                <div class="header-menu-item-label">
+                <div class="header-menu-item-label color-second">
                     {{item.text|e}}
                 </div>
             </a>
@@ -74,24 +80,47 @@
             {% endif %}
             {% if data.blocks.header_search.active %}
             <form class="flex-container-row flex-container-align-center flex-container-justify-center flex-float-right" action="/search">
-                <input name="q" type="search" class="header-input-field" placeholder="Поиск...">
-                <input type="submit" id="header-search-field" class="input-button-blank icon-search-white" value="">
+                <input name="q" type="search" id="search-field" class="header-input-field" placeholder="Поиск...">
+                <button class="input-button-blank">
+                    <svg class="second-svg" xmlns="http://www.w3.org/2000/svg" height="136pt" version="1.1" viewBox="-1 0 136 136.21852" width="136pt" fill="#ffffff">
+                        <g id="surface1">
+                            <path d="M 93.148438 80.832031 C 109.5 57.742188 104.03125 25.769531 80.941406 9.421875 C 57.851562 -6.925781 25.878906 -1.460938 9.53125 21.632812 C -6.816406 44.722656 -1.351562 76.691406 21.742188 93.039062 C 38.222656 104.707031 60.011719 105.605469 77.394531 95.339844 L 115.164062 132.882812 C 119.242188 137.175781 126.027344 137.347656 130.320312 133.269531 C 134.613281 129.195312 134.785156 122.410156 130.710938 118.117188 C 130.582031 117.980469 130.457031 117.855469 130.320312 117.726562 Z M 51.308594 84.332031 C 33.0625 84.335938 18.269531 69.554688 18.257812 51.308594 C 18.253906 33.0625 33.035156 18.269531 51.285156 18.261719 C 69.507812 18.253906 84.292969 33.011719 84.328125 51.234375 C 84.359375 69.484375 69.585938 84.300781 51.332031 84.332031 C 51.324219 84.332031 51.320312 84.332031 51.308594 84.332031 Z M 51.308594 84.332031 " />
+                        </g>
+                    </svg>
+                </button>
+                <script>
+                    (function(){
+                        let q = helpers.findGetParameter('q');
+                        if(q){
+                            document.getElementById('search-field').value = q.split('+').join(' ');
+                        }
+                    }());
+                </script>
             </form>
             {% endif %}
         </nav>
         {% endif %}
     </header>  
-    <main class="flex-resize content ck-content">
+    <main class="flex-resize content">
         {% if data.content.type == 'static' %}
-        {{data.content.html|raw}}
+        <div class="ck-content">
+            {{data.content.html|raw}}
+        </div>
         {% elseif data.content.type == 'posts' %}
-        posts
+        {{include('content-post-list.twig')}}
         {% elseif data.content.type == 'post' %}
-        post
+        {{include('content-post.twig')}}
         {% endif %}
     </main>
-    <footer class="background-color-main">
-        footer
+    <footer class="footer flex-container-row flex-container-justify-center flex-container-align-center background-color-main box-shadow">
+        {% if data.blocks.footer_text.active %}
+        {% for module in data.blocks.footer_text.modules %}
+        <div class="footer-info color-second">{{module.data.text|raw}}</div>
+        {% endfor %}
+        {% endif %}
+        {% if data.blocks.footer_social.active %}
+        {{include('blocks/footer-social.twig')}}
+        {% endif %}
     </footer>
 </body>
 </html>

@@ -4,12 +4,11 @@ namespace App\content;
 abstract class Content {
     private $loaded = false;
    
-    public function __construct($args)
-    {
-        $this->loaded = $this->loadData($args);
+    public function __construct(array $args, array $managers, array $get = []){
+        $this->loaded = $this->loadData($args, $managers, $get);
     }
 
-    protected abstract function loadData(array $args);
+    protected abstract function loadData(array $args, array $managers, array $get = []);
 
     public function getType(){
         $name = explode('\\',get_class($this));
@@ -19,10 +18,10 @@ abstract class Content {
         return strtolower($name);
     }
 
-    public static function create(string $type, array $args){
+    public static function create(string $type, array $args, array $managers, array $get = []){
         $type = 'App\\content\\'.ucfirst($type).'Content';
         if(class_exists($type)){
-            return new $type($args);
+            return new $type($args, $managers, $get);
         }
         return null;
     }

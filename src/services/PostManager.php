@@ -24,8 +24,11 @@ class PostManager extends Manager {
         $this->postcatr = $postcatr;        
     }
 
-    public function createCategory(string $name, string $title){
-        $cat = new PostCategory();
+    public function saveCategory(string $name, string $title){
+        $cat = $this->getCategory($name);
+        if(is_null($cat)){
+            $cat = new PostCategory();
+        }
         $cat->setName($name);
         $cat->setTitle($title);
 
@@ -89,12 +92,12 @@ class PostManager extends Manager {
         return $post;
     }
 
-    public function loadPosts(int $start_from = 0, int $limit = 0, $catlist = null, DateTimeInterface $begin = null, DateTimeInterface $end = null){
-        return $this->postr->findByCategoriesAndDate($start_from, $limit, $catlist, $begin, $end);
+    public function loadPosts(int $start_from = 0, int $limit = 0, $catlist = null, DateTimeInterface $begin = null, DateTimeInterface $end = null, array $keywords = null, bool $desc_order = false){
+        return $this->postr->findByCategoriesAndDate($start_from, $limit, $catlist, $begin, $end, $keywords, $desc_order);
     }
 
-    public function countPosts($catlist = null, DateTimeInterface $begin = null, DateTimeInterface $end = null){
-        return $this->postr->countByCategoriesAndDate($catlist, $begin, $end);
+    public function countPosts($catlist = null, DateTimeInterface $begin = null, DateTimeInterface $end = null, array $keywords = null){
+        return $this->postr->countByCategoriesAndDate($catlist, $begin, $end, $keywords);
     }
 
     public function getPost($id){

@@ -1,3 +1,4 @@
+<script src="/assets/ckeditor.js"></script>
 <div class="content-container">
     <script>
         var posts_current_offset = Number.parseInt('{{data.offset}}');
@@ -134,7 +135,7 @@
                         <script>
                             document.getElementById('posts-remove-{{post.id}}').onclick = (evt) => {
                                 confirmPopup('Действительно удалить статью?<br>Это действие нельзя отменить.', () => {
-                                    admin_helpers.sendRequest('{{url.controller_url}}/post/{{post.id}}/remove').then((response) => {
+                                    helpers.sendRequest('{{url.controller_url}}/post/{{post.id}}/remove').then((response) => {
                                         if(response){
                                             if(response.data.success){
                                                 let fold = evt.target.parentNode.parentNode.parentNode;
@@ -153,10 +154,10 @@
                         </script>
                     </div>
                 </div>
-                <div class="fold-content-placeholder">
+                <div class="fold-content-placeholder ck-content">
                     {{post.preview|raw}}
                 </div>
-                <div class="fold-content">
+                <div class="fold-content ck-content">
                     {{post.content|raw}}
                 </div>
             </div>

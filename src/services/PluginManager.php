@@ -172,7 +172,6 @@ class PluginManager extends Manager {
             ]);
             return null;
         }
-        
         return new \Symfony\Component\Routing\Route(
             $path, 
             ['_controller' => $controller[0].'::'.$controller[1]],

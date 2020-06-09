@@ -1,0 +1,79 @@
+.post-header {
+    padding-bottom: 15px;
+    margin-bottom: 10px;
+    border-bottom: 2px solid transparent;
+    border-image: linear-gradient(90deg, transparent, #ccc);
+    border-image-slice: 1;
+
+    font-family: Roboto;
+}
+
+.post-title {
+    margin-top: 10px;
+    font-weight: bold;
+    font-size: 36px;
+    color: #333;
+}
+
+.post-info {
+    color: #aaa;
+    margin: 0px 10px;
+}
+
+/*
+СПИСОК ПОСТОВ
+*/
+
+.post-preview-container {
+    flex-basis: 400px;
+    flex-grow: 1;
+    min-width: 33%;
+    box-sizing: border-box;
+    padding: 10px 10px;
+}
+
+.post-preview {
+    position: relative;
+    background: #f6f6ff;
+    box-shadow: 1px 1px 5px 1px rgb(0,0,0,0.3);
+    color: inherit;
+    text-decoration: none;
+}
+
+.post-preview-image {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+
+    background-position: center center;
+    background-size: cover;
+    opacity: 0.5;
+}
+
+.post-preview-title {
+    font-family: Roboto;
+    font-weight: bold;
+    color: #333;
+    font-size: 1.75rem;
+    padding: 15px 20px;
+    padding-bottom: 0;
+}
+
+.post-preview-content {
+    padding: 10px 20px;
+    background: linear-gradient(rgb(255, 255, 255, 0), 30%, rgb(255, 255, 255, 0.99));
+}
+
+.post-preview-text {
+    font-family: Roboto;
+    color: black;
+    margin-bottom: 10px;
+    min-height: 150px;
+}
+
+.post-preview-info {
+    font-family: Roboto;
+    color: #aaa;
+}

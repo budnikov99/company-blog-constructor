@@ -1,0 +1,109 @@
+<div class="flex-fill-container content-container">
+    {% if data.mode == 'settings' %}
+    <div class="flex-fill-container content-container-title big">
+        Настройки текущей темы ({{data.active_title}})
+    </div>
+    <div class="flex-fill-container content-container-block">
+        {% if data.settings is empty %}
+        Тема не содержит настроек.
+        {% else %}
+        <div class="list flex-container-align-stretch">
+            {% for name, setting in data.settings %}
+                <div class="list-line">
+                    <div class="list-label size-30">{{setting.title}}</div>
+                    {% if setting.value is same as(true) or setting.value is same as(false) %}
+                        <input type="checkbox" {{ setting.value ? 'checked' }} data-setting-name="{{name}}" class="setting-editor-setting-field input-checkbox" style="margin-right: auto"/>
+                    {% elseif setting.value matches '/^\\d+$/' or setting.value matches '/^[-+]?[0-9]*\\.?[0-9]+$/' %}
+                        <input type="number" data-setting-name="{{name}}" class="setting-editor-setting-field input-field flex-resize" value="{{setting.value}}"/>
+                    {% else %}
+                        <input type="text" data-setting-name="{{name}}" class="setting-editor-setting-field input-field flex-resize" value="{{setting.value}}"/>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <input type="button" id="settings-apply" class="input-button blue block-margin" value="Сохранить" />
+        </div>
+        <script>
+            document.getElementById('settings-apply').onclick = () => {
+                let values = {};
+                let fields = document.getElementsByClassName('setting-editor-setting-field');
+
+                if(!fields || fields.length == 0){
+                    errorPopup('Значений не обнаружено');
+                    return;
+                }
+                for(let i = 0; i<fields.length; i++){
+                    let item = fields.item(i);
+                    if(item.type == 'checkbox'){
+                        values[item.dataset.settingName] = item.checked;
+                    }else{
+                        values[item.dataset.settingName] = item.value;
+                    }
+                }
+                helpers.sendRequest('{{url.controller_url}}/theme/settings/apply', JSON.stringify(values)).then((response) => {
+                    successPopup('Сохранено!');
+                }, (response) => {
+                    if(response.response){
+                        errorPopup(response.response.message);
+                    }else{
+                        errorPopup('Произошла ошибка');
+                    }
+                });
+            };
+        </script>
+        {% endif %}
+    </div>
+    {% elseif data.mode == 'change' %}
+    <div class="flex-fill-container content-container-title big">
+        Список тем
+    </div>
+    <div class="flex-fill-container content-container-block flex-container-column">
+        {% for name, theme in data.themes %}
+        <div class="fold {{data.active == name ? 'unfolded'}}">
+            <div class="fold-header">
+                {{theme.title}} ({{name}}) {{data.active == name ? '(активная)'}}
+            </div>
+            <div class="fold-content flex-container-row">
+                <div class="flex-container-column flex-resize">
+                    <div class="list flex-self-stretch">
+                        <div class="list-title">
+                            Блоки
+                        </div>
+                        {% for bname, bdata in theme.blocks %}
+                        <div class="list-label">
+                            {{bdata.title}} ({{bname}})
+                        </div>
+                        {% else %}
+                        <div class="list-label">
+                            Блоки отсутствуют.
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="flex-container-column flex-resize">
+                    <input {{data.active == name ? 'disabled'}} data-theme="{{name}}" type="button" class="input-button big blue theme-apply-theme" value="Установить">
+                </div>
+            </div>
+        </div>
+        {% else %}
+        Тем не установлено.
+        {% endfor %}
+    </div>
+    <script>
+        document.querySelectorAll('.theme-apply-theme').forEach((item) => {
+            item.onclick = (evt) => {
+                helpers.sendRequest('{{url.controller_url}}/theme/change/'+item.dataset.theme).then((response) => {
+                    location.href = location.href;
+                }, (response) => {
+                    if(response.response){
+                        errorPopup(response.response.message);
+                    }else{
+                        errorPopup('Произошла ошибка');
+                    }
+                });
+            }
+        });
+    </script>
+    {% endif %}
+</div>
+
+

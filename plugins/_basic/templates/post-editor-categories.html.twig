@@ -6,16 +6,38 @@
         <div class="list flex-self-stretch">
             {% for category in data.categories %}
             <div class="list-line flex-self-stretch block-border block-padding">
-                <div class="list-label">{{category.title}} ({{category.name}})</div>
+                <input id="category-title-{{category.name}}" size="32" class="input-field" value="{{category.title}}"/>
+                <input id="category-save-{{category.name}}" type="button" class="input-button blue" value="сохр."/>
+                <div class="list-label"> ({{category.name}})</div>
                 <a class="input-button blue flex-float-right" href="{{url.panel_url}}/posts?category={{category.name}}">Статей: {{data.category_counts[category.name]}}</a>
                 <input {{(data.category_counts[category.name] > 0 or category.name == 'uncategorized')?'disabled'}} id="category-remove-{{category.name}}" type="button" class="input-button red" value="X"/>
             </div>
             <script>
                 document.getElementById('category-remove-{{category.name}}').onclick = (evt) => {
-                    admin_helpers.sendRequest('{{url.controller_url}}/category/{{category.name}}/remove').then((response) => {
+                    helpers.sendRequest('{{url.controller_url}}/category/{{category.name}}/remove').then((response) => {
                         if(response.data){
                             if(response.data.success){
                                 location.href = location.href;
+                            }else{
+                                errorPopup(response.data.message);
+                            }
+                        }else{
+                            errorPopup('Произошла ошибка');
+                        }
+                    }, (response) => {
+                        if(response.data){
+                            errorPopup(response.data.message);
+                        }else{
+                            errorPopup('Произошла ошибка');
+                        }
+                    });
+                };
+                document.getElementById('category-save-{{category.name}}').onclick = (evt) => {
+                    title = document.getElementById('category-title-{{category.name}}').value;
+                    helpers.sendRequest('{{url.controller_url}}/category/{{category.name}}/save?title='+title).then((response) => {
+                        if(response.data){
+                            if(response.data.success){
+                                successPopup('Переименовано');
                             }else{
                                 errorPopup(response.data.message);
                             }
@@ -39,21 +61,7 @@
             </div>
             <script>
                 function generateAlias(title = ''){
-                    let letters = {
-                        'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd',
-                        'е': 'e', 'ё': 'jo', 'ж': 'zh', 'з': 'z', 'и': 'i',
-                        'й': 'j', 'к': 'k', 'л': 'l', 'м': 'm', 'н': 'n',
-                        'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't',
-                        'у': 'y', 'ф': 'f', 'х': 'x', 'ц': 'ts', 'ч': 'tch',
-                        'ш': 'sh', 'щ': 'sch', 'ъ': '_', 'ы': 'y', 'ь': '_',
-                        'э': 'e', 'ю': 'ju', 'я': 'ja'
-                    };
-                    let keep = 'abcdefghijklmnopqrstuvwxyz1234567890-'.split('');
-
-                    let alias = title.toLowerCase();
-                    return alias.split('').map((symbol) => 
-                        keep.indexOf(symbol) == -1?(letters.hasOwnProperty(symbol)?letters[symbol]:'_'):symbol
-                    ).join('');
+                    return helpers.transliterateRu(title);
                 }
 
                 function validateAlias(alias = ''){
@@ -84,27 +92,31 @@
                     }
                 };
 
+                function saveCategory(name, title){
+                    helpers.sendRequest('{{url.controller_url}}/category/'+name+'/save?title='+title).then((response) => {
+                        if(response.data){
+                            if(response.data.success){
+                                location.href = location.href;
+                            }else{
+                                errorPopup(response.data.message);
+                            }
+                        }else{
+                            errorPopup('Произошла ошибка');
+                        }
+                    }, (response) => {
+                        if(response.data){
+                            errorPopup(response.data.message);
+                        }else{
+                            errorPopup('Произошла ошибка');
+                        }
+                    });
+                }
+
                 document.getElementById('category-create-button').onclick = (evt) => {
                     let name = document.getElementById('category-create-name').value;
                     let title = document.getElementById('category-create-title').value;
                     if(name && title && validateAlias(name)){
-                        admin_helpers.sendRequest('{{url.controller_url}}/category/'+name+'/create?title='+title).then((response) => {
-                            if(response.data){
-                                if(response.data.success){
-                                    location.href = location.href;
-                                }else{
-                                    errorPopup(response.data.message);
-                                }
-                            }else{
-                                errorPopup('Произошла ошибка');
-                            }
-                        }, (response) => {
-                            if(response.data){
-                                errorPopup(response.data.message);
-                            }else{
-                                errorPopup('Произошла ошибка');
-                            }
-                        });
+                        saveCategory(name, title);
                     }
                 };
             </script>

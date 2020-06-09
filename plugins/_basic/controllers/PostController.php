@@ -17,7 +17,7 @@ class PostController extends AbstractController {
             $post = $pm->getPost($id);
 
             if(is_null($post)){
-                $post = $pm->createPost($data['title'], $data['content'], $data['preview'], $data['image'], $data['category']);
+                $post = $pm->createPost($data['title'], $data['content'], $data['preview'], $data['image']??'', $data['category']);
                 if(is_null($post)){
                     return new JsonResponse(['success' => false, 'message' => 'Не удалось создать пост'], Response::HTTP_INTERNAL_SERVER_ERROR);
                 }
@@ -32,12 +32,12 @@ class PostController extends AbstractController {
                 $post->setTitle($data['title']);
                 $post->setContent($data['content']);
                 $post->setPreview($data['preview']);
-                $post->setImage($data['image']);
+                $post->setImage($data['image']??'');
                 $post->setCategory($category);
                 $pm->flushDB();
             }
         } catch (\Throwable $th) {
-            return new JsonResponse(['success' => false, 'message' => $th->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return new JsonResponse(['success' => false, 'message' => 'Произошла ошибка', 'exception' => $th->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return new JsonResponse(['success' => true, 'message' => '']);
@@ -85,14 +85,14 @@ class PostController extends AbstractController {
     }   
 
 
-    public function createCategory(PostManager $pm, Request $request, $name){
+    public function saveCategory(PostManager $pm, Request $request, $name){
         $this->denyAccessUnlessGranted('ROLE_PUBLISHER');
 
         $title = $request->query->get('title', null);
         if(!$title){
-            return new JsonResponse(['success' => false, 'message' => 'Не задано название категории'], Response::HTTP_BAD_REQUEST);
+            return new JsonResponse(['success' => false, 'message' => 'Не указано название категории'], Response::HTTP_BAD_REQUEST);
         }
-        if(!$pm->createCategory($name, $title)){
+        if(!$pm->saveCategory($name, $title)){
             return new JsonResponse(['success' => false, 'message' => 'Не удалось создать категорию'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 

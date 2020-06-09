@@ -2,3 +2,7 @@
 #    path: test/{var<\d+>?1} (путь. при загрузке преобразуется в "public/plugin/<название плагина>/<исходное значение>")
 #    controller: ControllerClass::method (название класса. класс ищется только в неймспейсе \Plugin\<плагин>\public_controllers)
 #    methods: GET|POST|PUT (методы)
+
+post_load:
+    path: posts/load
+    controller: PostListController::loadPosts

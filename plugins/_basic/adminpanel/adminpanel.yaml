@@ -4,6 +4,12 @@ site_settings:
   roles:
     - ROLE_CONSTRUCTOR
 
+theme_settings:
+  title: 'Темы'
+  class: ThemeSettings
+  roles:
+    - ROLE_CONSTRUCTOR
+
 page_editor:
   title: 'Страницы'
   class: PageEditor
@@ -19,5 +25,11 @@ post_editor:
 ckfinder:
   title: 'Файловый менеджер'
   class: FileManager
+  roles:
+    - ROLE_PANEL
+
+admins:
+  title: 'Администраторы'
+  class: AdminSettings
   roles:
     - ROLE_PANEL

@@ -60,7 +60,7 @@
             </div>
             <script>
                 document.getElementById('post-save-button').onclick = (evt) => {
-                    admin_helpers.sendRequest('{{url.controller_url}}/post/'+post_id+'/save', JSON.stringify(post_data)).then((response) => {
+                    helpers.sendRequest('{{url.controller_url}}/post/'+post_id+'/save', JSON.stringify(post_data)).then((response) => {
                         if(response){
                             if(response.data.success){
                                 if(post_id == -1){
@@ -78,11 +78,17 @@
                         }else{
                             errorPopup('Не удалось сохранить статью');
                         }
+                    }, (response) => {
+                        if(response.data){
+                            errorPopup(response.data.message);
+                        }else{
+                            errorPopup('Не удалось сохранить статью');
+                        }
                     });
                 }
 
                 document.getElementById('post-title').oninput = (evt) => {
-                    post_data.title = evt.target.value;
+                    post_data.title = evt.target.value.substr(0, 255);
                 }
                 post_data.category = document.getElementById('post-category').value;
                 document.getElementById('post-category').oninput = (evt) => {
@@ -93,7 +99,7 @@
             <script>
                 document.getElementById('post-remove-button').onclick = (evt) => {
                     confirmPopup('Действительно удалить статью?<br>Это действие нельзя отменить.', () => {
-                        admin_helpers.sendRequest('{{url.controller_url}}/post/{{data.post.id}}/remove').then((response) => {
+                        helpers.sendRequest('{{url.controller_url}}/post/{{data.post.id}}/remove').then((response) => {
                             if(response){
                                 if(response.data.success){
                                     location.href = '{{url.panel_url}}/posts';
@@ -111,7 +117,7 @@
         </div>
     </div>
     <div class="content-container-block">
-        <div class="fold {{not data.post is null ? 'unfolded'}}">
+        <div class="fold unfolded">
             <div class="fold-header">
                 Краткая форма
             </div>
@@ -134,7 +140,7 @@
 
                     let preview = document.createElement('div');
 
-                    let max_count = 200;
+                    let max_count = 400;
                     let count = 0;
                     let child = container.firstChild;
                     while(child){
@@ -142,8 +148,10 @@
                             let size = child.innerText ? child.innerText.length : 0;
                             preview.appendChild(child);
                             if(count + size > max_count){
-                                let text = child.innerText.substr(0, child.innerText.indexOf(' ', max_count-count)) + '...';
-                                child.innerText = text;  
+                                let ind = child.innerText.indexOf(' ', max_count-count);
+                                if(ind != -1){
+                                    child.innerText = child.innerText.substr(0, ind) + '...';;  
+                                }
                                 return preview.innerHTML;
                             }
                             count += size;

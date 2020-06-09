@@ -1,0 +1,19 @@
+<link rel="stylesheet" href="/assets/theme/css/post.scss">
+<div class="flex-container-column flex-resize">
+    <div class="post-header flex-container-column">
+        <div class="post-title">
+            {{data.content.title}}
+        </div>
+        <div class="flex-container-row">
+            <div class="flex-float-right post-info">
+                {{data.content.category}}
+            </div>
+            <div class="post-info">
+                {{data.content.created.format('d.m.Y')}}
+            </div>
+        </div>
+    </div>
+    <div class="ck-content">
+        {{data.content.content|raw}}
+    </div>
+</div>

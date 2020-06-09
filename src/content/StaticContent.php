@@ -6,13 +6,10 @@ use App\Services\PageManager;
 class StaticContent extends Content {
     private $html = null;
 
-    protected function loadData(array $args){
-        if(array_key_exists('content', $args)){
-            $this->html = $args['content'];
-            return true;
-        }
+    protected function loadData(array $args, array $managers, array $get = []){
+        $this->html = $args['content']??'';
 
-        return false;
+        return true;
     }
 
     public function getHtml(){

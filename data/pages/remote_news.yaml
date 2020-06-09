@@ -1,0 +1,19 @@
+title: 'Дистанционное обучение'
+page_content:
+    type: posts
+    categories: [distantsionnoe_obytchenie]
+    date_start: ''
+    date_end: ''
+    order: true
+    page_size: '30'
+    amount: '0'
+blocks:
+    favicon: { active: null, modules: {  } }
+    header_logo: { active: null, modules: {  } }
+    header_title: { active: null, modules: {  } }
+    header_info: { active: null, modules: {  } }
+    header_menu: { active: null, modules: {  } }
+    header_search: { active: null, modules: {  } }
+    header_background: { active: null, modules: {  } }
+    footer_text: { active: null, modules: {  } }
+    footer_social: { active: null, modules: {  } }

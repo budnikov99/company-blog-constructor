@@ -58,6 +58,11 @@ test:
     controller: App\Controller\MainController::test
 
 ##################
+
+search:
+    path: /search
+    controller: App\Controller\MainController::search
+
 post:
     path: /post/{category}/{id}
     controller: App\Controller\MainController::getPost

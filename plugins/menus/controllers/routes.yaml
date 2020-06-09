@@ -1,0 +1,9 @@
+
+update_menu:
+    path: save/{name}
+    controller: MenuController::saveMenu
+
+remove_menu:
+    path: remove/{name}
+    controller: MenuController::removeMenu
+

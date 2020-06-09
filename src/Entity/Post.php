@@ -38,13 +38,13 @@ class Post
     private $preview;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="text", nullable=true)
      */
     private $image;
 
     /**
      * @ORM\ManyToOne(targetEntity=PostCategory::class, inversedBy="posts")
-     * @ORM\JoinColumn(nullable=false, name="category", referencedColumnName="name")
+     * @ORM\JoinColumn(nullable=true, name="category", referencedColumnName="name")
      */
     private $category;
 
@@ -134,6 +134,7 @@ class Post
             'preview' => $this->preview,
             'image' => $this->image,
             'category' => $this->category->getTitle(),
+            'category_id' => $this->category->getName(),
         ];
     }
 }

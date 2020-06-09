@@ -1,38 +1,47 @@
-main_template: 'page.html.twig'
-settings:
-    main_color:
-        title: 'Основной цвет'
-        value: '#cf9000'
+title: "Стандартная тема"
+main_template: page.html.twig
 blocks:
     favicon:
-        title: 'Иконка сайта'
+        title: "Иконка сайта"
         multiple: false
-        accepted_formats:
-            - ImageFormat
+        accepted_formats: [ImageFormat]
+
     header_logo:
-        title: 'Логотип в шапке'
+        title: "Логотип в шапке"
         multiple: false
-        accepted_formats:
-            - ImageFormat
+        accepted_formats: [ImageFormat]
+
+    header_background:
+        title: "Фоновая картинка шапки"
+        multiple: false
+        accepted_formats: [ImageFormat]
+
     header_title:
-        title: 'Название в шапке'
+        title: "Название в шапке"
         multiple: false
-        accepted_formats:
-            - TextFormat
+        accepted_formats: [TextFormat]
+
     header_info:
-        title: 'Дополнительная информация в шапке'
+        title: "Дополнительная информация в шапке"
         multiple: true
-        accepted_formats:
-            - TextFormat
+        accepted_formats: [TextFormat]
+
     header_menu:
-        title: 'Меню в шапке'
+        title: "Меню в шапке"
         multiple: false
-        accepted_formats:
-            - MenuFormat
+        accepted_formats: [MenuFormat]
+
     header_search:
-        title: 'Строка поиска в шапке'
+        title: "Строка поиска в шапке"
         multiple: false
         accepted_formats: []
 
-
-
+    footer_text:
+        title: "Текст в подвале"
+        multiple: false
+        accepted_formats: [TextFormat]
+        
+    footer_social:
+        title: "Социальные сети"
+        multiple: true
+        accepted_formats: [LinkFormat]

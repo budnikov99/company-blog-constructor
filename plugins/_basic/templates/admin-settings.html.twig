@@ -1,0 +1,129 @@
+{% set disabled = '' %}
+{% if not is_granted('ROLE_ACCOUNTS') %}
+    {% set disabled = 'disabled' %}
+{% endif %}
+{% set role_list = [
+    ['ROLE_MODERATOR', 'Модератор'], 
+    ['ROLE_PUBLISHER', 'Управление публикациями'], 
+    ['ROLE_CONSTRUCTOR', 'Управление сайтом'], 
+    ['ROLE_PLUGINS', 'Управление плагинами'], 
+    ['ROLE_ACCOUNTS', 'Управление учётными записями']
+] %}
+
+<div class="flex-fill-container content-container">
+    <div class="flex-fill-container content-container-title big">
+        Настройки сайта
+    </div>
+    <div class="flex-container-column flex-fill-container content-container-block">
+        {% for admin in data.admins %}
+            <div class="fold">
+                <div class="fold-header">
+                    {{admin.username}} {{'ROLE_SUPER_ADMIN' in admin.roles ? '(главный администратор)'}}
+                </div>
+                <div class="fold-content list">
+                    <div class="list-line flex-self-stretch">
+                        <div class="list-label">Сменить пароль: </div>
+                        <input {{disabled}} type="text" id="account-new-password-{{admin.username}}" class="input-field flex-resize" placeholder="Новый пароль">
+                        <input {{disabled}} type="button" id="account-save-button-{{admin.username}}" class="input-button blue" value="Обновить">
+                        <input {{disabled or 'ROLE_SUPER_ADMIN' in admin.roles ? 'disabled'}} type="button" id="account-remove-button-{{admin.username}}" class="input-button red" value="Удалить">
+                    </div>
+                    {% for role in role_list %} 
+                    <div class="list-line">
+                        <input 
+                            {{disabled or 'ROLE_SUPER_ADMIN' in admin.roles ? 'disabled'}} 
+                            {{role[0] in admin.roles or 'ROLE_SUPER_ADMIN' in admin.roles ? 'disabled' ? 'checked'}} 
+                            type="checkbox" data-role="{{role[0]}}" 
+                            class="input-checkbox account-role-checkbox-{{admin.username}}"
+                        />
+                        <div class="list-label">{{role[1]}}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <script>
+                    document.getElementById('account-save-button-{{admin.username}}').onclick = (evt) => {
+                        data = {
+                        username: '{{admin.username}}',
+                        password: document.getElementById('account-new-password-{{admin.username}}').value,
+                        roles: Array.prototype.slice.call(document.querySelectorAll('.account-role-checkbox-{{admin.username}}'))
+                            .filter((item) => item.checked)
+                            .map((item) => item.dataset.role)
+                        };
+
+                        helpers.sendRequest('{{url.controller_url}}/admin/save', JSON.stringify(data)).then((response) => {
+                            location.href = location.href;
+                        }, (response) => {
+                            if(response.response){
+                                errorPopup(response.response.message);
+                            }else{
+                                errorPopup('Произошла ошибка');
+                            }
+                        });
+                    };
+                    document.getElementById('account-remove-button-{{admin.username}}').onclick = (evt) => {
+                        data = {
+                            username: '{{admin.username}}',
+                        };
+
+                        helpers.sendRequest('{{url.controller_url}}/admin/remove', JSON.stringify(data)).then((response) => {
+                            location.href = location.href;
+                        }, (response) => {
+                            if(response.response){
+                                errorPopup(response.response.message);
+                            }else{
+                                errorPopup('Произошла ошибка');
+                            }
+                        });
+                    };
+                </script>
+            </div>
+        {% endfor %}
+        <div class="fold">
+            <div class="fold-header">
+                Создать
+            </div>
+            <div class="fold-content list">
+                <div class="list-line flex-self-stretch">
+                    <div class="list-label size-20">Логин: </div>
+                    <input {{disabled}} type="text" id="new-account-login" class="input-field flex-resize" placeholder="Имя пользователя">
+                </div>
+                <div class="list-line flex-self-stretch">
+                    <div class="list-label size-20">Пароль: </div>
+                    <input {{disabled}} size="10" type="text" id="new-account-password" class="input-field flex-resize" placeholder="Новый пароль">
+                    <input {{disabled}} type="button" id="new-account-save-button" class="input-button blue" value="Создать">
+                </div>
+                {% for role in role_list %} 
+                <div class="list-line">
+                    <input {{disabled}} type="checkbox" data-role="{{role[0]}}" class="input-checkbox new-account-role-checkbox"/>
+                    <div class="list-label">{{role[1]}}</div>
+                </div>
+                {% endfor %}
+            </div>
+            <script>
+                document.getElementById('new-account-save-button').onclick = (evt) => {
+                    data = {
+                    username: document.getElementById('new-account-login').value,
+                    password: document.getElementById('new-account-password').value,
+                    roles: Array.prototype.slice.call(document.querySelectorAll('.new-account-role-checkbox'))
+                        .filter((item) => item.checked)
+                        .map((item) => item.dataset.role)
+                    };
+
+                    helpers.sendRequest('{{url.controller_url}}/admin/save', JSON.stringify(data)).then((response) => {
+                        location.href = location.href;
+                    }, (response) => {
+                        if(response.response){
+                            errorPopup(response.response.message);
+                        }else{
+                            errorPopup('Произошла ошибка');
+                        }
+                    });
+                };
+            </script>
+        </div>
+    <div>
+    <script>
+
+    </script>
+</div>
+
+

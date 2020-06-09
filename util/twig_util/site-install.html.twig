@@ -184,7 +184,7 @@
             function checkDatabase(){
                 updateDbInfo();
                 return new Promise((resolve, reject) => {
-                    admin_helpers.sendRequest('/install/checkdb', JSON.stringify(db_info)).then((response, status) => {
+                    helpers.sendRequest('/install/checkdb', JSON.stringify(db_info)).then((response, status) => {
                         resolve();
                     }, (response, status) => {
                         reject();
@@ -210,7 +210,7 @@
                     updateDbInfo();
                     db_info['admin_login'] = document.getElementById('admin-login').value;
                     db_info['admin_password'] = document.getElementById('admin-password').value;
-                    admin_helpers.sendRequest('/install', JSON.stringify(db_info)).then((response, status) => {
+                    helpers.sendRequest('/install', JSON.stringify(db_info)).then((response, status) => {
                         location.href = '/admin';
                     }, (response, status) => {
                         popup.hidePopup('loading-popup');

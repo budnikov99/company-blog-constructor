@@ -49,11 +49,18 @@ class MainController extends AbstractController
         return new Response($pr->getPost($category, $id));
     }
 
-    public function test(PostManager $pm, EntityManagerInterface $em, SiteManager $sm){
-        $pm->createCategory('test10', 'Тестовая категория 10');
-        foreach(range(1, 20) as $i){
-            $pm->createPost('1т10-'.$i, 'пост', null, 'test10');
+    public function search(PageRenderer $pr, Request $request){
+        $keywords = $request->query->get('q');
+
+        if($keywords){
+            $keywords = explode(' ', $keywords);
         }
+
+        return new Response($pr->searchPage($keywords));
+    }
+
+    public function test(PostManager $pm, EntityManagerInterface $em, SiteManager $sm){
+        
         
         return new Response();
     }

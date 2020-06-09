@@ -155,6 +155,14 @@ class SiteManager extends Manager {
         return true;
     }
 
+    public function getAdminAccount(string $username){
+        return $this->entitym->getRepository(Admin::class)->findOneBy(['username' => $username]);
+    }
+
+    public function getAdminAccounts(){
+        return $this->entitym->getRepository(Admin::class)->findAll();
+    }
+
     public function removeAdminAccount(string $username){
         $admin = $this->entitym->getRepository(Admin::class)->findOneBy(['username' => $username]);
         if(!$admin){
@@ -162,6 +170,25 @@ class SiteManager extends Manager {
         }
 
         $this->entitym->remove($admin);
+        $this->entitym->flush();
+        return $admin;
+    }
+
+    public function updateAdminAccount(string $username, string $password = null, array $roles = null){
+        $admin = $this->entitym->getRepository(Admin::class)->findOneBy(['username' => $username]);
+        if(!$admin){
+            return null;
+        }
+
+        if(!empty($password)){
+            $hash = $this->encoder->encodePassword($admin, $password);
+            $admin->setPassword($hash);
+        }
+
+        if(!empty($roles)){
+            $admin->setRoles($roles);
+        }
+
         $this->entitym->flush();
         return $admin;
     }

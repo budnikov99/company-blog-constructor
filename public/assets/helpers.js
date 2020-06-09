@@ -1,6 +1,6 @@
 'use strict';
 
-var admin_helpers = {
+var helpers = {
     /**
      * 
      * @param {string} address - url для запроса.
@@ -34,6 +34,51 @@ var admin_helpers = {
 
             xhr.send(data);
         });
+    },
+
+    findGetParameter(parameterName) {
+        var result = null,
+            tmp = [];
+        location.search
+            .substr(1)
+            .split("&")
+            .forEach(function (item) {
+              tmp = item.split("=");
+              if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
+            });
+        return result;
+    },
+
+    wrap(elements, classes){
+        if(!elements){ elements = []; }
+        if(!classes){ classes = []; }
+        if(!Array.isArray(classes)){ classes = [classes]; }
+        if(!Array.isArray(elements)){ elements = [elements]; }
+        let wrapper = document.createElement('div');
+        classes.forEach((classname) => { wrapper.classList.add(classname); });
+        elements.forEach((element) => {
+            if(!element){return;}
+            if(typeof element == 'string'){ element = document.createTextNode(element); }
+            wrapper.appendChild(element);
+        });
+        return wrapper;
+    },
+
+    transliterateRu(title = ''){
+        let letters = {
+            'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd',
+            'е': 'e', 'ё': 'jo', 'ж': 'zh', 'з': 'z', 'и': 'i',
+            'й': 'j', 'к': 'k', 'л': 'l', 'м': 'm', 'н': 'n',
+            'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't',
+            'у': 'y', 'ф': 'f', 'х': 'x', 'ц': 'ts', 'ч': 'tch',
+            'ш': 'sh', 'щ': 'sch', 'ъ': '', 'ы': 'y', 'ь': '',
+            'э': 'e', 'ю': 'ju', 'я': 'ja'
+        };
+        let keep = 'abcdefghijklmnopqrstuvwxyz1234567890-'.split('');
+
+        return title.toLowerCase().split('').map((symbol) => 
+            keep.indexOf(symbol) == -1?(letters.hasOwnProperty(symbol)?letters[symbol]:'_'):symbol
+        ).join('');
     },
 };
 

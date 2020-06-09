@@ -46,6 +46,16 @@ settings_apply:
     path: settings/apply
     controller: SiteSettingsController::applySettings
 
+#THEME
+
+theme_change:
+    path: /theme/change/{theme}
+    controller: ThemeSettingsController::changeTheme
+
+theme_settings_apply:
+    path: theme/settings/apply
+    controller: ThemeSettingsController::applySettings
+
 #POST
 
 post_save:
@@ -60,10 +70,20 @@ post_remove:
     path: post/{id}/remove
     controller: PostController::removePost
 
-category_create:
-    path: category/{name}/create
-    controller: PostController::createCategory
+category_save:
+    path: category/{name}/save
+    controller: PostController::saveCategory
 
 category_remove:
     path: category/{name}/remove
     controller: PostController::removeCategory
+
+#ADMIN  
+
+admin_save:
+    path: /admin/save
+    controller: AdminController::saveAdmin
+
+admin_remove:
+    path: /admin/remove
+    controller: AdminController::removeAdmin

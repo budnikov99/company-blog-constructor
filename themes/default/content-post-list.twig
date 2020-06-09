@@ -1,0 +1,162 @@
+<link rel="stylesheet" href="/assets/theme/css/post.scss">
+<script>
+    var post_list_data = {
+        categories: JSON.parse('{{data.content.categories|json_encode()|escape("js")}}'),
+        date_start: '{{ data.content.dateStart ? data.content.dateStart.format("Y-m-d") }}',
+        date_end: '{{ data.content.dateEnd ? data.content.dateEnd.format("Y-m-d") }}',
+        keywords: JSON.parse('{{data.content.keywords|json_encode()|escape("js")}}'),
+        order: new Boolean('{{data.content.order}}').valueOf(),
+        total_count: Number.parseInt('{{ data.content.totalPostCount ? data.content.totalPostCount : 0 }}'),
+        load_amount: Number.parseInt('{{ data.content.loadAmount ? data.content.loadAmount : 0 }}'),
+        page_limit: Number.parseInt('{{ data.content.pageSize ? data.content.pageSize : 30 }}'),
+
+        posts: JSON.parse('{{data.content.posts|json_encode()|escape("js")}}'),
+        next_offset: 0,
+    };
+
+    function loadPosts(offset){
+        return new Promise((resolve, reject) => {
+            data = {
+                'offset': offset,
+                'limit': post_list_data.page_limit,
+                'categories': post_list_data.categories,
+                'date_start': post_list_data.date_start,
+                'date_end': post_list_data.date_end,
+                'keywords': post_list_data.keywords,
+                'order': post_list_data.order,
+            };
+            helpers.sendRequest('/public/plugin/_basic/posts/load', JSON.stringify(data)).then((response) => {
+                if(response.data && response.data.success){
+                    resolve(response.data.data);
+                }else{
+                    reject();
+                }
+            }, (response) => {
+                reject();
+            });
+        });
+    }
+
+    function renderPosts(posts){
+        let container = document.getElementById('post-list-container');
+        if(!container){
+            return false;
+        }
+
+        posts.forEach((post_data) => {
+            let title = helpers.wrap(post_data.title, ['post-preview-title', 'position-relative']);
+
+            let preview = helpers.wrap([], ['post-preview-text']);
+            preview.innerHTML = post_data.preview;
+
+            function formatDate(date) {
+                date = new Date(date.date);
+                var dd = date.getDate();
+                if (dd < 10) dd = '0' + dd;
+                var mm = date.getMonth() + 1;
+                if (mm < 10) mm = '0' + mm;
+                var yy = date.getFullYear();
+                return dd + '.' + mm + '.' + yy;
+            }
+            let info = helpers.wrap(
+                [helpers.wrap(post_data.category), helpers.wrap(formatDate(post_data.created))],
+                ['post-preview-info', 'flex-float-bottom', 'flex-container-row', 'flex-container-justify-between']
+            );
+            let content = helpers.wrap([preview, info], ['post-preview-content', 'flex-resize', 'flex-container-column', 'position-relative']);
+
+            let post = document.createElement('a');
+            post.classList.add('post-preview');
+            post.classList.add('flex-resize');
+            post.classList.add('flex-container-column');
+            post.href = '/post/'+post_data.category_id+'/'+post_data.id;
+
+            if(post_data.image){
+                let image = helpers.wrap([], ['post-preview-image']);
+                image.style.backgroundImage = 'url(\''+post_data.image+'\')';
+                post.appendChild(image);
+            }
+            
+            post.appendChild(title);
+            post.appendChild(content);
+
+            container.appendChild(helpers.wrap(post,['post-preview-container', 'flex-container-column']));
+        });
+
+        post_list_data.next_offset += posts.length;
+
+        return true;
+    }
+
+</script>
+<div class="flex-container-column flex-resize">
+    <div id="post-list-container" class="flex-container-row flex-container-wrap flex-resize">
+        {#
+        <div class="post-preview-container flex-container-column">
+            <a class="post-preview flex-resize flex-container-column" href="/post/news/1">
+                <div class="post-preview-image" style="background-image:url(/userfiles/images/cat-shocked.jpg)"></div>
+                <div class="post-preview-title position-relative">
+                        НАЗВАНИЕ ПОСТА
+                </div>
+                <div class="post-preview-content flex-resize flex-container-column position-relative">
+                    <div class="post-preview-text flex-resize">
+                        Текст предпросмотра кек лол арбидол, лол кек чебурек, авырпа ололол корабли лавировали лавировли да не вылавировали.
+                    </div>
+                    <div class="post-preview-info flex-float-bottom flex-container-row flex-container-justify-between">
+                        <div>Кекости</div>
+                        <div>31.02.2020</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        #}
+    </div>
+    <style>
+        @keyframes loading-spin {
+            from {transform: rotate(0deg);}
+            50% {transform: rotate(180deg);}
+            to {transform: rotate(360deg);}
+        }
+    </style>
+    <div id="post-loading" style="display: none; height: 30px; text-align: center; margin: 30px 0px;">
+        <svg style="height: 100%; animation: loading-spin 0.75s infinite linear;" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
+            <rect x="226" width="60" height="105"/>
+            <rect x="82.1" y="59.609" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -46.4391 112.1023)" width="59.999" height="104.999"/>
+            <rect y="226" width="105" height="60"/>
+            <rect x="59.604" y="369.895" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -249.934 196.3955)" width="104.999" height="59.999"/>
+            <rect x="226" y="407" width="60" height="105"/>
+            <rect x="369.9" y="347.392" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -165.6379 399.8979)" width="59.999" height="104.999"/>
+            <rect x="407" y="226" width="105" height="60"/>
+        </svg>
+    </div>
+</div>
+<script>
+    renderPosts(post_list_data.posts);
+
+    (function(){
+        let loading = false;
+        let loading_elem = document.getElementById('post-loading');
+        window.addEventListener('scroll', (evt) => {
+            //console.log(!loading, post_list_data.next_offset < post_list_data.total_count, pageYOffset + window.innerHeight + 300, document.body.scrollHeight);
+            if(!loading && post_list_data.next_offset < post_list_data.total_count && pageYOffset + window.innerHeight + 300 > document.body.scrollHeight){
+                loading = true;
+                loading_elem.style.display = 'block';
+                loadPosts(post_list_data.next_offset).then((posts) => {
+                    console.log(posts);
+                    if(posts && posts.length){
+                        renderPosts(posts);
+                    }
+                    loading = false;
+                    loading_elem.style.display = 'none';
+                }, () => {
+                    setTimeout(() => {
+                        loading = false;
+                        loading_elem.style.display = 'none';
+                    }, 1000);
+                });
+            }
+            
+        });
+    }());
+    
+</script>

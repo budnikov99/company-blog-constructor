@@ -9,4 +9,4 @@ db_version: 5.7.11
 admin_login: admin
 admin_password: password
 public:
-    site_name: { title: 'Название сайта', value: 'Мой блог' }
+    site_name: { title: 'Название сайта', value: 'Антон Гей' }

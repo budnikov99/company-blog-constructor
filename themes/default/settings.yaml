@@ -1,0 +1,6 @@
+main_color:
+    title: 'Основной цвет'
+    value: '#083E62'
+second_color:
+    title: 'Дополнительный цвет'
+    value: '#fff'

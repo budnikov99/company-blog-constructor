@@ -1,0 +1,5 @@
+menu_editor:
+  title: 'Меню'
+  class: MenuEditor
+  roles:
+    - ROLE_CONSTRUCTOR

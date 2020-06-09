@@ -1,0 +1,14 @@
+title: 'Правила приёма'
+page_content:
+    type: static
+    content: '<h2 style="text-align:justify;">Правила приема</h2><p>&nbsp;</p><h3 style="text-align:justify;"><strong>Уважаемые абитуриенты!</strong></h3><p style="text-align:justify;">Предлагаем вам познакомиться с Правилами приема в наш техникум на обучение по образовательным программам СПО на 2020 – 2021 учебный год (<a href="https://spt42.ru/docs/pravila/pravila_priema.pdf">здесь</a>)</p><p style="text-align:justify;">Предлагаем вам познакомиться с Программой вступительных испытаний на 2020 – 2021 учебный год <a href="https://spt42.ru/docs/programmy_razvitiia/programma_2018.pdf">(</a><a href="https://spt42.ru/index.php/abiturientu/pravila-priema#">здесь</a>)</p><p style="text-align:justify;">Если у вас останутся вопросы, то обращайтесь в приемную комиссию&nbsp;по тел.:</p><p style="text-align:justify;">Корпус №1 тел.8-384-225-59-01, 8-384-225-58-61</p><p style="text-align:justify;">Корпус №2 тел. 8-384-257-01-07, 8-384-257-00-17</p><p style="text-align:justify;">или электронной почте: <a href="mailto:guospospt@yandex.ru">guospospt@yandex.ru</a></p><p style="text-align:justify;">Специалисты приемной комиссии с радостью ответят Вам на все интересующие вопросы с 9:00 до 17:00 часов ежедневно, кроме субботы и воскресенья.</p><h3 style="text-align:justify;">Адреса приемной комиссии:</h3><p style="text-align:justify;">Корпус №1<br>г. Кемерово<br>650001, ул. 40 лет Октября, 4</p><p style="text-align:justify;">Корпус №2<br>г. Кемерово<br>650021, ул. Павленко, 1а</p><p>&nbsp;</p>'
+blocks:
+    favicon: { active: null, modules: {  } }
+    header_logo: { active: null, modules: {  } }
+    header_title: { active: null, modules: {  } }
+    header_info: { active: null, modules: {  } }
+    header_menu: { active: null, modules: {  } }
+    header_search: { active: null, modules: {  } }
+    header_background: { active: null, modules: {  } }
+    footer_text: { active: null, modules: {  } }
+    footer_social: { active: null, modules: {  } }

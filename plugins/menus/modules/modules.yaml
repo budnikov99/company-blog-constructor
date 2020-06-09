@@ -1,0 +1,10 @@
+menu: 
+  format: MenuFormat
+  class: MenuModule
+  title: 'Меню'
+  args:
+    menu:                     
+      type: list                                 
+      title: 'Отображаемое меню'
+
+      

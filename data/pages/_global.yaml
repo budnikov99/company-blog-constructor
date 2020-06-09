@@ -3,9 +3,12 @@ page_content:
     type: static
     content: ''
 blocks:
-    favicon: { active: true, modules: [{ module: _basic/image_file, url: /userfiles/images/horns-n-hooves.png, alt: '' }] }
-    header_logo: { active: true, modules: [{ module: _basic/image_file, url: /userfiles/images/horns-n-hooves.png, alt: '' }] }
-    header_title: { active: true, modules: [{ module: _basic/fixed_text, text: 'ООО "Рога и Копыта"' }] }
-    header_info: { active: true, modules: [{ module: _basic/fixed_text, text: 'Тел.: <b>8 (800) 555-35-35</b>' }, { module: _basic/fixed_text, text: 'г. Москва, ул. Пушкина 69, кв. 420' }] }
-    header_menu: { active: true, modules: [{ module: _basic/menu, menu: pages_menu }] }
+    favicon: { active: true, modules: [{ module: _basic/image_file, url: /userfiles/images/technicum.png, alt: '' }] }
+    header_logo: { active: true, modules: [{ module: _basic/image_file, url: /userfiles/images/technicum.png, alt: '' }] }
+    header_title: { active: true, modules: [{ module: _basic/fixed_text, text: 'СИБИРСКИЙ ПОЛИТЕХНИЧЕСКИЙ ТЕХНИКУМ' }] }
+    header_info: { active: true, modules: [{ module: _basic/fixed_text, text: 'Тел: <b>8 (3842) 25−50−19</b>' }, { module: _basic/fixed_text, text: 'г. Кемерово, ул. 40 лет Октября, 4' }] }
+    header_menu: { active: true, modules: [{ module: menus/menu, menu: navigatsija }] }
     header_search: { active: true, modules: {  } }
+    header_background: { active: false, modules: [{ module: _basic/image_file, url: /userfiles/images/gold.jpg, alt: '' }] }
+    footer_text: { active: false, modules: [{ module: _basic/fixed_text, text: '© Рога и Копыта 2020' }] }
+    footer_social: { active: true, modules: [{ module: _basic/link, text: twitter, href: 'https://twitter.com' }, { module: _basic/link, text: telegram, href: 'https://telegram.com' }, { module: _basic/link, text: facebook, href: 'https://facebook.com' }, { module: _basic/link, text: vk, href: 'https://vk.com' }, { module: _basic/link, text: ok, href: 'https://ok.ru' }] }

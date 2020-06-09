@@ -58,8 +58,9 @@ class PageData extends Data {
         $this->content = $content;
     }
 
-    public function createContentFromArgs(){
-        $this->setContent(Content::create($this->getContentType(), $this->getContentArgs()));
+    public function createContentFromArgs(array $managers, array $get = []){
+        $content = Content::create($this->getContentType(), $this->getContentArgs(), $managers, $get);
+        $this->setContent($content);
     }
 
     public function getContent(){
@@ -114,7 +115,6 @@ class PageData extends Data {
             'page_content' => $page_content,
             'blocks' => []
         ];
-
 
         foreach($this->blocks as $block_name => $block){
             $data['blocks'][$block_name] = $block->serialize();

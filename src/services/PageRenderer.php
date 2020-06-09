@@ -8,6 +8,7 @@ use \Twig\Environment;
 use \Twig\Loader\FilesystemLoader;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\CssSelector\Exception\InternalErrorException;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Yaml\Yaml;
@@ -20,12 +21,23 @@ class PageRenderer {
     private $twig = null;
     private $sitem = null;
 
-    public function __construct(Environment $twig, ThemeManager $themem, PluginManager $pluginm, PostManager $postm, PageManager $pagem, SiteManager $sitem){
+    private $managers = [];
+
+    public function __construct(Environment $twig, ThemeManager $themem, PluginManager $pluginm, PostManager $postm, PageManager $pagem, SiteManager $sitem, AssetManager $assetm){
         $this->themem = $themem;
         $this->postm = $postm;
         $this->pagem = $pagem;
         $this->sitem = $sitem;
         $this->pluginm = $pluginm;
+
+        $this->managers = [
+            AssetManager::class => $assetm,
+            PageManager::class => $pagem,
+            PluginManager::class => $pluginm,
+            SiteManager::class => $sitem,
+            ThemeManager::class => $themem,
+            PostManager::class => $postm,
+        ];
 
         $this->twig = $twig;
         $loader = $this->twig->getLoader();
@@ -102,7 +114,7 @@ class PageRenderer {
             throw new NotFoundHttpException();
         }
 
-        $page->createContentFromArgs();
+        $page->createContentFromArgs($this->managers, Request::createFromGlobals()->query->all());
         if(is_null($page->getContent()) || !$page->getContent()->isLoaded()){
             throw new InternalErrorException('Ошибка при загрузке контента');
         }
@@ -131,9 +143,47 @@ class PageRenderer {
 
         $page->setContentType('post');
         $page->setContentArgs($post->serialize());
-        $page->createContentFromArgs();
+
+        $page->createContentFromArgs($this->managers);
 
         $data = $this->generateTemplateData('_post', $page);
+        return $this->renderPage($data);
+    }
+
+    public function searchPage(array $keywords){
+        if(!$this->sitem->isInstalled()){
+            return $this->sitem->renderInstaller();
+        }
+
+        if(!empty($keywords)){
+            $tmp = [];
+            foreach($keywords as $word){
+                if(!empty($word)){
+                    $tmp []= $word;
+                }
+            }
+            $keywords = $tmp;
+        }
+
+        $page = $this->getPageData('_search');
+
+        if(!empty($keywords)){
+            $page->setContentType('posts');
+            $page->setContentArgs([
+                'keywords' => $keywords,
+                'order' => true,
+                'page_size' => 30,
+            ]);
+        }else{
+            $page->setContentType('static');
+            $page->setContentArgs([
+                'content' => '',
+            ]);
+        }
+
+        $page->createContentFromArgs($this->managers);
+
+        $data = $this->generateTemplateData('_search', $page);
         return $this->renderPage($data);
     }
 
