@@ -1,5 +1,5 @@
 <?php
-namespace Pluguns\menus;
+namespace Plugins\menus;
 
 use App\formats\MenuFormat;
 use App\Services\Data\Data;

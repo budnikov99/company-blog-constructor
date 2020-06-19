@@ -3,6 +3,7 @@ namespace Plugins\menus\controllers;
 
 use App\Services\SiteManager;
 use App\Services\ThemeManager;
+use Plugins\menus\MenuData as MenusMenuData;
 use Plugins\menus\MenuLoader;
 use Pluguns\menus\MenuData;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -23,7 +24,7 @@ class MenuController extends AbstractController {
             return new JsonResponse(['success' => false, 'message' => 'Некорректный JSON'], Response::HTTP_BAD_REQUEST);
         }
 
-        $menu = MenuData::deserialize($data);
+        $menu = MenusMenuData::deserialize($data);
         if(is_null($menu)){
             return new JsonResponse(['success' => false, 'message' => 'Некорректные данные меню'], Response::HTTP_BAD_REQUEST);
         }

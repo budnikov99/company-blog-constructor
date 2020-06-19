@@ -3,8 +3,8 @@ namespace Plugins\menus\adminpanel;
 
 use App\Plugins\AdminPanelExtension;
 use App\Services\PageManager;
+use Plugins\menus\MenuData;
 use Plugins\menus\MenuLoader;
-use Pluguns\menus\MenuData;
 use Symfony\Component\HttpFoundation\Request;
 
 class MenuEditor extends AdminPanelExtension {

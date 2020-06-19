@@ -60,6 +60,10 @@
             </div>
             <script>
                 document.getElementById('post-save-button').onclick = (evt) => {
+                    if(!post_data.title){
+                        errorPopup('Название статьи не может быть пустым');
+                        return;
+                    }
                     helpers.sendRequest('{{url.controller_url}}/post/'+post_id+'/save', JSON.stringify(post_data)).then((response) => {
                         if(response){
                             if(response.data.success){

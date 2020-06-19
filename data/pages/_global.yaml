@@ -10,5 +10,5 @@ blocks:
     header_menu: { active: true, modules: [{ module: menus/menu, menu: navigatsija }] }
     header_search: { active: true, modules: {  } }
     header_background: { active: false, modules: [{ module: _basic/image_file, url: /userfiles/images/gold.jpg, alt: '' }] }
-    footer_text: { active: false, modules: [{ module: _basic/fixed_text, text: '© Рога и Копыта 2020' }] }
+    footer_text: { active: false, modules: [{ module: _basic/fixed_text, text: '' }] }
     footer_social: { active: true, modules: [{ module: _basic/link, text: twitter, href: 'https://twitter.com' }, { module: _basic/link, text: telegram, href: 'https://telegram.com' }, { module: _basic/link, text: facebook, href: 'https://facebook.com' }, { module: _basic/link, text: vk, href: 'https://vk.com' }, { module: _basic/link, text: ok, href: 'https://ok.ru' }] }

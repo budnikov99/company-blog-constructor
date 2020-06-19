@@ -1,7 +1,7 @@
 <?php
 namespace Plugins\menus;
 
-use Pluguns\menus\MenuData;
+use Plugins\menus\MenuData;
 use Symfony\Component\Yaml\Yaml;
 
 class MenuLoader {

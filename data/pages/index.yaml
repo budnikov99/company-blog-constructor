@@ -4,7 +4,7 @@ page_content:
     categories: [distantsionnoe_obytchenie, konkyrsy, news, texnikym]
     date_start: ''
     date_end: ''
-    order: false
+    order: true
     page_size: '6'
     amount: '0'
 blocks:

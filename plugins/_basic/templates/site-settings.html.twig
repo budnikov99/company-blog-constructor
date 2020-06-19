@@ -67,8 +67,8 @@
                 helpers.sendRequest('{{url.controller_url}}/settings/reinstall').then((response) => {
                     location.href = location.href;
                 }, (response) => {
-                    if(response.response){
-                        errorPopup(response.response.message);
+                    if(response.data){
+                        errorPopup(response.data.message);
                     }else if(response.status == 403){
                         errorPopup('Недостаточно прав');
                     }else{

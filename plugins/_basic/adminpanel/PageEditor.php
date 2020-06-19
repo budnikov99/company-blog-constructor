@@ -34,32 +34,24 @@ class PageEditor extends AdminPanelExtension {
             return 'create';
         }else if($this->isPageEditable($pageid)){
             return 'edit';
+        }else if($subpath == 'list' || $subpath == 'page'){
+            return 'list';
         }else{
             return '';
         }
     }
 
     public function getSubmenu(string $subpath, Request $request){
+        $mode = $this->getMode($subpath);
         $data = [
-            'active' => '',
+            'active' => $mode,
             'items' => [
                 'create' => 'Создать страницу',
                 'global' => 'Общие настройки блоков',
+                'page' => 'Редактировать страницу',
+                'list' => 'Список страниц',
             ],
         ];
-        foreach($this->managers[PageManager::class]->getPageList() as $page){
-            if($page == '_global'){
-                continue;
-            }
-            $data['items']['page/'.$page] = $page;
-        }
-
-        $mode = $this->getMode($subpath);
-        if($mode == 'edit'){
-            $data['active'] = $subpath;
-        }else{
-            $data['active'] = $mode;
-        }
 
         return $data;
     }
@@ -68,7 +60,20 @@ class PageEditor extends AdminPanelExtension {
         $pageid = $this->getPageId($subpath)??'';
         $mode = $this->getMode($subpath);
 
-        if($mode != ''){
+        if($mode == 'list'){
+            $pages = [];
+            foreach($this->managers[PageManager::class]->getPageList() as $name){
+                if($name != '_global'){
+                    $pages[$name] = $this->managers[PageManager::class]->getCorrectedPage($name);
+                }
+            }
+            return [
+                'template' => '_basic/templates/page-editor-list.html.twig',
+                'data' => [
+                    'pages' => $pages,
+                ],
+            ];
+        }else if($mode != ''){
             $global_page = $this->managers[PageManager::class]->getGlobalPage();
 
             $modules_serialized = [];
@@ -89,16 +94,17 @@ class PageEditor extends AdminPanelExtension {
             }
 
             return [
-            'template' => '_basic/templates/page-editor.html.twig',
-            'data' => [
-                'create_mode' => $mode == 'create',
-                'global_mode' => $mode == 'global',
-                'page_id' => $pageid,
-                'page_json' => json_encode($current_page->serialize()),
-                'global_json' => json_encode($global_page->serialize()),
-                'blockinfo_json' => json_encode($blocks_serialized),
-                'modules_json' => json_encode($modules_serialized),
-                'categories' => $this->managers[PostManager::class]->loadCategories(),
+                'active' => $pageid?'page':$mode,
+                'template' => '_basic/templates/page-editor.html.twig',
+                'data' => [
+                    'create_mode' => $mode == 'create',
+                    'global_mode' => $mode == 'global',
+                    'page_id' => $pageid,
+                    'page_json' => json_encode($current_page->serialize()),
+                    'global_json' => json_encode($global_page->serialize()),
+                    'blockinfo_json' => json_encode($blocks_serialized),
+                    'modules_json' => json_encode($modules_serialized),
+                    'categories' => $this->managers[PostManager::class]->loadCategories(),
                 ],
             ];
         }

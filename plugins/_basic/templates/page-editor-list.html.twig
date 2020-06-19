@@ -1,0 +1,45 @@
+<div class="content-container flex-container-column flex-fill-container">
+    <div class="content-container-title big">
+        Список страниц
+    </div>
+    <div class="content-container-block flex-container-column">
+        {% for name, page in data.pages %}
+        <div class="block-padding-big block-border list-line">
+            <div class="list-label">
+                {% if name|first == '_' %}
+                <b>{{page.title}}</b> ({{name}})
+                {% else %}
+                <b>{{page.title}}</b> (<a href="/{{name}}">/{{name}}</a>)
+                {% endif %}
+            </div>
+            <a href="{{url.panel_url}}/page/{{name}}" class="input-button blue flex-float-right">Изменить</a>
+            <input {{name|first == '_'?'disabled'}} type="button" id="page-remove-{{name}}" class="input-button red" value="Удалить" />
+        </div>
+        <script>
+            (function(){
+                document.getElementById('page-remove-{{name}}').onclick = (evt) => {
+                    confirmPopup('Действительно удалить страницу?', () => {
+                        helpers.sendRequest('{{url.controller_url}}/page/{{name}}/remove').then((response) => {
+                            if(response.data){
+                                if(response.data.success){
+                                    location.href = location.href;
+                                }else{
+                                    errorPopup(response.data.message);
+                                }
+                            }else{
+                                errorPopup('Произошла ошибка');
+                            }
+                        }, (response) => {
+                            if(response.response){
+                                errorPopup(response.response.message);
+                            }else{
+                                errorPopup('Произошла ошибка');
+                            }
+                        });
+                    });
+                };
+            }());
+        </script>
+        {% endfor %}
+    </div>
+</div>

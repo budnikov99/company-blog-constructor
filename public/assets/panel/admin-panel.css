@@ -424,6 +424,10 @@ body, html {
     padding: 5px 10px;
 }
 
+.block-padding-big {
+    padding: 10px 20px;
+}
+
 .block-disabled {
     background: #eee;
 }
